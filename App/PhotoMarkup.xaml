@@ -1,0 +1,16 @@
+﻿<UserControl x:Class="All.PhotoMarkup"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:All"
+             mc:Ignorable="d" 
+             d:DesignHeight="400" d:DesignWidth="600">
+    <UserControl.Background>
+        <SolidColorBrush>Blue</SolidColorBrush>
+    </UserControl.Background>
+    <Canvas HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Name="CommonCanvas" ClipToBounds="True" Background="Transparent">
+        <Image Source="{Binding ImagePath, FallbackValue='pack://application:,,,/All;component/resources/checkerboard.jpg'}" IsManipulationEnabled="True" HorizontalAlignment="Left" VerticalAlignment="Top" Name="Image"/>
+        <local:PhotoCalibrationMarker x:Name="Marker"/>
+    </Canvas>
+</UserControl>
