@@ -16,6 +16,9 @@ using System.Windows.Shapes;
 
 namespace All
 {
+
+    public enum MarkupState { SettingUp, SettingBottom,SettingSide};
+
     /// <summary>
     /// Interaction logic for PhotoMarkup.xaml
     /// </summary>
@@ -26,7 +29,14 @@ namespace All
         private Point dragStartLocation = new Point();
         private PhotoCalibrationMarker currentDraggingMarker = null;
 
-        private ObservableCollection<PhotoCalibrationMarker> markers = new ObservableCollection<PhotoCalibrationMarker>();        
+        private ObservableCollection<PhotoCalibrationMarker> canvasMarkers = new ObservableCollection<PhotoCalibrationMarker>();
+        private ObservableCollection<AnnotatedPolygon> canvasPolygons = new ObservableCollection<AnnotatedPolygon>();
+
+        private List<PhotoCalibrationMarker> regionDraft = new List<PhotoCalibrationMarker>();
+
+        private List<CalibratedRegion> regions = new List<CalibratedRegion>();
+
+        private double angle = 0.0;
 
         public PhotoMarkup()
         {
@@ -34,44 +44,109 @@ namespace All
 
             CommonCanvas.MouseMove += InfoLayerCanvas_MouseMove;
 
-            //this.imageTranslation = new TranslateTransform(0, 0);
-            //this.imageScale = new ScaleTransform(0.5, 0.5);
-            //this.imageRotation = new RotateTransform(0.0);
-
-            //this.imageTransform = new TransformGroup();
-            //this.imageTransform.Children.Add(this.imageRotation);
-            //this.imageTransform.Children.Add(this.imageScale);
-            //this.imageTransform.Children.Add(this.imageTranslation);
-            //this.Image.RenderTransform = this.imageTransform;
-
             Image.ManipulationStarting += Image_ManipulationStarting;
             Image.ManipulationDelta += Image_ManipulationDelta;
 
-            this.markers.CollectionChanged += Markers_CollectionChanged;
+            this.canvasMarkers.CollectionChanged += Markers_CollectionChanged;
+            this.canvasPolygons.CollectionChanged += Polygons_CollectionChanged;
 
             var coordsTransformBinding = new Binding("RenderTransform");
             coordsTransformBinding.Source = Image;
             CommonCanvas.SetBinding(CoordTransformedCanvas.CoordsTransformProperty, coordsTransformBinding);
 
+            //temp: for emulating long touch
+            this.CommonCanvas.MouseRightButtonUp += CommonCanvas_MouseRightButtonUp;
 
-            var a = new PhotoCalibrationMarker() { CentreLocation = new Point(15.0, 15.0), MarkerName = "Верх", FillBrush = new SolidColorBrush(new Color() { R = 255, G = 150, B = 150, A = 200 }) };
-            var b = new PhotoCalibrationMarker() { CentreLocation = new Point(15.0, 255.0), MarkerName = "Низ", FillBrush = new SolidColorBrush(new Color() { R = 0, G = 255, B = 255, A = 200 }) };
-            var c = new PhotoCalibrationMarker() { CentreLocation = new Point(270.0, 75.0), MarkerName = "Сторона", FillBrush = new SolidColorBrush(new Color() { R = 255, G = 255, B = 255, A = 200 }) };
+            this.Image.MouseWheel += Image_MouseWheel;
             
-            markers.Add(a);
-            markers.Add(b);
-            markers.Add(c);
+        }
 
-            AnnotatedPolygon rect = new AnnotatedPolygon();
-            CommonCanvas.Children.Add(rect);
+        private void Image_MouseWheel(object sender, MouseWheelEventArgs e)
+        {
+            var delta = e.Delta * 0.01;
+            angle += delta;
+            Image.RenderTransform = new RotateTransform(angle);
+        }
 
-            CalibratedRegion region = new CalibratedRegion(a, b, c, rect);
+        public MarkupState CurrentState
+        {
+            get { return (MarkupState)GetValue(CurrentStateProperty); }
+            set { SetValue(CurrentStateProperty, value); }
+        }
+        
+        public static readonly DependencyProperty CurrentStateProperty =
+            DependencyProperty.Register("CurrentState", typeof(MarkupState), typeof(PhotoMarkup), new PropertyMetadata(MarkupState.SettingUp));
+
+
+
+        private void CommonCanvas_MouseRightButtonUp(object sender, MouseButtonEventArgs e)
+        {
+            PhotoCalibrationMarker toAdd = null;
+
+            Point position = e.GetPosition(CommonCanvas);
+
+            switch (CurrentState) {
+                case MarkupState.SettingUp:
+                    toAdd = new PhotoCalibrationMarker() { CentreLocation = position, MarkerName = "Верх", FillBrush = new SolidColorBrush(new Color() { R = 255, G = 150, B = 150, A = 200 }) };
+                    CurrentState = MarkupState.SettingBottom;
+                    break;
+                case MarkupState.SettingBottom:
+                    toAdd = new PhotoCalibrationMarker() { CentreLocation = position, MarkerName = "Низ", FillBrush = new SolidColorBrush(new Color() { R = 0, G = 255, B = 255, A = 200 }) };
+                    CurrentState = MarkupState.SettingSide;
+                    break;
+                case MarkupState.SettingSide:
+                    toAdd = new PhotoCalibrationMarker() { CentreLocation = position, MarkerName = "Сторона", FillBrush = new SolidColorBrush(new Color() { R = 255, G = 255, B = 255, A = 200 }) };
+                    CurrentState = MarkupState.SettingUp;
+                    break;
+            }
+            canvasMarkers.Add(toAdd);
+            regionDraft.Add(toAdd);
+
+            if (regionDraft.Count == 3) {
+                //draft is ready
+                AnnotatedPolygon rect = new AnnotatedPolygon();
+                CommonCanvas.Children.Add(rect);
+
+                CalibratedRegion region = new CalibratedRegion(regionDraft[0], regionDraft[1], regionDraft[2], rect);
+                regions.Add(region);
+                regionDraft.Clear();
+            }
 
         }
 
-        private void Markers_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        private void Polygons_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
         {
-            //all of the markers respect coords transform
+            if (e.NewItems != null)
+            {
+                foreach (var obj in e.NewItems)
+                {
+                    AnnotatedPolygon poly = (AnnotatedPolygon)obj;
+                    
+                    poly.MouseUp += Poly_MouseUp;
+
+                    CommonCanvas.Children.Insert(1,poly);
+                    Canvas.SetZIndex(poly,1);
+                }
+            }
+
+            if (e.OldItems != null)
+            {
+                foreach (var obj in e.OldItems)
+                {
+                    AnnotatedPolygon poly = (AnnotatedPolygon)obj;
+                    poly.MouseUp -= Poly_MouseUp;
+                    CommonCanvas.Children.Remove(poly);
+                }
+            }
+        }
+
+        private void Poly_MouseUp(object sender, MouseButtonEventArgs e)
+        {
+            throw new NotImplementedException();
+        }
+        
+        private void Markers_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        {            
             if (e.NewItems != null)
             {
                 foreach (var obj in e.NewItems)
@@ -82,6 +157,7 @@ namespace All
                     marker.MouseUp += Marker_MouseUp;
 
                     CommonCanvas.Children.Add(marker);
+                    Canvas.SetZIndex(marker, 2);
                 }
             }
 
@@ -90,7 +166,8 @@ namespace All
                 foreach (var obj in e.OldItems)
                 {
                     PhotoCalibrationMarker marker = (PhotoCalibrationMarker)obj;
-                    
+                    marker.MouseDown -= Marker_MouseDown;
+                    marker.MouseUp -= Marker_MouseUp;
                     CommonCanvas.Children.Remove(marker);
                 }
             }

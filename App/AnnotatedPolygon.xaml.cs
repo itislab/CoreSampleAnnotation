@@ -44,14 +44,15 @@ namespace All
             return new Point(Xt, Yt);
         }
 
-        private void UpdateRectCorners() {
-            Point T = GetNormalIntersection(BottomCentre, UpCentre, Side);
+        private void UpdateRectCorners(Point bottom, Point up, Point side) {
+            Point T = GetNormalIntersection(bottom, up, side);
             Vector toSide = Side - T;
             Point upperLeft = UpCentre - toSide;
             Point upperRight = UpCentre + toSide;
             Point lowerLeft = BottomCentre - toSide;
             Point lowerRight = BottomCentre + toSide;
             Polygon.Points = new PointCollection(new Point[] { upperLeft, upperRight, lowerRight, lowerLeft });
+            System.Diagnostics.Debug.WriteLine("rect updated due to points update");
         }
 
         public Point UpCentre
@@ -61,7 +62,10 @@ namespace All
         }
 
         public static readonly DependencyProperty UpCentreProperty =
-            DependencyProperty.Register("UpCentre", typeof(Point), typeof(AnnotatedPolygon), new PropertyMetadata(new Point(1.0,0.0),(obj,arg) => { ((AnnotatedPolygon)obj).UpdateRectCorners();}));
+            DependencyProperty.Register("UpCentre", typeof(Point), typeof(AnnotatedPolygon), new PropertyMetadata(new Point(1.0,0.0),(obj,arg) => {
+                var ap = (AnnotatedPolygon)obj;                
+                ap.UpdateRectCorners(ap.BottomCentre, (Point)arg.NewValue, ap.Side);
+            }));
 
 
 
@@ -73,7 +77,10 @@ namespace All
 
         // Using a DependencyProperty as the backing store for BottomCentre.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty BottomCentreProperty =
-            DependencyProperty.Register("BottomCentre", typeof(Point), typeof(AnnotatedPolygon), new PropertyMetadata(new Point(1.0,1.0), (obj,arg) => { ((AnnotatedPolygon)obj).UpdateRectCorners(); }));
+            DependencyProperty.Register("BottomCentre", typeof(Point), typeof(AnnotatedPolygon), new PropertyMetadata(new Point(1.0,1.0), (obj,arg) => {
+                var ap = (AnnotatedPolygon)obj;
+                ap.UpdateRectCorners((Point)arg.NewValue,ap.UpCentre , ap.Side);
+            }));
 
 
 
@@ -85,13 +92,18 @@ namespace All
 
         // Using a DependencyProperty as the backing store for Side.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty SideProperty =
-            DependencyProperty.Register("Side", typeof(Point), typeof(AnnotatedPolygon), new PropertyMetadata(new Point(2.0, 0.5), (obj, arg) => { ((AnnotatedPolygon)obj).UpdateRectCorners(); }));
+            DependencyProperty.Register("Side", typeof(Point), typeof(AnnotatedPolygon), new PropertyMetadata(new Point(2.0, 0.5), (obj, arg) => {
+                var ap = (AnnotatedPolygon)obj;
+                ap.UpdateRectCorners(ap.BottomCentre, ap.UpCentre, (Point)arg.NewValue);
+            }));
         
 
         public void ChangeCoordTransform(Transform oldTransformInv, Transform newTransform)
         {
-            var points = Polygon.Points;
-            Polygon.Points =new PointCollection(points.Select(p => newTransform.Transform(oldTransformInv.Transform(p))));
+            this.UpdateRectCorners(this.BottomCentre, this.UpCentre, this.Side);
+            //var points = Polygon.Points;
+            //Polygon.Points =new PointCollection(points.Select(p => newTransform.Transform(oldTransformInv.Transform(p))));
+            System.Diagnostics.Debug.WriteLine("transform reapplied");
         }
     }
 }
