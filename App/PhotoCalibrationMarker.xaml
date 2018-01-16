@@ -14,7 +14,7 @@
         <Line xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" X1="21" Y1="6" X2="21" Y2="36" Name="e2_line" StrokeThickness="1" Stroke="#FF000000"/>
         <Line xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" X1="6" Y1="21" X2="36" Y2="21" Name="e3_line" StrokeThickness="1" Stroke="#FF000000"/>
 
-        <Border Canvas.Left="50" Background="{Binding FillBrush, FallbackValue='#AA00FFFF'}" Visibility="{Binding IsNameVisible, Converter={StaticResource collapsedConverter}, FallbackValue=Visible}">
+        <Border Canvas.Left="50" Background="{Binding FillBrush, FallbackValue='#AA00FFFF'}">
             <Border.BorderThickness>1</Border.BorderThickness>
             <Border.BorderBrush>Black</Border.BorderBrush>
             <Border.CornerRadius>15</Border.CornerRadius>

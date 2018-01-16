@@ -24,30 +24,56 @@ namespace All
         private bool isDragging = false;
         private Point markerClickOffset = new Point();
         private Point dragStartLocation = new Point();
-        private PhotoCalibrationMarker currentDraggingMarker = null;
+        private UIElement currentDraggingElement = null;
 
-        private ObservableCollection<PhotoCalibrationMarker> markers = new ObservableCollection<PhotoCalibrationMarker>();        
+
+
+        public static bool GetDraggable(DependencyObject obj)
+        {
+            return (bool)obj.GetValue(DraggableProperty);
+        }
+
+        public static void SetDraggable(DependencyObject obj, bool value)
+        {
+            obj.SetValue(DraggableProperty, value);
+        }
+        
+        public static readonly DependencyProperty DraggableProperty =
+            DependencyProperty.RegisterAttached("Draggable", typeof(bool), typeof(PhotoMarkup), new PropertyMetadata(true));
+
+
+
+
+        public ObservableCollection<UIElement> Children
+        {
+            get { return (ObservableCollection<UIElement>)GetValue(ChildrenProperty); }
+            set { SetValue(ChildrenProperty, value); }
+        }
+
+        // Using a DependencyProperty as the backing store for Children.  This enables animation, styling, binding, etc...
+        public static readonly DependencyProperty ChildrenProperty =
+            DependencyProperty.Register("Children", typeof(ObservableCollection<UIElement>), typeof(PhotoMarkup), new PropertyMetadata(new ObservableCollection<UIElement>(),(obj,arg) =>
+            {
+                PhotoMarkup pm = (PhotoMarkup)obj;
+                if (arg.OldValue != null) {
+                    ObservableCollection<UIElement> oldCollection = (ObservableCollection<UIElement>)arg.OldValue;
+                    oldCollection.CollectionChanged -= pm.Children_CollectionContentChanged;
+                }
+                if (arg.NewValue != null) {
+                    ObservableCollection<UIElement> newCollection = (ObservableCollection<UIElement>)arg.NewValue;
+                    newCollection.CollectionChanged += pm.Children_CollectionContentChanged;
+                }
+            }
+            ));             
 
         public PhotoMarkup()
         {
             InitializeComponent();
 
             CommonCanvas.MouseMove += InfoLayerCanvas_MouseMove;
-
-            //this.imageTranslation = new TranslateTransform(0, 0);
-            //this.imageScale = new ScaleTransform(0.5, 0.5);
-            //this.imageRotation = new RotateTransform(0.0);
-
-            //this.imageTransform = new TransformGroup();
-            //this.imageTransform.Children.Add(this.imageRotation);
-            //this.imageTransform.Children.Add(this.imageScale);
-            //this.imageTransform.Children.Add(this.imageTranslation);
-            //this.Image.RenderTransform = this.imageTransform;
-
+            
             Image.ManipulationStarting += Image_ManipulationStarting;
             Image.ManipulationDelta += Image_ManipulationDelta;
-
-            this.markers.CollectionChanged += Markers_CollectionChanged;
 
             var coordsTransformBinding = new Binding("RenderTransform");
             coordsTransformBinding.Source = Image;
@@ -69,18 +95,17 @@ namespace All
 
         }
 
-        private void Markers_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        private void Children_CollectionContentChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
         {
             //all of the markers respect coords transform
             if (e.NewItems != null)
             {
                 foreach (var obj in e.NewItems)
                 {
-                    PhotoCalibrationMarker marker = (PhotoCalibrationMarker)obj;
+                    UIElement marker = (UIElement)obj;
                     
                     marker.MouseDown += Marker_MouseDown;
                     marker.MouseUp += Marker_MouseUp;
-
                     CommonCanvas.Children.Add(marker);
                 }
             }
@@ -89,8 +114,7 @@ namespace All
             {
                 foreach (var obj in e.OldItems)
                 {
-                    PhotoCalibrationMarker marker = (PhotoCalibrationMarker)obj;
-                    
+                    UIElement marker = (UIElement)obj;                    
                     CommonCanvas.Children.Remove(marker);
                 }
             }
@@ -107,11 +131,11 @@ namespace All
 
         private void Marker_MouseDown(object sender, MouseButtonEventArgs e)
         {
-            var marker = (PhotoCalibrationMarker)sender;
+            var marker = (UIElement)sender;
             isDragging = true;
-            this.currentDraggingMarker = marker;
+            this.currentDraggingElement = marker;
             this.markerClickOffset = e.GetPosition(CommonCanvas);
-            this.dragStartLocation = marker.CentreLocation;
+            this.dragStartLocation = new Point(Canvas.GetLeft(marker),Canvas.GetTop(marker));
             e.Handled = true;
         }
 
@@ -121,8 +145,8 @@ namespace All
             {
                 var pos = e.GetPosition(CommonCanvas);
                 var offset = new Point(pos.X - this.markerClickOffset.X, pos.Y - this.markerClickOffset.Y);
-                var newLoc = new Point(this.dragStartLocation.X + offset.X, this.dragStartLocation.Y + offset.Y);
-                this.currentDraggingMarker.CentreLocation = newLoc;                
+                Canvas.SetLeft(this.currentDraggingElement,this.dragStartLocation.X + offset.X);
+                Canvas.SetTop(this.currentDraggingElement, this.dragStartLocation.Y + offset.Y);                
             }
         }
 

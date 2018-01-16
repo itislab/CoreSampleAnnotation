@@ -65,6 +65,7 @@
     <Compile Include="PhotoCalibrationMarker.xaml.cs">
       <DependentUpon>PhotoCalibrationMarker.xaml</DependentUpon>
     </Compile>
+    <Compile Include="PhotoCalibrationMarkerVM.cs" />
     <Compile Include="PhotoMarkup.xaml.cs">
       <DependentUpon>PhotoMarkup.xaml</DependentUpon>
     </Compile>
