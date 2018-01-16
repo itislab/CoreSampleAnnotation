@@ -9,8 +9,12 @@
     <UserControl.Background>
         <SolidColorBrush>Blue</SolidColorBrush>
     </UserControl.Background>
-    <Canvas HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Name="CommonCanvas" ClipToBounds="True" Background="Transparent">
+    <local:CoordTransformedCanvas HorizontalAlignment="Stretch" VerticalAlignment="Stretch" x:Name="CommonCanvas" ClipToBounds="True" Background="Transparent">
         <Image Source="{Binding ImagePath, FallbackValue='pack://application:,,,/All;component/resources/checkerboard.jpg'}" IsManipulationEnabled="True" HorizontalAlignment="Left" VerticalAlignment="Top" Name="Image"/>
-        <local:PhotoCalibrationMarker x:Name="Marker"/>
-    </Canvas>
+        <!--<Polygon Points="300,200 400,125 400,275 300,200" Stroke="Purple" StrokeThickness="2">
+            <Polygon.Fill>
+                <SolidColorBrush Color="Blue" Opacity="0.4"/>
+            </Polygon.Fill>
+        </Polygon>-->
+    </local:CoordTransformedCanvas>
 </UserControl>

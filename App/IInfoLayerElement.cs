@@ -9,6 +9,6 @@ namespace All
 {
     interface IInfoLayerElement
     {
-        void ApplyCoordsTransform(Transform transform);
+        void ChangeCoordTransform(Transform oldTransformInv, Transform newTransform);
     }
 }

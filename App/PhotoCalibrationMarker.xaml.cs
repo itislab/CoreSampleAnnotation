@@ -18,7 +18,7 @@ namespace All
     /// <summary>
     /// Works with canvas
     /// </summary>
-    public partial class PhotoCalibrationMarker : UserControl
+    public partial class PhotoCalibrationMarker : UserControl, IInfoLayerElement
     {
         private Transform ActiveCoordsTransform = null;
         private Point CentreOffset = new Point();        
@@ -26,47 +26,41 @@ namespace All
         public PhotoCalibrationMarker()
         {
             InitializeComponent();
-            Binding bd = new Binding("CentreLocation");
-            bd.Source = this;
-            bd.Mode = BindingMode.TwoWay;
             this.CentreOffset = new Point(21.0, 21.0);
-            this.SetBinding(PhotoCalibrationMarker.InternalCentreLocationProperty, bd);            
+            this.DataContext = this;
         }
 
-        public Brush FillBrash
+        public Brush FillBrush
         {
-            get { return (Brush)GetValue(FillBrashProperty); }
-            set { SetValue(FillBrashProperty, value); }
+            get { return (Brush)GetValue(FillBrushProperty); }
+            set { SetValue(FillBrushProperty, value); }
         }
 
-        public static readonly DependencyProperty FillBrashProperty =
-            DependencyProperty.Register("FillBrash", typeof(Brush), typeof(PhotoCalibrationMarker), new PropertyMetadata(new SolidColorBrush(Colors.AliceBlue)));
+        public static readonly DependencyProperty FillBrushProperty =
+            DependencyProperty.Register("FillBrush", typeof(Brush), typeof(PhotoCalibrationMarker), new PropertyMetadata(new SolidColorBrush(Colors.AliceBlue)));
 
 
 
-        public Transform CoordsTransform
+        public string MarkerName
         {
-            get { return (Transform)GetValue(CoordsTransformProperty); }
-            set { SetValue(CoordsTransformProperty, value); }
+            get { return (string)GetValue(MarkerNameProperty); }
+            set { SetValue(MarkerNameProperty, value); }
         }
 
-        // Using a DependencyProperty as the backing store for CoordsTransform.  This enables animation, styling, binding, etc...
-        public static readonly DependencyProperty CoordsTransformProperty =
-            DependencyProperty.Register("CoordsTransform", typeof(Transform), typeof(PhotoCalibrationMarker), new PropertyMetadata(null, (obj,args) => {
-                if ((args.OldValue != null) && (args.NewValue != null))
-                {
-                    var marker = obj as PhotoCalibrationMarker;
+        // Using a DependencyProperty as the backing store for MarkerName.  This enables animation, styling, binding, etc...
+        public static readonly DependencyProperty MarkerNameProperty =
+            DependencyProperty.Register("MarkerName", typeof(string), typeof(PhotoCalibrationMarker), new PropertyMetadata("Marker"));        
 
-                    var orig = (args.OldValue as Transform).Inverse;
-                    var newVal = args.NewValue as Transform;
-                    var centre = marker.InternalCentreLocation;
-                    var origCentre = orig.Transform(centre);
-                    var newCentre = newVal.Transform(origCentre);
-                    marker.InternalCentreLocation = newCentre;
-                    //System.Diagnostics.Debug.WriteLine("Marker centre is now at "+newCentre.ToString());
-                }
-            }));
+        public bool IsNameVisible
+        {
+            get { return (bool)GetValue(IsNameVisibleProperty); }
+            set { SetValue(IsNameVisibleProperty, value); }
+        }
         
+        public static readonly DependencyProperty IsNameVisibleProperty =
+            DependencyProperty.Register("IsNameVisible", typeof(bool), typeof(PhotoCalibrationMarker), new PropertyMetadata(true));
+
+
 
         public Point CentreLocation
         {
@@ -81,20 +75,12 @@ namespace All
                 Point newLocation = new Point(p.X - marker.CentreOffset.X, p.Y - marker.CentreOffset.Y);
                 Canvas.SetLeft(marker, newLocation.X);
                 Canvas.SetTop(marker, newLocation.Y);
-                System.Diagnostics.Debug.WriteLine("Marker target to "+p.ToString());
+                //System.Diagnostics.Debug.WriteLine("Marker target to "+p.ToString());
             })));
 
-
-        /// <summary>
-        /// To be updated with mouse and touch events
-        /// </summary>
-        private Point InternalCentreLocation
+        public void ChangeCoordTransform(Transform oldTransformInv, Transform newTransform)
         {
-            get { return (Point)GetValue(InternalCentreLocationProperty); }
-            set { SetValue(InternalCentreLocationProperty, value); }
+            CentreLocation = newTransform.Transform(oldTransformInv.Transform(CentreLocation));
         }
-
-        private static readonly DependencyProperty InternalCentreLocationProperty =
-            DependencyProperty.Register("InternalCentreLocation", typeof(Point), typeof(PhotoCalibrationMarker), new PropertyMetadata(new Point(10.0, 10.0)));        
     }
 }
