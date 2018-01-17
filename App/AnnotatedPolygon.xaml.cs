@@ -51,8 +51,10 @@ namespace All
             Point upperRight = UpCentre + toSide;
             Point lowerLeft = BottomCentre - toSide;
             Point lowerRight = BottomCentre + toSide;
-            Polygon.Points = new PointCollection(new Point[] { upperLeft, upperRight, lowerRight, lowerLeft });
-            System.Diagnostics.Debug.WriteLine("rect updated due to points update");
+            var pointsCollection = new PointCollection(new Point[] { upperLeft, upperRight, lowerRight, lowerLeft });
+            PolygonBorder.Points = pointsCollection;
+            PolygonFill.Points = pointsCollection;
+            //System.Diagnostics.Debug.WriteLine("rect updated due to points update");
         }
 
         public Point UpCentre
@@ -103,7 +105,7 @@ namespace All
             this.UpdateRectCorners(this.BottomCentre, this.UpCentre, this.Side);
             //var points = Polygon.Points;
             //Polygon.Points =new PointCollection(points.Select(p => newTransform.Transform(oldTransformInv.Transform(p))));
-            System.Diagnostics.Debug.WriteLine("transform reapplied");
+            //System.Diagnostics.Debug.WriteLine("transform reapplied");
         }
     }
 }

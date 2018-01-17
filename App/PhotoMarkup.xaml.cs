@@ -30,11 +30,12 @@ namespace All
         private PhotoCalibrationMarker currentDraggingMarker = null;
 
         private ObservableCollection<PhotoCalibrationMarker> canvasMarkers = new ObservableCollection<PhotoCalibrationMarker>();
-        private ObservableCollection<AnnotatedPolygon> canvasPolygons = new ObservableCollection<AnnotatedPolygon>();
+        private ObservableCollection<AnnotatedPolygon> canvasPolygons = new ObservableCollection<AnnotatedPolygon>();        
+
+        private Dictionary<AnnotatedPolygon, CalibratedRegionVM> polygonDict = new Dictionary<AnnotatedPolygon, CalibratedRegionVM>();
 
         private List<PhotoCalibrationMarker> regionDraft = new List<PhotoCalibrationMarker>();
-
-        private List<CalibratedRegion> regions = new List<CalibratedRegion>();
+        private List<CalibratedRegionVM> regions = new List<CalibratedRegionVM>();
 
         private double angle = 0.0;
 
@@ -58,6 +59,8 @@ namespace All
             this.CommonCanvas.MouseRightButtonUp += CommonCanvas_MouseRightButtonUp;
 
             this.Image.MouseWheel += Image_MouseWheel;
+
+            RegionInfoView.Visibility = Visibility.Collapsed;
             
         }
 
@@ -77,7 +80,50 @@ namespace All
         public static readonly DependencyProperty CurrentStateProperty =
             DependencyProperty.Register("CurrentState", typeof(MarkupState), typeof(PhotoMarkup), new PropertyMetadata(MarkupState.SettingUp));
 
+        /// <summary>
+        /// Binds the View (e.g. IInfoLayerElements that are on the CoodTranformedCanvas) to the 
+        /// </summary>
+        /// <param name="up">Upper point of the core sample main axis</param>
+        /// <param name="bottom">Bottom point of the core sample main axis</param>
+        /// <param name="side">Any point that is on the side of the core sampe</param>
+        /// <param name="poly">An annotated polygon, that highlights the core sample</param>
+        /// <param name="vm">View Model that desribes the region</param>
+        private static void BindInfoLayer(PhotoCalibrationMarker up, PhotoCalibrationMarker bottom, PhotoCalibrationMarker side, AnnotatedPolygon poly, CalibratedRegionVM vm) {
+            var b1 = new Binding("CentreLocation");
+            b1.Source = up;
+            poly.SetBinding(AnnotatedPolygon.UpCentreProperty, b1);
 
+            var b2 = new Binding("CentreLocation");
+            b2.Source = bottom;
+            poly.SetBinding(AnnotatedPolygon.BottomCentreProperty, b2);
+
+            var b3 = new Binding("CentreLocation");
+            b3.Source = side;
+            poly.SetBinding(AnnotatedPolygon.SideProperty, b3);
+
+            var visConverter = new CollapsedConverter();
+            
+            var b4 = new Binding(nameof(vm.IsFocused));
+            b4.Source = vm;
+            b4.Converter = visConverter;
+            up.SetBinding(UIElement.VisibilityProperty, b4);
+
+            var b5 = new Binding(nameof(vm.IsFocused));
+            b5.Source = vm;
+            b5.Converter = visConverter;
+            bottom.SetBinding(UIElement.VisibilityProperty, b5);
+
+            var b6 = new Binding(nameof(vm.IsFocused));
+            b6.Source = vm;
+            b6.Converter = visConverter;
+            side.SetBinding(UIElement.VisibilityProperty, b6);
+
+        }
+
+        private void AttachRegionViewToRegion(CalibratedRegionVM vm) {
+            RegionInfoView.Visibility = Visibility.Visible;
+            RegionInfoView.DataContext = vm;
+        }
 
         private void CommonCanvas_MouseRightButtonUp(object sender, MouseButtonEventArgs e)
         {
@@ -102,16 +148,59 @@ namespace All
             canvasMarkers.Add(toAdd);
             regionDraft.Add(toAdd);
 
-            if (regionDraft.Count == 3) {
+            if (regionDraft.Count == 3)
+            {
                 //draft is ready
                 AnnotatedPolygon rect = new AnnotatedPolygon();
                 CommonCanvas.Children.Add(rect);
 
-                CalibratedRegion region = new CalibratedRegion(regionDraft[0], regionDraft[1], regionDraft[2], rect);
-                regions.Add(region);
+                rect.MouseRightButtonUp += Poly_MouseRightButtonUp;
+
+                CalibratedRegionVM vm = new CalibratedRegionVM();
+                vm.Order = polygonDict.Count + 1;
+                vm.IsFocused = true;                
+                BindInfoLayer(regionDraft[0], regionDraft[1], regionDraft[2], rect, vm);
+                regions.Add(vm);
                 regionDraft.Clear();
+
+                polygonDict.Add(rect, vm);
+
+                AttachRegionViewToRegion(vm);
+            }
+            else {
+                UnfocusAllRegions();
             }
 
+        }
+
+        private void UnfocusAllRegions() {
+            foreach (var pair in polygonDict)
+            {
+                pair.Value.IsFocused = false;
+            }
+
+            RegionInfoView.Visibility = Visibility.Collapsed;
+        }
+
+        private void CleanDraftMarkers() {            
+            foreach (var marker in regionDraft) {
+                canvasMarkers.Remove(marker);
+            }
+            regionDraft.Clear();
+            CurrentState = MarkupState.SettingUp;
+        }
+
+        private void Poly_MouseRightButtonUp(object sender, MouseButtonEventArgs e)
+        {
+            CleanDraftMarkers();
+            UnfocusAllRegions();
+
+            var vm = polygonDict[(AnnotatedPolygon)sender];
+            vm.IsFocused = true;
+
+            AttachRegionViewToRegion(vm);
+            
+            e.Handled = true;
         }
 
         private void Polygons_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
@@ -122,7 +211,7 @@ namespace All
                 {
                     AnnotatedPolygon poly = (AnnotatedPolygon)obj;
                     
-                    poly.MouseUp += Poly_MouseUp;
+                    poly.MouseUp += Poly_MouseRightButtonUp;
 
                     CommonCanvas.Children.Insert(1,poly);
                     Canvas.SetZIndex(poly,1);
@@ -134,16 +223,11 @@ namespace All
                 foreach (var obj in e.OldItems)
                 {
                     AnnotatedPolygon poly = (AnnotatedPolygon)obj;
-                    poly.MouseUp -= Poly_MouseUp;
+                    poly.MouseUp -= Poly_MouseRightButtonUp;
                     CommonCanvas.Children.Remove(poly);
                 }
             }
-        }
-
-        private void Poly_MouseUp(object sender, MouseButtonEventArgs e)
-        {
-            throw new NotImplementedException();
-        }
+        }        
         
         private void Markers_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
         {            

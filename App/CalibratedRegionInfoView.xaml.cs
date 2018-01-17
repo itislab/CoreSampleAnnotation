@@ -14,22 +14,15 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 
 namespace All
-{   
+{
     /// <summary>
-    /// Interaction logic for MainWindow.xaml
+    /// Interaction logic for CalibratedRegionInfoView.xaml
     /// </summary>
-    public partial class MainWindow : Window
+    public partial class CalibratedRegionInfoView : UserControl
     {
-        public MainWindow()
+        public CalibratedRegionInfoView()
         {
             InitializeComponent();
-            Loaded += MainWindow_Loaded;
-        }
-
-        private void MainWindow_Loaded(object sender, RoutedEventArgs e)
-        {
-            var vm = new PhotoMarkupVM();
-            this.Markup.DataContext = vm;
         }
     }
 }

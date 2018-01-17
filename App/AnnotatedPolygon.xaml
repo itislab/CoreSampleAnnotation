@@ -7,6 +7,7 @@
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300">
     <Canvas>
-        <Polygon Name="Polygon" Stroke="Red" StrokeThickness="2"/>
+        <Polygon Name="PolygonBorder" Stroke="Red" StrokeThickness="2"/>
+        <Polygon Name="PolygonFill" Fill="Red" Opacity="0.01" StrokeThickness="0"/>
     </Canvas>
 </UserControl>
