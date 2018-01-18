@@ -24,12 +24,20 @@ namespace All
         {
             InitializeComponent();
             Loaded += MainWindow_Loaded;
+            PreviewKeyDown += new KeyEventHandler(HandleEsc);
         }
 
         private void MainWindow_Loaded(object sender, RoutedEventArgs e)
         {
             var vm = new PhotoMarkupVM();
             this.Markup.DataContext = vm;
+            Activate();
+        }
+
+        private void HandleEsc(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Escape)
+                Close();
         }
     }
 }

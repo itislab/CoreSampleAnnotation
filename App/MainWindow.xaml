@@ -5,6 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:All"
         mc:Ignorable="d"
+        WindowStyle="None" ResizeMode="NoResize" 
         Title="Описание керна" Height="350" Width="525" WindowState="Maximized">
     <Grid>
         <local:PhotoMarkup x:Name="Markup" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>

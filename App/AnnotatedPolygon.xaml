@@ -7,12 +7,14 @@
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300">
     <UserControl.Resources>
-        <local:UpBotomSideToRectConverter x:Key="upBotomSideToRectConverter"/>
+        <local:UpBottomSideToRectConverter x:Key="upBottomSideToRectConverter"/>
+        <local:LabelTransformConverter x:Key="labelTransformConverter"/>
+        <local:LabelTextConverter x:Key="labelTextConverter"/>
     </UserControl.Resources>
     <Canvas>
         <Polygon Name="PolygonBorder" Stroke="Red" StrokeThickness="2">
             <Polygon.Points>
-                <MultiBinding Converter="{StaticResource upBotomSideToRectConverter}">
+                <MultiBinding Converter="{StaticResource upBottomSideToRectConverter}">
                     <Binding Path="Bottom" />
                     <Binding Path="Up" />
                     <Binding Path="Side" />
@@ -21,13 +23,27 @@
         </Polygon>
         <Polygon Name="PolygonFill" Fill="Red" Opacity="0.01" StrokeThickness="0">
             <Polygon.Points>
-                <MultiBinding Converter="{StaticResource upBotomSideToRectConverter}">
+                <MultiBinding Converter="{StaticResource upBottomSideToRectConverter}">
                     <Binding Path="Bottom" />
                     <Binding Path="Up" />
                     <Binding Path="Side" />
                 </MultiBinding>
             </Polygon.Points>
         </Polygon>
-        <Label Name="LabelElem" Foreground="Red" Content="{Binding Order}"></Label>
+        <Label Name="LabelElem" Foreground="Red" FontSize="30">
+            <Label.Content>
+                <MultiBinding Converter="{StaticResource labelTextConverter}">
+                    <Binding Path="Order" />
+                    <Binding Path="Length" />
+                </MultiBinding>
+            </Label.Content>
+            <Label.RenderTransform>
+                <MultiBinding Converter="{StaticResource labelTransformConverter}">
+                    <Binding Path="Bottom" />
+                    <Binding Path="Up" />
+                    <Binding Path="Side" />
+                </MultiBinding>
+            </Label.RenderTransform>
+        </Label>
     </Canvas>
 </UserControl>

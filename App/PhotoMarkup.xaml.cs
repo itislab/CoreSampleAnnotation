@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Timers;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -17,7 +18,7 @@ using System.Windows.Shapes;
 namespace All
 {
 
-    public enum MarkupState { SettingUp, SettingBottom,SettingSide};
+    public enum MarkupState { SettingUp, SettingBottom, SettingSide };
 
     /// <summary>
     /// Interaction logic for PhotoMarkup.xaml
@@ -30,7 +31,7 @@ namespace All
         private PhotoCalibrationMarker currentDraggingMarker = null;
 
         private ObservableCollection<PhotoCalibrationMarker> canvasMarkers = new ObservableCollection<PhotoCalibrationMarker>();
-        private ObservableCollection<AnnotatedPolygon> canvasPolygons = new ObservableCollection<AnnotatedPolygon>();        
+        private ObservableCollection<AnnotatedPolygon> canvasPolygons = new ObservableCollection<AnnotatedPolygon>();
 
         private Dictionary<AnnotatedPolygon, CalibratedRegionVM> polygonDict = new Dictionary<AnnotatedPolygon, CalibratedRegionVM>();
 
@@ -38,6 +39,9 @@ namespace All
         private List<CalibratedRegionVM> regions = new List<CalibratedRegionVM>();
 
         private double angle = 0.0;
+
+        private Point touchPoint;
+        private Timer holdTimer = null;
 
         public PhotoMarkup()
         {
@@ -48,6 +52,10 @@ namespace All
             Image.ManipulationStarting += Image_ManipulationStarting;
             Image.ManipulationDelta += Image_ManipulationDelta;
 
+            Image.PreviewTouchDown += Image_TouchDown;
+            Image.PreviewTouchUp += Image_TouchUp;
+            Image.PreviewTouchMove += Image_TouchMove;
+
             this.canvasMarkers.CollectionChanged += Markers_CollectionChanged;
             this.canvasPolygons.CollectionChanged += Polygons_CollectionChanged;
 
@@ -57,11 +65,70 @@ namespace All
 
             //temp: for emulating long touch
             this.CommonCanvas.MouseRightButtonUp += CommonCanvas_MouseRightButtonUp;
-
             this.Image.MouseWheel += Image_MouseWheel;
 
             RegionInfoView.Visibility = Visibility.Collapsed;
-            
+
+        }
+
+        private void Image_TouchMove(object sender, TouchEventArgs e)
+        {
+            var curTouchPoint = e.GetTouchPoint(CommonCanvas);
+            var dist = (touchPoint - curTouchPoint.Position).Length;
+            if (dist > 5)
+            {
+                //diactivating touch and hold
+                if (holdTimer != null)
+                {
+                    System.Diagnostics.Debug.WriteLine("touch-hold timer diactivated due to move ({0})",dist);
+                    holdTimer.Elapsed -= HoldTimer_Elapsed;
+                    holdTimer.Stop();
+                    holdTimer = null;
+                }
+            }
+        }
+
+        private void HoldTimer_Elapsed(object sender, ElapsedEventArgs e)
+        {
+            Dispatcher.BeginInvoke((Action)(() =>
+            {
+                PlaceMarker(touchPoint);
+            }));
+            if (holdTimer != null)
+            {
+                System.Diagnostics.Debug.WriteLine("touch-hold timer diactivated as it ticked");
+                holdTimer.Elapsed -= HoldTimer_Elapsed;
+                holdTimer.Stop();
+                holdTimer = null;
+            }
+        }
+
+        private void Image_TouchUp(object sender, TouchEventArgs e)
+        {
+            if (holdTimer != null)
+            {
+                System.Diagnostics.Debug.WriteLine("touch-hold timer diactivated due to up event");
+                holdTimer.Elapsed -= HoldTimer_Elapsed;
+                holdTimer.Stop();
+                holdTimer = null;
+            }
+        }
+
+        private void Image_TouchDown(object sender, TouchEventArgs e)
+        {
+            touchPoint = e.GetTouchPoint(CommonCanvas).Position;
+            if (holdTimer != null)
+            {
+                System.Diagnostics.Debug.WriteLine("touch-hold timer diactivated as the new one starting");
+                holdTimer.Elapsed -= HoldTimer_Elapsed;
+                holdTimer.Stop();
+                holdTimer = null;
+            }
+            holdTimer = new Timer(1000);
+            holdTimer.Elapsed += HoldTimer_Elapsed;
+            holdTimer.Start();
+            System.Diagnostics.Debug.WriteLine("touch-hold timer activated");
+            UnfocusAllRegions();
         }
 
         private void Image_MouseWheel(object sender, MouseWheelEventArgs e)
@@ -76,7 +143,7 @@ namespace All
             get { return (MarkupState)GetValue(CurrentStateProperty); }
             set { SetValue(CurrentStateProperty, value); }
         }
-        
+
         public static readonly DependencyProperty CurrentStateProperty =
             DependencyProperty.Register("CurrentState", typeof(MarkupState), typeof(PhotoMarkup), new PropertyMetadata(MarkupState.SettingUp));
 
@@ -88,7 +155,8 @@ namespace All
         /// <param name="side">Any point that is on the side of the core sampe</param>
         /// <param name="poly">An annotated polygon, that highlights the core sample</param>
         /// <param name="vm">View Model that desribes the region</param>
-        private static void BindInfoLayer(PhotoCalibrationMarker up, PhotoCalibrationMarker bottom, PhotoCalibrationMarker side, AnnotatedPolygon poly, CalibratedRegionVM vm) {
+        private static void BindInfoLayer(PhotoCalibrationMarker up, PhotoCalibrationMarker bottom, PhotoCalibrationMarker side, AnnotatedPolygon poly, CalibratedRegionVM vm)
+        {
             vm.Up = up.CentreLocation;
             vm.Bottom = bottom.CentreLocation;
             vm.Side = side.CentreLocation;
@@ -109,7 +177,7 @@ namespace All
             side.SetBinding(PhotoCalibrationMarker.CentreLocationLocationProperty, b3);
 
             var visConverter = new CollapsedConverter();
-            
+
             var b4 = new Binding(nameof(vm.IsFocused));
             b4.Source = vm;
             b4.Converter = visConverter;
@@ -123,21 +191,27 @@ namespace All
             var b6 = new Binding(nameof(vm.IsFocused));
             b6.Source = vm;
             b6.Converter = visConverter;
-            side.SetBinding(UIElement.VisibilityProperty, b6);            
+            side.SetBinding(UIElement.VisibilityProperty, b6);
         }
 
-        private void AttachRegionViewToRegion(CalibratedRegionVM vm) {
+        private void AttachRegionViewToRegion(CalibratedRegionVM vm)
+        {
             RegionInfoView.Visibility = Visibility.Visible;
             RegionInfoView.DataContext = vm;
         }
 
         private void CommonCanvas_MouseRightButtonUp(object sender, MouseButtonEventArgs e)
         {
+            Point position = e.GetPosition(CommonCanvas);
+            PlaceMarker(position);
+        }
+
+        private void PlaceMarker(Point position)
+        {
             PhotoCalibrationMarker toAdd = null;
 
-            Point position = e.GetPosition(CommonCanvas);
-
-            switch (CurrentState) {
+            switch (CurrentState)
+            {
                 case MarkupState.SettingUp:
                     toAdd = new PhotoCalibrationMarker() { CentreLocation = position, MarkerName = "Верх", FillBrush = new SolidColorBrush(new Color() { R = 255, G = 150, B = 150, A = 200 }) };
                     CurrentState = MarkupState.SettingBottom;
@@ -161,10 +235,11 @@ namespace All
                 CommonCanvas.Children.Add(rect);
 
                 rect.MouseRightButtonUp += Poly_MouseRightButtonUp;
+                rect.PreviewTouchUp += Poly_PreviewTouchUp;
 
                 CalibratedRegionVM vm = new CalibratedRegionVM();
                 vm.Order = polygonDict.Count + 1;
-                vm.IsFocused = true;                
+                vm.IsFocused = true;
                 BindInfoLayer(regionDraft[0], regionDraft[1], regionDraft[2], rect, vm);
 
                 rect.DataContext = vm;
@@ -176,13 +251,21 @@ namespace All
 
                 AttachRegionViewToRegion(vm);
             }
-            else {
+            else
+            {
                 UnfocusAllRegions();
             }
-
         }
 
-        private void UnfocusAllRegions() {
+        private void Poly_PreviewTouchUp(object sender, TouchEventArgs e)
+        {
+            var vm = polygonDict[(AnnotatedPolygon)sender];
+            ActivatePolyFocus(vm);
+            e.Handled = true;
+        }
+
+        private void UnfocusAllRegions()
+        {
             foreach (var pair in polygonDict)
             {
                 pair.Value.IsFocused = false;
@@ -191,24 +274,29 @@ namespace All
             RegionInfoView.Visibility = Visibility.Collapsed;
         }
 
-        private void CleanDraftMarkers() {            
-            foreach (var marker in regionDraft) {
+        private void CleanDraftMarkers()
+        {
+            foreach (var marker in regionDraft)
+            {
                 canvasMarkers.Remove(marker);
             }
             regionDraft.Clear();
             CurrentState = MarkupState.SettingUp;
         }
 
-        private void Poly_MouseRightButtonUp(object sender, MouseButtonEventArgs e)
-        {
+        private void ActivatePolyFocus(CalibratedRegionVM vm) {
             CleanDraftMarkers();
             UnfocusAllRegions();
-
-            var vm = polygonDict[(AnnotatedPolygon)sender];
+            
             vm.IsFocused = true;
 
             AttachRegionViewToRegion(vm);
-            
+        }
+
+        private void Poly_MouseRightButtonUp(object sender, MouseButtonEventArgs e)
+        {
+            var vm = polygonDict[(AnnotatedPolygon)sender];
+            ActivatePolyFocus(vm);
             e.Handled = true;
         }
 
@@ -219,11 +307,11 @@ namespace All
                 foreach (var obj in e.NewItems)
                 {
                     AnnotatedPolygon poly = (AnnotatedPolygon)obj;
-                    
+
                     poly.MouseUp += Poly_MouseRightButtonUp;
 
-                    CommonCanvas.Children.Insert(1,poly);
-                    Canvas.SetZIndex(poly,1);
+                    CommonCanvas.Children.Insert(1, poly);
+                    Canvas.SetZIndex(poly, 1);
                 }
             }
 
@@ -236,16 +324,16 @@ namespace All
                     CommonCanvas.Children.Remove(poly);
                 }
             }
-        }        
-        
+        }
+
         private void Markers_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
-        {            
+        {
             if (e.NewItems != null)
             {
                 foreach (var obj in e.NewItems)
                 {
                     PhotoCalibrationMarker marker = (PhotoCalibrationMarker)obj;
-                    
+
                     marker.MouseDown += Marker_MouseDown;
                     marker.MouseUp += Marker_MouseUp;
 
@@ -292,7 +380,7 @@ namespace All
                 var pos = e.GetPosition(CommonCanvas);
                 var offset = new Point(pos.X - this.markerClickOffset.X, pos.Y - this.markerClickOffset.Y);
                 var newLoc = new Point(this.dragStartLocation.X + offset.X, this.dragStartLocation.Y + offset.Y);
-                this.currentDraggingMarker.CentreLocation = newLoc;                
+                this.currentDraggingMarker.CentreLocation = newLoc;
             }
         }
 
