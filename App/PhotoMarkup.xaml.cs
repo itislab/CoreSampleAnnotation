@@ -89,17 +89,24 @@ namespace All
         /// <param name="poly">An annotated polygon, that highlights the core sample</param>
         /// <param name="vm">View Model that desribes the region</param>
         private static void BindInfoLayer(PhotoCalibrationMarker up, PhotoCalibrationMarker bottom, PhotoCalibrationMarker side, AnnotatedPolygon poly, CalibratedRegionVM vm) {
-            var b1 = new Binding("CentreLocation");
-            b1.Source = up;
-            poly.SetBinding(AnnotatedPolygon.UpCentreProperty, b1);
+            vm.Up = up.CentreLocation;
+            vm.Bottom = bottom.CentreLocation;
+            vm.Side = side.CentreLocation;
 
-            var b2 = new Binding("CentreLocation");
-            b2.Source = bottom;
-            poly.SetBinding(AnnotatedPolygon.BottomCentreProperty, b2);
+            var b1 = new Binding(nameof(vm.Up));
+            b1.Source = vm;
+            b1.Mode = BindingMode.TwoWay;
+            up.SetBinding(PhotoCalibrationMarker.CentreLocationLocationProperty, b1);
 
-            var b3 = new Binding("CentreLocation");
-            b3.Source = side;
-            poly.SetBinding(AnnotatedPolygon.SideProperty, b3);
+            var b2 = new Binding(nameof(vm.Bottom));
+            b2.Source = vm;
+            b2.Mode = BindingMode.TwoWay;
+            bottom.SetBinding(PhotoCalibrationMarker.CentreLocationLocationProperty, b2);
+
+            var b3 = new Binding(nameof(vm.Side));
+            b3.Source = vm;
+            b3.Mode = BindingMode.TwoWay;
+            side.SetBinding(PhotoCalibrationMarker.CentreLocationLocationProperty, b3);
 
             var visConverter = new CollapsedConverter();
             
@@ -116,8 +123,7 @@ namespace All
             var b6 = new Binding(nameof(vm.IsFocused));
             b6.Source = vm;
             b6.Converter = visConverter;
-            side.SetBinding(UIElement.VisibilityProperty, b6);
-
+            side.SetBinding(UIElement.VisibilityProperty, b6);            
         }
 
         private void AttachRegionViewToRegion(CalibratedRegionVM vm) {
@@ -160,6 +166,9 @@ namespace All
                 vm.Order = polygonDict.Count + 1;
                 vm.IsFocused = true;                
                 BindInfoLayer(regionDraft[0], regionDraft[1], regionDraft[2], rect, vm);
+
+                rect.DataContext = vm;
+
                 regions.Add(vm);
                 regionDraft.Clear();
 

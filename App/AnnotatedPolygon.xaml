@@ -6,8 +6,28 @@
              xmlns:local="clr-namespace:All"
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300">
+    <UserControl.Resources>
+        <local:UpBotomSideToRectConverter x:Key="upBotomSideToRectConverter"/>
+    </UserControl.Resources>
     <Canvas>
-        <Polygon Name="PolygonBorder" Stroke="Red" StrokeThickness="2"/>
-        <Polygon Name="PolygonFill" Fill="Red" Opacity="0.01" StrokeThickness="0"/>
+        <Polygon Name="PolygonBorder" Stroke="Red" StrokeThickness="2">
+            <Polygon.Points>
+                <MultiBinding Converter="{StaticResource upBotomSideToRectConverter}">
+                    <Binding Path="Bottom" />
+                    <Binding Path="Up" />
+                    <Binding Path="Side" />
+                </MultiBinding>
+            </Polygon.Points>
+        </Polygon>
+        <Polygon Name="PolygonFill" Fill="Red" Opacity="0.01" StrokeThickness="0">
+            <Polygon.Points>
+                <MultiBinding Converter="{StaticResource upBotomSideToRectConverter}">
+                    <Binding Path="Bottom" />
+                    <Binding Path="Up" />
+                    <Binding Path="Side" />
+                </MultiBinding>
+            </Polygon.Points>
+        </Polygon>
+        <Label Name="LabelElem" Foreground="Red" Content="{Binding Order}"></Label>
     </Canvas>
 </UserControl>

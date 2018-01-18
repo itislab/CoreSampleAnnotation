@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -15,97 +16,58 @@ using System.Windows.Shapes;
 
 namespace All
 {
+    public class UpBotomSideToRectConverter : IMultiValueConverter
+    {
+        public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
+        {
+            if ((values != null) && (values.Length == 3))
+            {
+                Point bottomCentre = (Point)values[0];
+                Point upCentre = (Point)values[1];
+                Point side = (Point)values[2];
+
+                double y2y1 = upCentre.Y - bottomCentre.Y;
+                double x2x1 = upCentre.X - bottomCentre.X;
+
+                double doub_y2y1 = y2y1 * y2y1;
+                double doub_x2x1 = x2x1 * x2x1;
+
+                double Xt =
+                    (bottomCentre.X * doub_y2y1 +
+                    side.X * doub_x2x1 +
+                    x2x1 * y2y1 * (side.Y - bottomCentre.Y)) /
+                        (doub_y2y1 + doub_x2x1);
+                double Yt =
+                    x2x1 * (side.X - Xt) / y2y1 + side.Y;
+
+                Point t = new Point(Xt, Yt);
+
+                Vector toSide = side - t;
+                Point upperLeft = upCentre - toSide;
+                Point upperRight = upCentre + toSide;
+                Point lowerLeft = bottomCentre - toSide;
+                Point lowerRight = bottomCentre + toSide;
+                var pointsCollection = new PointCollection(new Point[] { upperLeft, upperRight, lowerRight, lowerLeft });
+                return pointsCollection;
+            }
+            else
+                return null;
+        }
+
+        public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
     /// <summary>
     /// Interaction logic for AnnotatedPolygon.xaml
     /// </summary>
-    public partial class AnnotatedPolygon : UserControl, IInfoLayerElement
+    public partial class AnnotatedPolygon : UserControl
     {
         public AnnotatedPolygon()
         {
             InitializeComponent();
-        }
-        
-        private static Point GetNormalIntersection(Point bottomCentre, Point UpCentre, Point side)
-        {
-            double y2y1 = UpCentre.Y - bottomCentre.Y;
-            double x2x1 = UpCentre.X - bottomCentre.X;
-
-            double doub_y2y1 = y2y1 * y2y1;
-            double doub_x2x1 = x2x1 * x2x1;
-
-            double Xt =
-                (bottomCentre.X * doub_y2y1 +
-                side.X * doub_x2x1 +
-                x2x1 * y2y1 * (side.Y - bottomCentre.Y)) /
-                    (doub_y2y1 + doub_x2x1);
-            double Yt =
-                x2x1 * (side.X - Xt) / y2y1 + side.Y;
-
-            return new Point(Xt, Yt);
-        }
-
-        private void UpdateRectCorners(Point bottom, Point up, Point side) {
-            Point T = GetNormalIntersection(bottom, up, side);
-            Vector toSide = Side - T;
-            Point upperLeft = UpCentre - toSide;
-            Point upperRight = UpCentre + toSide;
-            Point lowerLeft = BottomCentre - toSide;
-            Point lowerRight = BottomCentre + toSide;
-            var pointsCollection = new PointCollection(new Point[] { upperLeft, upperRight, lowerRight, lowerLeft });
-            PolygonBorder.Points = pointsCollection;
-            PolygonFill.Points = pointsCollection;
-            //System.Diagnostics.Debug.WriteLine("rect updated due to points update");
-        }
-
-        public Point UpCentre
-        {
-            get { return (Point)GetValue(UpCentreProperty); }
-            set { SetValue(UpCentreProperty, value); }
-        }
-
-        public static readonly DependencyProperty UpCentreProperty =
-            DependencyProperty.Register("UpCentre", typeof(Point), typeof(AnnotatedPolygon), new PropertyMetadata(new Point(1.0,0.0),(obj,arg) => {
-                var ap = (AnnotatedPolygon)obj;                
-                ap.UpdateRectCorners(ap.BottomCentre, (Point)arg.NewValue, ap.Side);
-            }));
-
-
-
-        public Point BottomCentre
-        {
-            get { return (Point)GetValue(BottomCentreProperty); }
-            set { SetValue(BottomCentreProperty, value); }
-        }
-
-        // Using a DependencyProperty as the backing store for BottomCentre.  This enables animation, styling, binding, etc...
-        public static readonly DependencyProperty BottomCentreProperty =
-            DependencyProperty.Register("BottomCentre", typeof(Point), typeof(AnnotatedPolygon), new PropertyMetadata(new Point(1.0,1.0), (obj,arg) => {
-                var ap = (AnnotatedPolygon)obj;
-                ap.UpdateRectCorners((Point)arg.NewValue,ap.UpCentre , ap.Side);
-            }));
-
-
-
-        public Point Side
-        {
-            get { return (Point)GetValue(SideProperty); }
-            set { SetValue(SideProperty, value); }
-        }
-
-        // Using a DependencyProperty as the backing store for Side.  This enables animation, styling, binding, etc...
-        public static readonly DependencyProperty SideProperty =
-            DependencyProperty.Register("Side", typeof(Point), typeof(AnnotatedPolygon), new PropertyMetadata(new Point(2.0, 0.5), (obj, arg) => {
-                var ap = (AnnotatedPolygon)obj;
-                ap.UpdateRectCorners(ap.BottomCentre, ap.UpCentre, (Point)arg.NewValue);
-            }));
-        
-
-        public void ChangeCoordTransform(Transform oldTransformInv, Transform newTransform)
-        {
-            this.UpdateRectCorners(this.BottomCentre, this.UpCentre, this.Side);
-            //var points = Polygon.Points;
-            //Polygon.Points =new PointCollection(points.Select(p => newTransform.Transform(oldTransformInv.Transform(p))));
-            //System.Diagnostics.Debug.WriteLine("transform reapplied");
-        }
+        }        
     }
 }
