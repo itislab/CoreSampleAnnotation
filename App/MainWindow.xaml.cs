@@ -32,6 +32,8 @@ namespace All
             var vm = new PhotoMarkupVM();
             this.Markup.DataContext = vm;
             Activate();
+
+            vm.ImagePath = "kern.jpg";
         }
 
         private void HandleEsc(object sender, KeyEventArgs e)

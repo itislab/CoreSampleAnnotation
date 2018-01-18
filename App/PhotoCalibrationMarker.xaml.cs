@@ -28,6 +28,7 @@ namespace All
             InitializeComponent();
             this.CentreOffset = new Point(21.0, 21.0);
             this.DataContext = this;
+
         }
 
         public Brush FillBrush

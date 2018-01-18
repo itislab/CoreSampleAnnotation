@@ -336,6 +336,7 @@ namespace All
 
                     marker.MouseDown += Marker_MouseDown;
                     marker.MouseUp += Marker_MouseUp;
+                    marker.PreviewTouchUp += Marker_PreviewTouchDown;
 
                     CommonCanvas.Children.Add(marker);
                     Canvas.SetZIndex(marker, 2);
@@ -349,9 +350,15 @@ namespace All
                     PhotoCalibrationMarker marker = (PhotoCalibrationMarker)obj;
                     marker.MouseDown -= Marker_MouseDown;
                     marker.MouseUp -= Marker_MouseUp;
+                    marker.PreviewTouchUp -= Marker_PreviewTouchDown;
                     CommonCanvas.Children.Remove(marker);
                 }
             }
+        }
+
+        private void Marker_PreviewTouchDown(object sender, TouchEventArgs e)
+        {
+            e.Handled = true;
         }
 
 
