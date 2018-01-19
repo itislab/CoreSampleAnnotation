@@ -8,6 +8,8 @@
         WindowStyle="None" ResizeMode="NoResize" 
         Title="Описание керна" Height="350" Width="525" WindowState="Maximized">
     <Grid>
-        <local:PhotoMarkup x:Name="Markup" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
+        <local:PhotoMarkup x:Name="Markup" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Panel.ZIndex="1"/>
+        <local:ExtractionInfoView x:Name="ExtractionView" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="30" Panel.ZIndex="3">
+        </local:ExtractionInfoView>
     </Grid>
 </Window>

@@ -158,7 +158,7 @@ namespace All
                 string lengthStr = "не задана";
                 if (length > 0.0)
                     lengthStr = string.Format("{0} см", length);
-                return string.Format("{0}: длина {1}", order, lengthStr);
+                return string.Format("№{0}: длина {1}", order, lengthStr);
             }
             else return null;
         }

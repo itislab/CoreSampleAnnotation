@@ -25,6 +25,18 @@ namespace All
             }
         }
 
+        private IEnumerable<CalibratedRegion> calibratedRegions = null;
+        public IEnumerable<CalibratedRegion> CalibratedRegions
+        {
+            get { return calibratedRegions; }
+            set {
+                if (calibratedRegions != value) {
+                    calibratedRegions = value;
+                    RaisePropertyChanged(nameof(CalibratedRegions));
+                }
+            }
+        }
 
+        
     }
 }

@@ -58,6 +58,7 @@
     <Compile Include="AnnotatedPolygon.xaml.cs">
       <DependentUpon>AnnotatedPolygon.xaml</DependentUpon>
     </Compile>
+    <Compile Include="CalibratedRegion.cs" />
     <Compile Include="CalibratedRegionInfoView.xaml.cs">
       <DependentUpon>CalibratedRegionInfoView.xaml</DependentUpon>
     </Compile>
@@ -65,6 +66,10 @@
     <Compile Include="Converters.cs" />
     <Compile Include="CoordTransformedCanvas.cs" />
     <Compile Include="DelegateCommand.cs" />
+    <Compile Include="ExtractionInfoView.xaml.cs">
+      <DependentUpon>ExtractionInfoView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="ExtractionInfoVM.cs" />
     <Compile Include="IInfoLayerElement.cs" />
     <Compile Include="PhotoCalibrationMarker.xaml.cs">
       <DependentUpon>PhotoCalibrationMarker.xaml</DependentUpon>
@@ -80,6 +85,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="CalibratedRegionInfoView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="ExtractionInfoView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

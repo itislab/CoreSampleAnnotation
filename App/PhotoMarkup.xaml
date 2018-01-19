@@ -11,6 +11,6 @@
     </UserControl.Background>
     <local:CoordTransformedCanvas HorizontalAlignment="Stretch" VerticalAlignment="Stretch" x:Name="CommonCanvas" ClipToBounds="True" Background="Transparent">
         <Image Source="{Binding ImagePath, FallbackValue='pack://application:,,,/All;component/resources/checkerboard.jpg'}" IsManipulationEnabled="True" HorizontalAlignment="Left" VerticalAlignment="Top" Name="Image"/>
-        <local:CalibratedRegionInfoView x:Name="RegionInfoView"></local:CalibratedRegionInfoView>
+        <local:CalibratedRegionInfoView Panel.ZIndex="20" x:Name="RegionInfoView"></local:CalibratedRegionInfoView>
     </local:CoordTransformedCanvas>
 </UserControl>

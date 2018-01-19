@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -20,6 +21,9 @@ namespace All
     /// </summary>
     public partial class MainWindow : Window
     {
+        private ExtractionInfoVM extractionViewVM;
+        private PhotoMarkupVM photoMarkupVM;
+
         public MainWindow()
         {
             InitializeComponent();
@@ -29,11 +33,29 @@ namespace All
 
         private void MainWindow_Loaded(object sender, RoutedEventArgs e)
         {
-            var vm = new PhotoMarkupVM();
-            this.Markup.DataContext = vm;
-            Activate();
+            photoMarkupVM = new PhotoMarkupVM();
+            photoMarkupVM.ImagePath = "kern.jpg";
+            //propagating changes to other VMs
+            photoMarkupVM.PropertyChanged += PhotoMarkupVM_PropertyChanged;
+            this.Markup.DataContext = photoMarkupVM;
 
-            vm.ImagePath = "kern.jpg";
+            extractionViewVM = new ExtractionInfoVM();
+            extractionViewVM.ExtractionName = "Тюменская 168р";
+            extractionViewVM.LowerDepth = 2830.0;
+            extractionViewVM.UpperDepth = 2800.0;
+            this.ExtractionView.DataContext = extractionViewVM;
+
+            
+            Activate();
+        }
+
+        private void PhotoMarkupVM_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            switch (e.PropertyName) {
+                case nameof(photoMarkupVM.CalibratedRegions):
+                    extractionViewVM.AnnotatedLength = photoMarkupVM.CalibratedRegions.Sum(r => r.Length) * 1e-2;
+                    break;
+            }
         }
 
         private void HandleEsc(object sender, KeyEventArgs e)

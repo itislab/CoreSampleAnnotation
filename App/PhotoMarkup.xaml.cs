@@ -116,7 +116,7 @@ namespace All
                 holdTimer = null;
             }
         }
-
+        
         private void Image_TouchDown(object sender, TouchEventArgs e)
         {
             touchPoint = e.GetTouchPoint(CommonCanvas).Position;
@@ -268,7 +268,8 @@ namespace All
 
                 CalibratedRegionVM vm = new CalibratedRegionVM();
                 vm.Order = polygonDict.Count + 1;
-                vm.IsFocused = true;                
+                vm.IsFocused = true;
+                vm.PropertyChanged += Vm_PropertyChanged;
                 rect.DataContext = vm;
 
                 var canMoveUp = new Predicate<object>(obj => {
@@ -310,6 +311,15 @@ namespace All
             else
             {
                 UnfocusAllRegions();
+            }
+        }
+
+        private void Vm_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            //for now works only with PhotoMarkupVM
+            PhotoMarkupVM vm = DataContext as PhotoMarkupVM;
+            if (vm != null) {
+                vm.CalibratedRegions = regions.Select(r => new CalibratedRegion() { Order = r.Order, Length = r.Length });
             }
         }
 
@@ -368,7 +378,7 @@ namespace All
                     poly.MouseUp += Poly_MouseRightButtonUp;
 
                     CommonCanvas.Children.Insert(1, poly);
-                    Canvas.SetZIndex(poly, 1);
+                    Canvas.SetZIndex(poly, 5);
                 }
             }
 
@@ -396,7 +406,7 @@ namespace All
                     marker.PreviewTouchUp += Marker_PreviewTouchDown;
 
                     CommonCanvas.Children.Add(marker);
-                    Canvas.SetZIndex(marker, 2);
+                    Canvas.SetZIndex(marker, 3);
                 }
             }
 
