@@ -64,6 +64,7 @@
     <Compile Include="CalibratedRegionVM.cs" />
     <Compile Include="Converters.cs" />
     <Compile Include="CoordTransformedCanvas.cs" />
+    <Compile Include="DelegateCommand.cs" />
     <Compile Include="IInfoLayerElement.cs" />
     <Compile Include="PhotoCalibrationMarker.xaml.cs">
       <DependentUpon>PhotoCalibrationMarker.xaml</DependentUpon>

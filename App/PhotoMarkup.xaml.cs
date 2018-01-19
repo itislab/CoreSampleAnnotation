@@ -20,6 +20,8 @@ namespace All
 
     public enum MarkupState { SettingUp, SettingBottom, SettingSide };
 
+    public enum OrderMoveDirection { Up, Down};
+
     /// <summary>
     /// Interaction logic for PhotoMarkup.xaml
     /// </summary>
@@ -37,6 +39,7 @@ namespace All
 
         private List<PhotoCalibrationMarker> regionDraft = new List<PhotoCalibrationMarker>();
         private List<CalibratedRegionVM> regions = new List<CalibratedRegionVM>();
+        private List<Action> canMoveChangedActivations = new List<Action>();
 
         private double angle = 0.0;
 
@@ -206,6 +209,32 @@ namespace All
             PlaceMarker(position);
         }
 
+        public void MoveRegionOrder(int regionToMove,OrderMoveDirection direction) {
+            int addition = (direction == OrderMoveDirection.Up) ? (-1) : 1;
+            int toSwapWithIdx = regionToMove +addition;
+            CalibratedRegionVM toSwapWith = null, target = null;
+            foreach (CalibratedRegionVM vm in regions) {
+                if (vm.Order == regionToMove)
+                {
+                    target = vm;                    
+                }
+                else if (vm.Order == toSwapWithIdx) {
+                    toSwapWith = vm;                    
+                }
+            }
+
+            target.Order = toSwapWithIdx;
+            toSwapWith.Order = regionToMove;
+            System.Diagnostics.Debug.WriteLine("swapped {0} and {1}", toSwapWithIdx, regionToMove);
+            RaiseCanOrderMoveChanged();
+        }
+
+        private void RaiseCanOrderMoveChanged() {
+            foreach (Action act in canMoveChangedActivations)
+                act();
+            System.Diagnostics.Debug.WriteLine("Triggered can move changed");
+        }
+
         private void PlaceMarker(Point position)
         {
             PhotoCalibrationMarker toAdd = null;
@@ -239,17 +268,44 @@ namespace All
 
                 CalibratedRegionVM vm = new CalibratedRegionVM();
                 vm.Order = polygonDict.Count + 1;
-                vm.IsFocused = true;
-                BindInfoLayer(regionDraft[0], regionDraft[1], regionDraft[2], rect, vm);
-
+                vm.IsFocused = true;                
                 rect.DataContext = vm;
 
-                regions.Add(vm);
+                var canMoveUp = new Predicate<object>(obj => {
+                    if (obj != null)
+                    {
+                        int order = (int)obj;
+                        return order > 1;
+                    }
+                    else
+                        return false;
+                });
+
+                var canMoveDown = new Predicate<object>(obj => {
+                    if (obj != null)
+                    {
+                        int order = (int)obj;
+                        return order < regions.Count;
+                    }
+                    else
+                        return false;
+                });
+
+                var delComUp = new DelegateCommand(obj => MoveRegionOrder((int)obj, OrderMoveDirection.Up), canMoveUp);
+                var delComDown = new DelegateCommand(obj => MoveRegionOrder((int)obj, OrderMoveDirection.Down), canMoveDown);
+                vm.MoveUp = delComUp;
+                vm.MoveDown = delComDown;
+                BindInfoLayer(regionDraft[0], regionDraft[1], regionDraft[2], rect, vm);
+
+                canMoveChangedActivations.Add(() => delComUp.RaiseCanExecuteChanged());
+                canMoveChangedActivations.Add(() => delComDown.RaiseCanExecuteChanged());
+                regions.Add(vm);                
                 regionDraft.Clear();
 
                 polygonDict.Add(rect, vm);
 
                 AttachRegionViewToRegion(vm);
+                RaiseCanOrderMoveChanged();
             }
             else
             {
@@ -291,6 +347,7 @@ namespace All
             vm.IsFocused = true;
 
             AttachRegionViewToRegion(vm);
+            RaiseCanOrderMoveChanged();
         }
 
         private void Poly_MouseRightButtonUp(object sender, MouseButtonEventArgs e)

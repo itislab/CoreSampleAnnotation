@@ -6,12 +6,15 @@
              xmlns:local="clr-namespace:All"
              mc:Ignorable="d" 
              d:DesignHeight="100" d:DesignWidth="900">
-    <Border CornerRadius="15" Background="White" Padding="15" Margin="15">
-        <StackPanel Orientation="Horizontal">
+    <Border CornerRadius="15" Background="White" Padding="15" Margin="15" Opacity="0.95">
+        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
             <TextBlock FontSize="30" Grid.Column="0" Margin="10">
                 <Run Text="Участок №"/>
                 <Run Text="{Binding Order, FallbackValue=1}"/>
             </TextBlock>
+            <TextBlock FontSize="30" Margin="10">сдвинуть:</TextBlock>
+            <Button Margin="2,10,2,10" FontSize="20" Command="{Binding MoveUp}" CommandParameter="{Binding Order}">Вверх</Button>
+            <Button Margin="2,10,10,10" FontSize="20" Command="{Binding MoveDown}"  CommandParameter="{Binding Order}">Вниз</Button>
             <TextBlock FontSize="30" Grid.Column="2" Text="длина (см):" Margin="10,10,0,10"/>
             <TextBox  FontSize="30" Grid.Column="3" Width="70" HorizontalAlignment="Left" Text="{Binding Length, FallbackValue=100, UpdateSourceTrigger=PropertyChanged}"  Margin="0,10,10,10"></TextBox>            
         </StackPanel>

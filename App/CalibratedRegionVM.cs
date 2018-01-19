@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Data;
+using System.Windows.Input;
 
 namespace All
 {
@@ -93,6 +94,28 @@ namespace All
                 if (length != value) {
                     length = value;
                     RaisePropertyChanged(nameof(Length));
+                }
+            }
+        }
+
+        private ICommand moveUp;
+        public ICommand MoveUp {
+            get { return moveUp; }
+            set {
+                if (moveUp != value) {
+                    moveUp = value;
+                    RaisePropertyChanged(nameof(MoveUp));
+                }
+            }
+        }
+
+        private ICommand moveDown;
+        public ICommand MoveDown {
+            get { return moveDown; }
+            set {
+                if (moveDown != value) {
+                    moveDown = value;
+                    RaisePropertyChanged(nameof(MoveDown));
                 }
             }
         }
