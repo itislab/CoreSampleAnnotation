@@ -23,6 +23,8 @@ namespace All
     {
         private ExtractionInfoVM extractionViewVM;
         private PhotoMarkupVM photoMarkupVM;
+        private int curDemoImageIdx = 0;
+        private string[] demoImagePaths = null;
 
         public MainWindow()
         {
@@ -31,21 +33,30 @@ namespace All
             PreviewKeyDown += new KeyEventHandler(HandleEsc);
         }
 
-        private void MainWindow_Loaded(object sender, RoutedEventArgs e)
-        {
+        private void LoadNextImage() {
+            string imgPath = demoImagePaths[(curDemoImageIdx++) % demoImagePaths.Length];
+
+            if (photoMarkupVM != null)
+                photoMarkupVM.PropertyChanged -= PhotoMarkupVM_PropertyChanged;
+
             photoMarkupVM = new PhotoMarkupVM();
-            photoMarkupVM.ImagePath = "kern.jpg";
+            photoMarkupVM.ImagePath = System.IO.Path.GetFullPath(imgPath); //"kern.jpg";
             //propagating changes to other VMs
             photoMarkupVM.PropertyChanged += PhotoMarkupVM_PropertyChanged;
             this.Markup.DataContext = photoMarkupVM;
+            this.Markup.Reset();
 
             extractionViewVM = new ExtractionInfoVM();
             extractionViewVM.ExtractionName = "Тюменская 168р";
             extractionViewVM.LowerDepth = 2830.0;
             extractionViewVM.UpperDepth = 2800.0;
             this.ExtractionView.DataContext = extractionViewVM;
+        }
 
-            
+        private void MainWindow_Loaded(object sender, RoutedEventArgs e)
+        {
+            demoImagePaths = System.IO.Directory.EnumerateFiles("photos", "*.jpg").ToArray();
+            LoadNextImage();
             Activate();
         }
 
@@ -62,6 +73,8 @@ namespace All
         {
             if (e.Key == Key.Escape)
                 Close();
+            if (e.Key == Key.Tab)
+                LoadNextImage();
         }
     }
 }

@@ -74,6 +74,22 @@ namespace All
 
         }
 
+        public void Reset() {
+            UnfocusAllRegions();
+            angle = 0.0;
+            regionDraft.Clear();
+            polygonDict.Clear();
+            CurrentState = MarkupState.SettingUp;
+            var markers = canvasMarkers.ToArray();
+            foreach (var m in markers)
+                canvasMarkers.Remove(m);
+            var polygons = canvasPolygons.ToArray();
+            foreach (var p in polygons)
+                canvasPolygons.Remove(p);
+            regions.Clear();
+            canMoveChangedActivations.Clear();            
+        }
+
         private void Image_TouchMove(object sender, TouchEventArgs e)
         {
             var curTouchPoint = e.GetTouchPoint(CommonCanvas);
@@ -261,10 +277,7 @@ namespace All
             {
                 //draft is ready
                 AnnotatedPolygon rect = new AnnotatedPolygon();
-                CommonCanvas.Children.Add(rect);
-
-                rect.MouseRightButtonUp += Poly_MouseRightButtonUp;
-                rect.PreviewTouchUp += Poly_PreviewTouchUp;
+                canvasPolygons.Add(rect);                
 
                 CalibratedRegionVM vm = new CalibratedRegionVM();
                 vm.Order = polygonDict.Count + 1;
@@ -375,10 +388,11 @@ namespace All
                 {
                     AnnotatedPolygon poly = (AnnotatedPolygon)obj;
 
-                    poly.MouseUp += Poly_MouseRightButtonUp;
+                    poly.MouseRightButtonUp += Poly_MouseRightButtonUp;
+                    poly.PreviewTouchUp += Poly_PreviewTouchUp;
 
                     CommonCanvas.Children.Insert(1, poly);
-                    Canvas.SetZIndex(poly, 5);
+                    Canvas.SetZIndex(poly, 1);
                 }
             }
 
@@ -387,10 +401,9 @@ namespace All
                 foreach (var obj in e.OldItems)
                 {
                     AnnotatedPolygon poly = (AnnotatedPolygon)obj;
-                    poly.MouseUp -= Poly_MouseRightButtonUp;
-                    CommonCanvas.Children.Remove(poly);
+                    RemovePolygon(poly);
                 }
-            }
+            }            
         }
 
         private void Markers_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
@@ -408,19 +421,29 @@ namespace All
                     CommonCanvas.Children.Add(marker);
                     Canvas.SetZIndex(marker, 3);
                 }
-            }
-
+            }            
             if (e.OldItems != null)
             {
                 foreach (var obj in e.OldItems)
                 {
                     PhotoCalibrationMarker marker = (PhotoCalibrationMarker)obj;
-                    marker.MouseDown -= Marker_MouseDown;
-                    marker.MouseUp -= Marker_MouseUp;
-                    marker.PreviewTouchUp -= Marker_PreviewTouchDown;
-                    CommonCanvas.Children.Remove(marker);
+                    RemoveMarker(marker);
                 }
-            }
+            }            
+        }
+
+        private void RemovePolygon(AnnotatedPolygon poly) {
+            
+            poly.MouseRightButtonUp -= Poly_MouseRightButtonUp;
+            poly.PreviewTouchUp -= Poly_PreviewTouchUp;
+            CommonCanvas.Children.Remove(poly);
+        }
+
+        private void RemoveMarker(PhotoCalibrationMarker marker) {
+            marker.MouseDown -= Marker_MouseDown;
+            marker.MouseUp -= Marker_MouseUp;
+            marker.PreviewTouchUp -= Marker_PreviewTouchDown;
+            CommonCanvas.Children.Remove(marker);
         }
 
         private void Marker_PreviewTouchDown(object sender, TouchEventArgs e)
