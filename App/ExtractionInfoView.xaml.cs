@@ -28,22 +28,47 @@ namespace All
             Button.MouseUp += Button_MouseUp;
             Button.MouseLeave += Button_MouseLeave;
 
+            Button.TouchDown += Button_TouchDown;
+            Button.TouchUp += Button_TouchUp;
+            Button.TouchLeave += Button_TouchLeave;
+
             HoverWindow.Visibility = Visibility.Collapsed;
+        }
+
+        private void Button_TouchLeave(object sender, TouchEventArgs e)
+        {
+            HoverWindow.Visibility = Visibility.Collapsed;
+            e.Handled = true;
+        }
+
+        private void Button_TouchUp(object sender, TouchEventArgs e)
+        {
+            HoverWindow.Visibility = Visibility.Collapsed;
+            e.Handled = true;
+        }
+
+        private void Button_TouchDown(object sender, TouchEventArgs e)
+        {
+            HoverWindow.Visibility = Visibility.Visible;
+            e.Handled = true;
         }
 
         private void Button_MouseLeave(object sender, MouseEventArgs e)
         {
             HoverWindow.Visibility = Visibility.Collapsed;
+            e.Handled = true;
         }
 
         private void Button_MouseUp(object sender, MouseButtonEventArgs e)
         {
             HoverWindow.Visibility = Visibility.Collapsed;
+            e.Handled = true;
         }
 
         private void Button_MouseDown(object sender, MouseButtonEventArgs e)
         {
             HoverWindow.Visibility = Visibility.Visible;
+            e.Handled = true;
         }
     }
 }
