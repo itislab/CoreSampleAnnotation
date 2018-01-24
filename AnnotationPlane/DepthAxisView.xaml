@@ -7,5 +7,5 @@
              mc:Ignorable="d" 
              xmlns:d3="clr-namespace:InteractiveDataDisplay.WPF;assembly=InteractiveDataDisplay.WPF"
              d:DesignHeight="300" d:DesignWidth="300">
-    <d3:Axis AxisOrientation="Left" Height="{Binding ColumnHeight}" Range="{Binding Range}"></d3:Axis>
+    <d3:Axis x:Name="Axis" AxisOrientation="Left" Height="{Binding ColumnHeight}" Range="{Binding Range}"></d3:Axis>
 </UserControl>

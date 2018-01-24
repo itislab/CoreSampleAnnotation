@@ -4,6 +4,8 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Controls;
+using System.Windows.Media;
 
 namespace AnnotationPlane
 {
@@ -41,34 +43,29 @@ namespace AnnotationPlane
             }
         }
 
-        public ColumnVM(string heading) {
-            this.heading = heading;
-        }
-
-        
-    }
-
-    public class DepthAxisColumnVM : ColumnVM {
         private double upperBound = 0;
         /// <summary>
-        /// Units: meters
+        /// Units: meters (positive value)
         /// </summary>
-        public double UpperBound {
-            get {
+        public double UpperBound
+        {
+            get
+            {
                 return upperBound;
             }
-            set {
-                if (upperBound != value) {
+            set
+            {
+                if (upperBound != value)
+                {
                     upperBound = value;
-                    RaisePropertyChanged(nameof(UpperBound));
-                    RaisePropertyChanged(nameof(Range));
+                    RaisePropertyChanged(nameof(UpperBound));                    
                 }
             }
         }
 
         private double lowerBound = 0;
         /// <summary>
-        /// Units: meters
+        /// Units: meters (positive value)
         /// </summary>
         public double LowerBound
         {
@@ -81,25 +78,38 @@ namespace AnnotationPlane
                 if (lowerBound != value)
                 {
                     lowerBound = value;
-                    RaisePropertyChanged(nameof(LowerBound));
-                    RaisePropertyChanged(nameof(Range));
+                    RaisePropertyChanged(nameof(LowerBound));                    
                 }
             }
         }
 
+
+        public ColumnVM(string heading) {
+            this.heading = heading;
+        }
+
+        
+    }
+
+    public class DepthAxisColumnVM : ColumnVM {
+        
         public InteractiveDataDisplay.WPF.Range Range {
             get {
-                return new InteractiveDataDisplay.WPF.Range(LowerBound, UpperBound);
+                return new InteractiveDataDisplay.WPF.Range(-LowerBound, -UpperBound);
             }
         }
 
         public DepthAxisColumnVM(string heading): base(heading){
+            this.PropertyChanged += DepthAxisColumnVM_PropertyChanged;
         }
 
-        public DepthAxisColumnVM(string heading, double lowerBound, double upperBound):this(heading) {
-            this.lowerBound = lowerBound;
-            this.upperBound = upperBound;
-        }
+        private void DepthAxisColumnVM_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            if ((e.PropertyName == nameof(UpperBound)) || (e.PropertyName == nameof(LowerBound))) {
+                DepthAxisColumnVM dacVM = (DepthAxisColumnVM)sender;
+                dacVM.RaisePropertyChanged(nameof(Range));
+            }
+        }        
     }
 
     public class LayeredColumnVM: ColumnVM
@@ -119,5 +129,55 @@ namespace AnnotationPlane
         }
 
         public LayeredColumnVM(string heading) : base(heading) { }
+    }
+
+    public class ImageColumnVM : ColumnVM {
+        public ImageColumnVM(string heading) : base(heading) {
+            
+        }
+
+        private ImageSource source = null;
+        public ImageSource Source {
+            get {
+                return source;
+            }
+            set {
+                if (source != value) {
+                    source = value;
+                    RaisePropertyChanged(nameof(Source));
+                }
+            }
+        }
+
+        private double imageUpperDepth;
+        /// <summary>
+        /// In meters (positive value)
+        /// </summary>
+        public double ImageUpperDepth {
+            get { return imageUpperDepth; }
+            set {
+                if (imageUpperDepth != value) {
+                    imageUpperDepth = value;
+                    RaisePropertyChanged(nameof(ImageUpperDepth));
+                }
+            }
+        }
+
+        private double imageLowerDepth;
+        /// <summary>
+        /// In meters (positive value)
+        /// </summary>
+        public double ImageLowerDepth
+        {
+            get { return imageLowerDepth; }
+            set
+            {
+                if (imageLowerDepth != value)
+                {
+                    imageLowerDepth = value;
+                    RaisePropertyChanged(nameof(ImageLowerDepth));
+                }
+            }
+        }
     }
 }

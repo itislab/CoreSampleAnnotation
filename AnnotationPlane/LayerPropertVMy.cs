@@ -10,7 +10,7 @@ namespace AnnotationPlane
     {
         private double length = 0;
         /// <summary>
-        /// Length of the layer in cm
+        /// Length of the layer in WPF units
         /// </summary>
         public double Length {
             get {

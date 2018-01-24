@@ -13,9 +13,12 @@
         <DataTemplate DataType="{x:Type local:LayeredColumnVM}">
             <local:LayeredColumnView />
         </DataTemplate>
+        <DataTemplate DataType="{x:Type local:ImageColumnVM}">
+            <local:ImageColumnView />
+        </DataTemplate>
         <DataTemplate DataType="{x:Type local:ViewModel}">
             <TextBlock>Column template is not set</TextBlock>
         </DataTemplate>
     </UserControl.Resources>
-    <ContentPresenter Content="{Binding}"/>
+    <ContentPresenter Content="{Binding}" ClipToBounds="True"/>
 </UserControl>

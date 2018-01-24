@@ -42,36 +42,41 @@ namespace AnnotationPlane
     /// </summary>
     public partial class MainWindow : Window
     {
+        private ColumnScale.Controller colScaleController = new ColumnScale.Controller();
+        public ColumnScale.Controller ColScaleController {
+            get {
+                return colScaleController;
+            }            
+        }
+
         public MainWindow()
         {
             InitializeComponent();
 
             AnnotationGridVM vm = new AnnotationGridVM();
             this.Plane.DataContext = vm;
+            this.DataContext = this;
+            
+            ColScaleController.UpperDepth = 2800;
+            ColScaleController.LowerDepth = 2830;
+            ColScaleController.ScaleFactor = 600.0;
 
-            DepthAxisColumnVM depthColumnVm = new DepthAxisColumnVM("Шкала шлубин");
-            depthColumnVm.LowerBound = -2830;
-            depthColumnVm.UpperBound = -2800;
-            depthColumnVm.ColumnHeight = 200;
+            DepthAxisColumnVM depthColumnVm = new DepthAxisColumnVM("Шкала глубин");
+            ColScaleController.AttachToColumn(new ColVMAdapter(depthColumnVm));
+
+            ImageColumnVM imageColumnVm = new ImageColumnVM("Фото керна");            
+            imageColumnVm.Source = new BitmapImage(new Uri("core_part.jpg",UriKind.Relative));
+            imageColumnVm.ImageUpperDepth = 2801;
+            imageColumnVm.ImageLowerDepth = 2802;
+
+            ColScaleController.AttachToColumn(new ColVMAdapter(imageColumnVm));
 
             LayeredColumnVM layerLengthVM = new LayeredColumnVM("Мощность эл-та цикла");
-            layerLengthVM.ColumnHeight = 200;
-            layerLengthVM.Layers.Add(new LengthLayerVM() { Length = 150});
-            layerLengthVM.Layers.Add(new LengthLayerVM() { Length = 50 });
+            ColScaleController.AttachToColumn(new ColVMAdapter(layerLengthVM));
 
             vm.Columns.Add(depthColumnVm);
-            vm.Columns.Add(layerLengthVM);
-
-            //LayeredColumnVM secondColumnVM = new LayeredColumnVM("Числовая характеристика");
-            //secondColumnVM.Layers.Add(new )
-
-            //Transform headerRotation = new RotateTransform(-90.0);
-            //header1.LayoutTransform = headerRotation;
-            //header2.LayoutTransform = headerRotation;
-            //header3.LayoutTransform = headerRotation;
-
-
-            //DepthAxis.DataTransform = new DepthDataTransform(DepthAxis.Range);
+            vm.Columns.Add(imageColumnVm);
+            vm.Columns.Add(layerLengthVM);            
         }
     }
 }

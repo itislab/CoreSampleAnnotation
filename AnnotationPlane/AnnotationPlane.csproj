@@ -86,14 +86,22 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="AnnotationGrid.cs" />
+    <Compile Include="AnnotationGrid.xaml.cs">
+      <DependentUpon>AnnotationGrid.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="AnnotationGridold.cs" />
     <Compile Include="AnnotationGridVM.cs" />
+    <Compile Include="ColumnScaleAdapters.cs" />
+    <Compile Include="ColumnScaleController.cs" />
     <Compile Include="ColumnView.xaml.cs">
       <DependentUpon>ColumnView.xaml</DependentUpon>
     </Compile>
     <Compile Include="ColumnVM.cs" />
     <Compile Include="DepthAxisView.xaml.cs">
       <DependentUpon>DepthAxisView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="ImageColumnView.xaml.cs">
+      <DependentUpon>ImageColumnView.xaml</DependentUpon>
     </Compile>
     <Compile Include="LayerDepthPropertyView.xaml.cs">
       <DependentUpon>LayerDepthPropertyView.xaml</DependentUpon>
@@ -103,11 +111,19 @@
     </Compile>
     <Compile Include="ViewModel.cs" />
     <Compile Include="ZoomBorder.cs" />
+    <Page Include="AnnotationGrid.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="ColumnView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="DepthAxisView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="ImageColumnView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -160,6 +176,11 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="core_part.jpg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
