@@ -20,5 +20,7 @@
             <TextBlock>Column template is not set</TextBlock>
         </DataTemplate>
     </UserControl.Resources>
-    <ContentPresenter Content="{Binding}" ClipToBounds="True"/>
+    <Border Background="AliceBlue">
+        <ContentPresenter Content="{Binding}" ClipToBounds="True"/>
+    </Border>
 </UserControl>

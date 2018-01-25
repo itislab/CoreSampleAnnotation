@@ -6,7 +6,7 @@
              xmlns:local="clr-namespace:AnnotationPlane"
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300">
-    <Grid>
+    <Grid Grid.IsSharedSizeScope="True">
         <Grid.RowDefinitions>
             <RowDefinition Height="auto"/>
             <RowDefinition/>
@@ -14,12 +14,11 @@
         <Border Grid.Row="0" BorderThickness="0" BorderBrush="Black">
             <Grid Name="HeadersGrid" >
             <Grid.RowDefinitions>
-                <RowDefinition Height="auto"/>
-                <RowDefinition Height="auto"/>
-            </Grid.RowDefinitions>
+                    <RowDefinition Height="auto"/>
+                </Grid.RowDefinitions>
         </Grid>
         </Border>
-        <ScrollViewer  Grid.Row="1">
+        <ScrollViewer VerticalAlignment="Top" Grid.Row="1">
             <Border BorderBrush="Black" BorderThickness="0">
             <Grid Name="ColumnsGrid"></Grid>
             </Border>

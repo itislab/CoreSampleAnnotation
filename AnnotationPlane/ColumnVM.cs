@@ -180,4 +180,42 @@ namespace AnnotationPlane
             }
         }
     }
+
+    /// <summary>
+    /// This is a spectial case of LayeredColumnVM which maintains the up-to-date RealLength property in every LengthLayerVM among layers
+    /// </summary>
+    public class LayerRealLengthColumnVM : LayeredColumnVM {
+        public LayerRealLengthColumnVM(string heading) : base(heading) {            
+            this.PropertyChanged += LayerRealSizeColumnVM_PropertyChanged;
+            Layers.CollectionChanged += Layers_CollectionChanged;
+        }
+
+        private void Layers_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        {
+            UpdateRealLength();
+        }
+
+        private void LayerRealSizeColumnVM_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            switch (e.PropertyName) {
+                case nameof(UpperBound):
+                case nameof(LowerBound):
+                case nameof(ColumnHeight):
+                    UpdateRealLength();
+                    break;
+            }
+        }
+
+        private void UpdateRealLength() {
+            double realToWpfFactor = (LowerBound - UpperBound)/ColumnHeight;
+            for (int i = 0; i < Layers.Count; i++) {
+                LengthLayerVM llvm = Layers[i] as LengthLayerVM;
+                if (llvm != null) {
+                    llvm.RealLength = llvm.Length * realToWpfFactor;
+                }
+            }
+        }
+        
+                
+    }
 }

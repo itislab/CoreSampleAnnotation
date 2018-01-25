@@ -7,6 +7,9 @@ using System.Threading.Tasks;
 namespace AnnotationPlane.ColumnScale
 {
     public interface IColumn {
+        /// <summary>
+        /// In WPF units
+        /// </summary>
         double ColumnHeight { set; }
         /// <summary>
         /// In meters (positive value)
@@ -86,6 +89,6 @@ namespace AnnotationPlane.ColumnScale
             column.LowerDepth = LowerDepth;
             column.UpperDepth = UpperDepth;
             column.ColumnHeight = (LowerDepth - UpperDepth) * ScaleFactor;
-        }        
+        }
     }
 }

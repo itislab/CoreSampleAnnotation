@@ -109,6 +109,9 @@
     <Compile Include="LayeredColumnView.xaml.cs">
       <DependentUpon>LayeredColumnView.xaml</DependentUpon>
     </Compile>
+    <Compile Include="LayerSynchronizer.cs" />
+    <Compile Include="SyncronizerColumnAdapter.cs" />
+    <Compile Include="SyncronizerScaleAdapter.cs" />
     <Compile Include="ViewModel.cs" />
     <Compile Include="ZoomBorder.cs" />
     <Page Include="AnnotationGrid.xaml">
@@ -143,7 +146,7 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="LayerPropertVMy.cs" />
+    <Compile Include="LayerPropertyVM.cs" />
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>

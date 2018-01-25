@@ -56,15 +56,23 @@ namespace AnnotationPlane
         }
     }
 
-
     /// <summary>
     /// Interaction logic for ImageColumnView.xaml
     /// </summary>
     public partial class ImageColumnView : UserControl
     {
+        //public event EventHandler<NewLayerBoundaryRequestedEventArgs> NewLayerBoundaryRequested = null;
+
         public ImageColumnView()
         {
-            InitializeComponent();            
+            InitializeComponent();
+
+            this.MouseRightButtonDown += ImageColumnView_MouseRightButtonDown;
+        }
+
+        private void ImageColumnView_MouseRightButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            
         }
     }
 }

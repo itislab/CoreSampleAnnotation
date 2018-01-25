@@ -14,12 +14,14 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 
 namespace AnnotationPlane
-{
+{    
     /// <summary>
     /// Interaction logic for DepthAxisView.xaml
     /// </summary>
-    public partial class DepthAxisView : UserControl
+    public partial class DepthAxisView : UserControl        
     {
+
+
         public DepthAxisView()
         {
             InitializeComponent();
