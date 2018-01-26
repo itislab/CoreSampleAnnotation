@@ -28,7 +28,24 @@ namespace AnnotationPlane
 
             Binding b = new Binding("DataContext");
             b.Source = this;
-            this.SetBinding(AnnotationGrid.BoundDataContextProperty, b);            
+            this.SetBinding(AnnotationGrid.BoundDataContextProperty, b);
+
+            //ColumnsGrid.ManipulationStarting += ColumnsGrid_ManipulationStarting;
+            //ColumnsGrid.ManipulationDelta += ColumnsGrid_ManipulationDelta;
+
+
+            Binding b2 = new Binding("ScaleFactor");
+            b2.Source = this;
+            b2.Mode = BindingMode.TwoWay;
+            SetBinding(AnnotationGrid.InternalScaleFactorProperty, b2);
+        }
+
+        private void ColumnsGrid_ManipulationDelta(object sender, ManipulationDeltaEventArgs e)
+        {
+            double factor = e.DeltaManipulation.Scale.Y;
+            InternalScaleFactor *= factor;
+            //System.Diagnostics.Debug.WriteLine("scale changed by {2} to {0}, trandlation changed to {1}", InternalScaleFactor, e.DeltaManipulation.Translation.Y,factor);            
+            e.Handled = true;
         }
 
         #region long hold related
@@ -122,6 +139,42 @@ namespace AnnotationPlane
         }
         #endregion
 
+        #region multitouch related
+
+
+        public double ScaleFactor
+        {
+            get { return (double)GetValue(ScaleFactorProperty); }
+            set { SetValue(ScaleFactorProperty, value); }
+        }
+
+        // Using a DependencyProperty as the backing store for ScaleFactor.  This enables animation, styling, binding, etc...
+        public static readonly DependencyProperty ScaleFactorProperty =
+            DependencyProperty.Register("ScaleFactor", typeof(double), typeof(AnnotationGrid), new PropertyMetadata(500.0));
+
+
+
+        private double InternalScaleFactor
+        {
+            get { return (double)GetValue(InternalScaleFactorProperty); }
+            set { SetValue(InternalScaleFactorProperty, value); }
+        }
+
+        // Using a DependencyProperty as the backing store for InternalScaleFactor.  This enables animation, styling, binding, etc...
+        private static readonly DependencyProperty InternalScaleFactorProperty =
+            DependencyProperty.Register("InternalScaleFactor", typeof(double), typeof(AnnotationGrid), new PropertyMetadata(500.0));
+
+
+
+
+
+        private void ColumnsGrid_ManipulationStarting(object sender, ManipulationStartingEventArgs e)
+        {
+            e.ManipulationContainer = this;
+            e.Handled = true;
+            //System.Diagnostics.Debug.WriteLine("manipulation started");
+        }
+        #endregion
         public event EventHandler<PointSelectedEventArgs> PointSelected = null;
 
         public object BoundDataContext
@@ -169,6 +222,7 @@ namespace AnnotationPlane
                 view.PreviewTouchDown += View_TouchDown;
                 view.PreviewTouchMove += View_TouchMove;
                 view.PreviewTouchUp += View_TouchUp;
+                view.IsManipulationEnabled = true;
                 view.TouchLeave += View_TouchLeave;
 
                 string sharedWidthGroupName = "annotation_grid_"+Guid.NewGuid().ToString().Replace('-','_');

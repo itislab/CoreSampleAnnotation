@@ -20,7 +20,7 @@
         </Border>
         <ScrollViewer VerticalAlignment="Top" Grid.Row="1">
             <Border BorderBrush="Black" BorderThickness="0">
-            <Grid Name="ColumnsGrid"></Grid>
+                <Grid Name="ColumnsGrid" IsManipulationEnabled="True"></Grid>
             </Border>
         </ScrollViewer>
     </Grid>

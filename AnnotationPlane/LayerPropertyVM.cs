@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -67,26 +68,66 @@ namespace AnnotationPlane
         }
     }
 
-    public class TextLayerVM : LayerVM {
-        private string text = string.Empty;
+    public class ClassificationLayerVM : LayerVM {
+        private LayerClass currentClass = null;
 
-        public string Text {
-            get { return text; }
+        public LayerClass CurrentClass
+        {
+            get { return currentClass; }
             set {
-                if (text != value) {
-                    text = value;
-                    RaisePropertyChanged(nameof(Text));
+                if (currentClass != value) {
+                    currentClass = value;
+                    RaisePropertyChanged(nameof(CurrentClass));
+                }
+            }
+        }
+
+        private ObservableCollection<LayerClass> possibleClasses = new ObservableCollection<LayerClass>();
+        public ObservableCollection<LayerClass> PossibleClasses {
+            get { return possibleClasses; }
+            set {
+                if (possibleClasses != value) {
+                    possibleClasses = value;
+                    RaisePropertyChanged(nameof(PossibleClasses));
                 }
             }
         }
 
         public override LayerVM DeepClone()
         {
-            var result = new TextLayerVM();
-            result.Length = Length;
-            result.Text = Text;
+            var result = new ClassificationLayerVM();
+            result.CurrentClass = CurrentClass;
+            result.PossibleClasses = new ObservableCollection<LayerClass>(PossibleClasses);
             return result;
+        }
+    }
 
+    public class LayerClass : ViewModel {
+        public LayerClass(string acronym, string description) {
+            this.acronym = acronym;
+            this.description = description;
+        }
+
+        private string acronym;
+        public string Acronym {
+            get { return acronym; }
+            set {
+                if (acronym != value) {
+                    acronym = value;
+                    RaisePropertyChanged(nameof(Acronym));
+                }
+            }
+        }
+
+        private string description;
+        public string Description {
+            get { return description; }
+            set {
+                if (description != value) {
+                    description = value;
+                    RaisePropertyChanged(nameof(Description));
+                }
+            }
         }
     }
 }

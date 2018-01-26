@@ -101,6 +101,21 @@ namespace AnnotationPlane.LayerSyncronization
             foreach (var column in columns)
                 ResetColumn(column);
         }
+        /// <summary>
+        /// Returns the index of the layer that contains the point with Y = wpf offset from the upper bound from the column
+        /// </summary>
+        /// <param name="wpfOffset"></param>
+        /// <returns></returns>
+        public int GetLayerIndex(double wpfOffset) {
+            var wpfBoundaries = depthBoundaries.Select(b => (b - UpperDepth) * ScaleFactor).ToArray();
+            int idx = Array.BinarySearch(wpfBoundaries, wpfOffset);
+            if (idx < 0)
+            {
+                idx = ~idx;
+                idx--;
+            }
+            return idx;
+        }
 
 
         public void RegisterLayer(ILayersColumn column) {
@@ -152,7 +167,7 @@ namespace AnnotationPlane.LayerSyncronization
                 foreach (var column in columns)
                 {
                     column.SetLayerHeight(idx, newTopLayerHeight);
-                    column.InsertLayer(idx + 1, 0);
+                    column.InsertLayer(idx + 1, idx);
                     column.SetLayerHeight(idx + 1, newLowerLayerHeight);
                 }
 

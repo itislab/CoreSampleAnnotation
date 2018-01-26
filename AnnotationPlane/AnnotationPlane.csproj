@@ -91,12 +91,17 @@
     </Compile>
     <Compile Include="AnnotationGridold.cs" />
     <Compile Include="AnnotationGridVM.cs" />
+    <Compile Include="ClassificationView.xaml.cs">
+      <DependentUpon>ClassificationView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="ClassificationVM.cs" />
     <Compile Include="ColumnScaleAdapters.cs" />
     <Compile Include="ColumnScaleController.cs" />
     <Compile Include="ColumnView.xaml.cs">
       <DependentUpon>ColumnView.xaml</DependentUpon>
     </Compile>
     <Compile Include="ColumnVM.cs" />
+    <Compile Include="DelegateCommand.cs" />
     <Compile Include="DepthAxisView.xaml.cs">
       <DependentUpon>DepthAxisView.xaml</DependentUpon>
     </Compile>
@@ -113,8 +118,13 @@
     <Compile Include="SyncronizerColumnAdapter.cs" />
     <Compile Include="SyncronizerScaleAdapter.cs" />
     <Compile Include="ViewModel.cs" />
+    <Compile Include="VisisbilityConverters.cs" />
     <Compile Include="ZoomBorder.cs" />
     <Page Include="AnnotationGrid.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="ClassificationView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
