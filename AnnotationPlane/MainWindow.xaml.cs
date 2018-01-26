@@ -50,7 +50,18 @@ namespace AnnotationPlane
             vm = new AnnotationGridVM();
             this.Plane.DataContext = vm;
             this.DataContext = this;
-            
+
+            Binding sfBind1 = new Binding("ScaleFactor");
+            sfBind1.Source = ColScaleController;
+            sfBind1.Mode = BindingMode.OneWayToSource;
+            Plane.SetBinding(AnnotationGrid.ScaleFactorProperty, sfBind1);
+
+            Binding sfBind2 = new Binding("ScaleFactor");
+            sfBind2.Source = LayerSyncController;
+            sfBind2.Mode = BindingMode.OneWayToSource;
+            Plane.SetBinding(AnnotationGrid.ScaleFactorProperty, sfBind2);
+
+
             ColScaleController.UpperDepth = 2800;
             ColScaleController.LowerDepth = 2830;
             ColScaleController.ScaleFactor = 600.0;

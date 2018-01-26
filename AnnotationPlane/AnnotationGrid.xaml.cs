@@ -30,8 +30,8 @@ namespace AnnotationPlane
             b.Source = this;
             this.SetBinding(AnnotationGrid.BoundDataContextProperty, b);
 
-            //ColumnsGrid.ManipulationStarting += ColumnsGrid_ManipulationStarting;
-            //ColumnsGrid.ManipulationDelta += ColumnsGrid_ManipulationDelta;
+            ColumnsGrid.ManipulationStarting += ColumnsGrid_ManipulationStarting;
+            ColumnsGrid.ManipulationDelta += ColumnsGrid_ManipulationDelta;
 
 
             Binding b2 = new Binding("ScaleFactor");
@@ -42,9 +42,34 @@ namespace AnnotationPlane
 
         private void ColumnsGrid_ManipulationDelta(object sender, ManipulationDeltaEventArgs e)
         {
-            double factor = e.DeltaManipulation.Scale.Y;
-            InternalScaleFactor *= factor;
+
+            double prefScaleFactor = InternalScaleFactor;
+            double scaleFactor = e.DeltaManipulation.Scale.Y;
+            if (scaleFactor != 1.0)
+            {
+                InternalScaleFactor *= scaleFactor;
+                //System.Diagnostics.Debug.WriteLine("scale changed by {0:0.0000} to {1:0.##}", scaleFactor, InternalScaleFactor);
+            }
+            double newScaleFactor = InternalScaleFactor;
             //System.Diagnostics.Debug.WriteLine("scale changed by {2} to {0}, trandlation changed to {1}", InternalScaleFactor, e.DeltaManipulation.Translation.Y,factor);            
+            var wpfMo = ColumnsGrid.PointFromScreen(new Point(0.0, e.ManipulationOrigin.Y));//as manipulation origin is in screen coods
+            double mo = wpfMo.Y;            
+            double startOffset = GridScroll.VerticalOffset;
+            double shift = -e.DeltaManipulation.Translation.Y;
+
+            //double startOffsetInScreen = ColumnsGrid.PointToScreen(new Point(0.0, GridScroll.VerticalOffset)).Y;
+
+            //double endOffsetInScreen = startOffset/prefScaleFactor + shi;            
+
+            double endOffsetInWPF = scaleFactor * (startOffset + shift);
+
+            //double newOffset1 = (startOffset-mo+shift)*scaleFactor + mo;
+
+            //System.Diagnostics.Debug.WriteLine("screen mo is {0}; offset {1}l wpf mo is {2}",mo,startOffset, wpfMo.Y);
+
+
+
+            GridScroll.ScrollToVerticalOffset(endOffsetInWPF);            
             e.Handled = true;
         }
 
@@ -62,7 +87,7 @@ namespace AnnotationPlane
                 //diactivating touch and hold
                 if (holdTimer != null)
                 {
-                    System.Diagnostics.Debug.WriteLine("touch-hold timer diactivated due to move ({0})", dist);
+                    //System.Diagnostics.Debug.WriteLine("touch-hold timer diactivated due to move ({0})", dist);
                     holdTimer.Elapsed -= HoldTimer_Elapsed;
                     holdTimer.Stop();
                     holdTimer = null;
@@ -79,7 +104,7 @@ namespace AnnotationPlane
             }));
             if (holdTimer != null)
             {
-                System.Diagnostics.Debug.WriteLine("touch-hold timer diactivated as it ticked");
+                //System.Diagnostics.Debug.WriteLine("touch-hold timer diactivated as it ticked");
                 holdTimer.Elapsed -= HoldTimer_Elapsed;
                 holdTimer.Stop();
                 holdTimer = null;
@@ -91,7 +116,7 @@ namespace AnnotationPlane
         {
             if (holdTimer != null)
             {
-                System.Diagnostics.Debug.WriteLine("touch-hold timer diactivated due to touch leave");
+                //System.Diagnostics.Debug.WriteLine("touch-hold timer diactivated due to touch leave");
                 holdTimer.Elapsed -= HoldTimer_Elapsed;
                 holdTimer.Stop();
                 holdTimer = null;
@@ -102,7 +127,7 @@ namespace AnnotationPlane
         {
             if (holdTimer != null)
             {
-                System.Diagnostics.Debug.WriteLine("touch-hold timer diactivated due to up event");
+                //System.Diagnostics.Debug.WriteLine("touch-hold timer diactivated due to up event");
                 holdTimer.Elapsed -= HoldTimer_Elapsed;
                 holdTimer.Stop();
                 holdTimer = null;

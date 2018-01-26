@@ -12,7 +12,7 @@
             <RowDefinition Height="auto"/>
             <RowDefinition/>
         </Grid.RowDefinitions>
-        <Slider Orientation="Horizontal" Name="ScaleSlider" Minimum="10" Maximum="3000" Value="{Binding Path=ColScaleController.ScaleFactor, Mode=TwoWay}"></Slider>
+        <!--<Slider Orientation="Horizontal" Name="ScaleSlider" Minimum="10" Maximum="3000" Value="{Binding Path=ColScaleController.ScaleFactor, Mode=TwoWay}"></Slider>-->
         <local:AnnotationGrid x:Name="Plane" Grid.Row="1">
         </local:AnnotationGrid>
         <local:ClassificationView x:Name="ClassificationView" Grid.Row="1" HorizontalAlignment="Center" VerticalAlignment="Center" Padding="30">

@@ -18,7 +18,7 @@
                 </Grid.RowDefinitions>
         </Grid>
         </Border>
-        <ScrollViewer VerticalAlignment="Top" Grid.Row="1">
+        <ScrollViewer VerticalAlignment="Top" Grid.Row="1" Name="GridScroll">
             <Border BorderBrush="Black" BorderThickness="0">
                 <Grid Name="ColumnsGrid" IsManipulationEnabled="True"></Grid>
             </Border>
