@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--This file is NOT compatible with Silverlight-->
+<Viewbox xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" Stretch="Uniform">
+  <Canvas Name="svg4507" Canvas.Left="0" Canvas.Top="0" Width="100" Height="125">
+    <Canvas.RenderTransform>
+      <TranslateTransform X="0" Y="0"/>
+    </Canvas.RenderTransform>
+    <Canvas.Resources/>
+    <!--Unknown tag: metadata-->
+    <!--Unknown tag: sodipodi:namedview-->
+    <Path xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" Name="path4501" Fill="#000000">
+      <Path.Data>
+        <PathGeometry Figures="M80.4 8.3l-24 24c-3.5 3.5-9.2 3.5-12.7 0l-24-24L9 18.9l24 24c3.5 3.5 3.5 9.2 0 12.7l-24 24l10.6 10.6l24-24  c3.5-3.5 9.2-3.5 12.7 0l24 24L91 79.7l-24-24c-3.5-3.5-3.5-9.2 0-12.7l24-24L80.4 8.3z" FillRule="NonZero"/>
+      </Path.Data>
+    </Path>
+    <TextBlock xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" FontSize="5" FontWeight="Bold" FontFamily="Helvetica Neue, Helvetica, Arial-Unicode, Arial, Sans-serif" Foreground="#FF000000" Canvas.Left="0" Canvas.Top="110" Name="text4503">Created by Viktor Vorobyev</TextBlock>
+    <TextBlock xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" FontSize="5" FontWeight="Bold" FontFamily="Helvetica Neue, Helvetica, Arial-Unicode, Arial, Sans-serif" Foreground="#FF000000" Canvas.Left="0" Canvas.Top="115" Name="text4505">from the Noun Project</TextBlock>
+  </Canvas>
+</Viewbox>

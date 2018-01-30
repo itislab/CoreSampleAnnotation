@@ -1,0 +1,2 @@
+﻿<TextBlock xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" FontSize="5" FontWeight="Bold" FontFamily="Helvetica Neue, Helvetica, Arial-Unicode, Arial, Sans-serif" Foreground="#FF000000" Canvas.Left="0" Canvas.Top="110" Name="text4503">Created by Viktor Vorobyev</TextBlock>
+    <TextBlock xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" FontSize="5" FontWeight="Bold

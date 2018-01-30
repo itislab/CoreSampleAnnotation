@@ -1,0 +1,17 @@
+﻿<Application x:Class="CoreSampleAnnotation.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="clr-namespace:CoreSampleAnnotation"
+             StartupUri="MainWindow.xaml">
+    <Application.Resources>
+        <SolidColorBrush Color="#5d4037" x:Key="ColorPrimary" />
+        <SolidColorBrush Color="#ffffff" x:Key="ColorTextOnPrimary"/>
+        <Style x:Key="MetroButton" TargetType="Button">
+            <Setter Property="Background" Value="{StaticResource ColorPrimary}"/>
+            <Setter Property="Foreground" Value="{StaticResource ColorTextOnPrimary}"/>
+            <Setter Property="Margin" Value="10"/>
+            <Setter Property="Padding" Value="10"/>
+            <Setter Property="FontSize" Value="20"/>
+        </Style>
+    </Application.Resources>
+</Application>
