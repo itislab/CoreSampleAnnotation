@@ -40,7 +40,7 @@ namespace All
                 photoMarkupVM.PropertyChanged -= PhotoMarkupVM_PropertyChanged;
 
             photoMarkupVM = new PhotoMarkupVM();
-            photoMarkupVM.ImagePath = System.IO.Path.GetFullPath(imgPath); //"kern.jpg";
+            photoMarkupVM.ImagePath = System.IO.Path.GetFullPath(imgPath);
             //propagating changes to other VMs
             photoMarkupVM.PropertyChanged += PhotoMarkupVM_PropertyChanged;
             this.Markup.DataContext = photoMarkupVM;

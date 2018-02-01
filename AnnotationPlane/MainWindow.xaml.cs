@@ -64,7 +64,7 @@ namespace AnnotationPlane
 
             ColScaleController.UpperDepth = 2800;
             ColScaleController.LowerDepth = 2830;
-            ColScaleController.ScaleFactor = 600.0;
+            ColScaleController.ScaleFactor = 3000.0;
 
             this.Plane.PointSelected += Plane_PointSelected;
 

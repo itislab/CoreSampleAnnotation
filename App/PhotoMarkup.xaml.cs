@@ -489,7 +489,7 @@ namespace All
         {
             Matrix rectsMatrix = ((MatrixTransform)this.Image.RenderTransform).Matrix;
 
-            rectsMatrix.RotateAt(e.DeltaManipulation.Rotation, e.ManipulationOrigin.X, e.ManipulationOrigin.Y);
+            //rectsMatrix.RotateAt(e.DeltaManipulation.Rotation, e.ManipulationOrigin.X, e.ManipulationOrigin.Y);
 
             rectsMatrix.ScaleAt(e.DeltaManipulation.Scale.X, e.DeltaManipulation.Scale.X,
                e.ManipulationOrigin.X, e.ManipulationOrigin.Y);

@@ -5,20 +5,21 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows.Media.Imaging;
 
 namespace CoreSampleAnnotation.Intervals
 {
     public class PhotoCalibratedBoreIntervalVM : BoreIntervalVM
     {
-        private double annotatedLength = 0;
         /// <summary>
         /// A total length in meters of all annotated parts of the core sample
         /// </summary>
         public double AnnotatedLength
         {
-            get { return regions.Sum(r => r.Length)*0.01; }            
+            get { return regions.Sum(r => r.Length) * 0.01; }
         }
 
         public double AnnotatedPercentage
@@ -97,10 +98,17 @@ namespace CoreSampleAnnotation.Intervals
         private int curImageIdx = 0;
         private List<string> imagePaths = new List<string>();
 
-        public int CurImageIdx {
+        public int ImagesCount {
+            get { return imagePaths.Count; }
+        }
+
+        public int CurImageIdx
+        {
             get { return curImageIdx; }
-            set {
-                if (curImageIdx != value) {
+            set
+            {
+                if (curImageIdx != value)
+                {
                     curImageIdx = value;
                     RaisePropertyChanged(nameof(CurImageIdx));
                     RaisePropertyChanged(nameof(ImagePath));
@@ -121,12 +129,23 @@ namespace CoreSampleAnnotation.Intervals
 
         private ICommand addNewImageCommand = null;
 
+        private ICommand rotateCurrentImageCommand = null;
+
+        //private ICommand removeCurrentImageCommand = null;
+
         public ICommand AddNewImageCommand
         {
             get { return addNewImageCommand; }
         }
 
         public ICommand NextImageCommand { private set; get; }
+
+        public ICommand RotateCurrentImageCommand
+        {
+            get { return rotateCurrentImageCommand; }
+        }
+
+        public ICommand RemoveCurrentImageCommand { get; private set; }
 
         public int AvailableImagesCount
         {
@@ -151,11 +170,36 @@ namespace CoreSampleAnnotation.Intervals
                     curImageIdx = imagePaths.Count - 1;
                     RaisePropertyChanged(nameof(ImagePath));
                     RaisePropertyChanged(nameof(ImageTransform));
+                    RaisePropertyChanged(nameof(ImagesCount));
                 }
             });
 
-            NextImageCommand = new DelegateCommand(() => {                
+            NextImageCommand = new DelegateCommand(() =>
+            {
+                if (imagePaths.Count > 0)
+                    CurImageIdx = (curImageIdx + 1) % imagePaths.Count;
+            });
+
+            rotateCurrentImageCommand = new DelegateCommand(() =>
+            {
+                //Image img = new Image();
+                //img.Source = new BitmapImage(new Uri(ImagePath));
+
+                Matrix orig = ImageTransform.Value;
+                Matrix additional = new RotateTransform(-90.0).Value;
+                ImageTransform = new MatrixTransform(orig * additional);
+            });
+
+            RemoveCurrentImageCommand = new DelegateCommand(() => {
+                int idxToRemove = curImageIdx;
                 CurImageIdx = (curImageIdx + 1) % imagePaths.Count;
+
+                imagePaths.RemoveAt(idxToRemove);
+                imageTransforms.RemoveAt(idxToRemove);
+
+                RaisePropertyChanged(nameof(ImagePath));
+                RaisePropertyChanged(nameof(ImageTransform));
+                RaisePropertyChanged(nameof(ImagesCount));
             });
         }
 
@@ -166,7 +210,7 @@ namespace CoreSampleAnnotation.Intervals
             {
                 case nameof(base.LowerDepth):
                 case nameof(base.UpperDepth):
-                    RaisePropertyChanged(nameof(AnnotatedPercentage));
+                    RaisePropertyChanged(nameof(AnnotatedPercentage));                    
                     break;
             }
         }

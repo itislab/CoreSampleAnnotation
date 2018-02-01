@@ -8,6 +8,10 @@
              xmlns:media="clr-namespace:CoreSampleAnnotation.Media"
              mc:Ignorable="d" 
              d:DesignHeight="400" d:DesignWidth="800">
+    <UserControl.Resources>
+        <local:FileExistsVisibilityconverter x:Key="fileExistsVisibilityConverter" />
+        <local:MoreThanOneVisibilityConverter x:Key="moreThanOneVisibilityConverter" />
+    </UserControl.Resources>
     <Grid>
         <markup:PhotoMarkup x:Name="Markup" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Panel.ZIndex="1" CalibratedRegions="{Binding CalibratedRegions, Mode=TwoWay}"/>
         <markup:ExtractionInfoView x:Name="ExtractionView" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="30" Panel.ZIndex="3">
@@ -19,8 +23,10 @@
                 <RowDefinition/>
                 <RowDefinition/>
             </Grid.RowDefinitions>
-            <Button Grid.Row="0" Style="{StaticResource MetroButton}" Width="50" Height="50" Command="{Binding AddNewImageCommand}">Новое фото</Button>
-            <Button Grid.Row="1" Style="{StaticResource MetroButton}" Width="50" Height="50" Command="{Binding NextImageCommand}">
+            <Button Grid.Row="0" Style="{StaticResource MetroButton}" Width="50" Height="50" Command="{Binding AddNewImageCommand}">
+                <media:AddNewPhoto/>
+            </Button>
+            <Button Grid.Row="1" Style="{StaticResource MetroButton}" Width="50" Height="50" Command="{Binding NextImageCommand}" Visibility="{Binding ImagesCount, Converter={StaticResource moreThanOneVisibilityConverter}}">
                 <Button.LayoutTransform>
                     <RotateTransform Angle="90"/>
                 </Button.LayoutTransform>
@@ -28,8 +34,12 @@
                     
                 </media:Arrow_In_circle>
             </Button>
-            <Button Grid.Row="2" Style="{StaticResource MetroButton}" Width="50" Height="50">Разворот</Button>
-            <Button Grid.Row="3" Style="{StaticResource MetroButton}" Width="50" Height="50">Удалить текущее</Button>
+            <Button Grid.Row="2" Style="{StaticResource MetroButton}" Width="50" Height="50" Command="{Binding RotateCurrentImageCommand}" Visibility="{Binding ImagePath, Converter={StaticResource fileExistsVisibilityConverter}}">
+                <media:RotateIcon/>
+            </Button>
+            <Button Grid.Row="3" Style="{StaticResource MetroButton}" Width="50" Height="50" Command="{Binding RemoveCurrentImageCommand}" Visibility="{Binding ImagePath, Converter={StaticResource fileExistsVisibilityConverter}}">
+                <media:CrossIcon/>
+            </Button>
         </Grid>
     </Grid>
 </UserControl>

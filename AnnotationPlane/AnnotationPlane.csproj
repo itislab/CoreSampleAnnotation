@@ -89,7 +89,6 @@
     <Compile Include="AnnotationGrid.xaml.cs">
       <DependentUpon>AnnotationGrid.xaml</DependentUpon>
     </Compile>
-    <Compile Include="AnnotationGridold.cs" />
     <Compile Include="AnnotationGridVM.cs" />
     <Compile Include="ClassificationView.xaml.cs">
       <DependentUpon>ClassificationView.xaml</DependentUpon>

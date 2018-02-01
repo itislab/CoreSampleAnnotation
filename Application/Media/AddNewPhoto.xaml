@@ -1,0 +1,29 @@
+﻿<UserControl x:Class="CoreSampleAnnotation.Media.AddNewPhoto"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:CoreSampleAnnotation.Media"
+             mc:Ignorable="d" 
+             d:DesignHeight="300" d:DesignWidth="300">
+    <Viewbox xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" Stretch="Uniform">
+        <Canvas Name="svg4503" Canvas.Left="0" Canvas.Top="0" Width="100" Height="100" Background="{StaticResource ColorPrimary}">
+            <Canvas.RenderTransform>
+                <TranslateTransform X="0" Y="0"/>
+            </Canvas.RenderTransform>
+            <Canvas.Resources/>
+            <!--Unknown tag: metadata-->
+            <!--Unknown tag: sodipodi:namedview-->
+            <Canvas Name="g4497">
+                <Canvas.RenderTransform>
+                    <TranslateTransform X="0" Y="-952.36218"/>
+                </Canvas.RenderTransform>
+                <Path xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" Name="path4495" Fill="{StaticResource ColorTextOnPrimary}">
+                    <Path.Data>
+                        <PathGeometry Figures="m 41.6875 967.36625 a 3.0003 3.0001393 0 0 0 -2.5 1.9374 l -2.28125 6.06217 -9.90625 0 c -2.43987 0 -4.522787 1.26876 -5.875 2.93735 -1.352213 1.66858 -2.125 3.7988 -2.125 6.06217 l 0 25.27986 c -7.927815 1.4333 -14 8.3934 -14 16.7179 0 9.3528 7.646693 16.9991 17 16.9991 8.324993 0 15.285407 -6.0719 16.71875 -13.9993 l 48.28125 0 c 4.157739 0 8 -3.4728 8 -7.9995 l 0 -36.99806 c 0 -2.26337 -0.772787 -4.39359 -2.125 -6.06217 -1.352213 -1.66859 -3.43513 -2.93735 -5.875 -2.93735 l -9.90625 0 -2.28125 -6.06217 A 3.0003 3.0001393 0 0 0 72 967.36625 l -30 0 a 3.0003 3.0001393 0 0 0 -0.3125 0 z m 2.375 5.99968 25.875 0 2.25 6.03093 A 3.0003 3.0001393 0 0 0 75 981.3655 l 12 0 c 0.330157 0 0.76347 0.15691 1.21875 0.71871 0.45528 0.5618 0.78125 1.46664 0.78125 2.28113 l 0 36.99806 c 0 1.6289 -0.617685 1.9999 -2 1.9999 l -48.28125 0 C 37.462455 1016.4151 31.94856 1010.9015 25 1009.6452 l 0 -25.27986 c 0 -0.81449 0.32597 -1.71933 0.78125 -2.28113 0.45528 -0.5618 0.888593 -0.71871 1.21875 -0.71871 l 12 0 a 3.0003 3.0001393 0 0 0 2.8125 -1.96864 l 2.25 -6.03093 z M 57 984.36534 c -9.306363 0 -16.90625 7.64179 -16.90625 16.99906 0 9.3573 7.599887 16.9991 16.90625 16.9991 9.306363 0 16.90625 -7.6418 16.90625 -16.9991 0 -9.35727 -7.599887 -16.99906 -16.90625 -16.99906 z m 0 5.99968 c 6.072643 0 10.9375 4.89353 10.9375 10.99938 0 6.1059 -4.864857 10.9994 -10.9375 10.9994 -6.072643 0 -10.9375 -4.8935 -10.9375 -10.9994 0 -6.10585 4.864857 -10.99938 10.9375 -10.99938 z m -35 24.99868 c 6.110666 0 11 4.889 11 10.9994 0 6.1103 -4.889334 10.9994 -11 10.9994 -6.110666 0 -11 -4.8891 -11 -10.9994 0 -6.1104 4.889334 -10.9994 11 -10.9994 z m -0.03125 1.9374 A 3.0003 3.0001393 0 0 0 19 1020.3634 l 0 2.9999 -3 0 a 3.0003 3.0001393 0 0 0 -0.3125 0 3.0040663 3.0039054 0 1 0 0.3125 5.9996 l 3 0 0 2.9999 a 3.0003 3.0001393 0 1 0 6 0 l 0 -2.9999 3 0 a 3.0003 3.0001393 0 1 0 0 -5.9996 l -3 0 0 -2.9999 a 3.0003 3.0001393 0 0 0 -3.03125 -3.0623 z" FillRule="NonZero"/>
+                    </Path.Data>
+                </Path>
+            </Canvas>
+        </Canvas>
+    </Viewbox>
+</UserControl>

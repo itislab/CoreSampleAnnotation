@@ -66,6 +66,9 @@
       <DependentUpon>IntervalImages.xaml</DependentUpon>
     </Compile>
     <Compile Include="Intervals\PhotoCalibratedBoreIntervalVM.cs" />
+    <Compile Include="Media\AddNewPhoto.xaml.cs">
+      <DependentUpon>AddNewPhoto.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Media\Arrow_In_circle.xaml.cs">
       <DependentUpon>Arrow_In_circle.xaml</DependentUpon>
     </Compile>
@@ -74,6 +77,9 @@
     </Compile>
     <Compile Include="Media\ExitIcon.xaml.cs">
       <DependentUpon>ExitIcon.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Media\RotateIcon.xaml.cs">
+      <DependentUpon>RotateIcon.xaml</DependentUpon>
     </Compile>
     <Compile Include="PhotoMarkup\AnnotatedPolygon.xaml.cs">
       <DependentUpon>AnnotatedPolygon.xaml</DependentUpon>
@@ -100,6 +106,9 @@
     </Compile>
     <Compile Include="ProjectMenuVM.cs" />
     <Compile Include="ProjectVM.cs" />
+    <Compile Include="TextInput.xaml.cs">
+      <DependentUpon>TextInput.xaml</DependentUpon>
+    </Compile>
     <Compile Include="ViewModel.cs" />
     <Compile Include="ViewModelStubs.cs" />
     <Page Include="Intervals\BoreIntervalsView.xaml">
@@ -122,6 +131,10 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="Media\AddNewPhoto.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Media\Arrow_In_circle.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -131,6 +144,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Media\ExitIcon.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Media\RotateIcon.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -155,6 +172,10 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="ProjectMenuView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="TextInput.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -196,7 +217,9 @@
   <ItemGroup>
     <Resource Include="credits\cross_icon_cc.txt" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Resource Include="credits\rotate-icon.txt" />
+  </ItemGroup>
   <ItemGroup>
     <Resource Include="Media\cross_marker_blue.svg" />
   </ItemGroup>

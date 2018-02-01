@@ -51,18 +51,18 @@ namespace CoreSampleAnnotation.Intervals
             if (str != null)
             {
                 if (str == string.Empty)
-                    return double.NaN;
+                    return null;
                 else
                 {
                     double result;
                     if (double.TryParse(str, out result))
                         return result;
                     else
-                        return double.NaN;
+                        return null;
                 }
             }
             else
-                return double.NaN;
+                return null;
         }
     }    
 }

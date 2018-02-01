@@ -7,18 +7,9 @@
              xmlns:media="clr-namespace:CoreSampleAnnotation.Media"
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300">
-    <UserControl.Resources>
-        <local:CollapsedConverter x:Key="CollapsedConverter" />
-    </UserControl.Resources>
     <Grid>
         <StackPanel Orientation="Vertical" VerticalAlignment="Center" HorizontalAlignment="Center">
-            <Grid HorizontalAlignment="Center" VerticalAlignment="Top"  >
-                <!-- overlay with hint text -->
-                <TextBlock FontSize="25" Margin="20" Width="350" Text="Введите название скважены" 
-                   Foreground="DimGray" Visibility="{Binding ElementName=txtBoreName, Path=Text.IsEmpty, Converter={StaticResource CollapsedConverter}}" />
-                <!-- enter term here -->
-                <TextBox TextAlignment="Left" BorderThickness="0" Margin="20" FontSize="25" Width="350" Name="txtBoreName" Background="Transparent" Text="{Binding ProjectVM.BoreName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-            </Grid>
+            <local:TextInput MinWidth="400" HintText="Введите название скважены" Text="{Binding ProjectVM.BoreName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
             <Button Style="{StaticResource MetroButton}" Command="{Binding ActivateBoreIntervalsCommand}">Интервалы отбора</Button>
             <Button Style="{StaticResource MetroButton}" Command="{Binding ActivateAnnotationPlaneCommand}">Разметка слоев</Button>
             <Button Style="{StaticResource MetroButton}" Command="{Binding ActivateTemplateEditorCommand}">Редактор шаблона</Button>

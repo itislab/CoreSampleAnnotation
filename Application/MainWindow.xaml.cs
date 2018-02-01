@@ -21,37 +21,39 @@ namespace CoreSampleAnnotation
     /// </summary>
     public partial class MainWindow : Window
     {
-        private MainWindowVM vm = new MainWindowVM();        
+        private MainWindowVM vm = new MainWindowVM();
         private ProjectMenuVM menuVM = null;
 
         public MainWindow()
         {
             InitializeComponent();
             DataContext = vm;
-
-            vm.CurrentProjectVM.BoreIntervalsVM.ActivateIntervalImagesCommand = new DelegateCommand(arg => {                
-                Intervals.PhotoCalibratedBoreIntervalVM intervalVM = arg as Intervals.PhotoCalibratedBoreIntervalVM;
-                vm.ActiveSectionVM = intervalVM;
-
-                if (intervalVM.AvailableImagesCount == 0)
-                    intervalVM.AddNewImageCommand.Execute(null);
-            }); 
+            
+            vm.CurrentProjectVM.BoreIntervalsVM.ActivateIntervalImagesCommand = 
+                new DelegateCommand(arg =>
+                {
+                    Intervals.PhotoCalibratedBoreIntervalVM intervalVM = arg as Intervals.PhotoCalibratedBoreIntervalVM;
+                    vm.ActiveSectionVM = intervalVM;
+                });
 
             menuVM = new ProjectMenuVM(vm.CurrentProjectVM);
 
             menuVM.ExitAppCommand = new DelegateCommand(() =>
             {
-                var result = MessageBox.Show("Закрыть приложение?", "Выход", MessageBoxButton.OKCancel,MessageBoxImage.Question);
-                if (result == MessageBoxResult.OK) {
+                var result = MessageBox.Show("Закрыть приложение?", "Выход", MessageBoxButton.OKCancel, MessageBoxImage.Question);
+                if (result == MessageBoxResult.OK)
+                {
                     Close();
                 }
             });
 
-            menuVM.ActivateBoreIntervalsCommand = new DelegateCommand(() => {
+            menuVM.ActivateBoreIntervalsCommand = new DelegateCommand(() =>
+            {
                 vm.ActiveSectionVM = vm.CurrentProjectVM.BoreIntervalsVM;
             });
 
-            menuVM.ActivateAnnotationPlaneCommand = new DelegateCommand(() => {
+            menuVM.ActivateAnnotationPlaneCommand = new DelegateCommand(() =>
+            {
                 vm.ActiveSectionVM = new AnnotationPlaneStubVM();
             });
 
@@ -61,7 +63,7 @@ namespace CoreSampleAnnotation
             vm.ActiveSectionVM = menuVM;
 
             Activate();
-        }        
+        }
 
         private void ButtonActivateMenu_Click(object sender, RoutedEventArgs e)
         {

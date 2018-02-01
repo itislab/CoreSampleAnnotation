@@ -26,7 +26,7 @@ namespace CoreSampleAnnotation.Intervals
             }
         }
 
-        private double upperDepth = 0;
+        private double upperDepth = double.NaN;
         /// <summary>
         /// A depth (positive value) in meters of the highest extraction point
         /// </summary>
@@ -48,7 +48,7 @@ namespace CoreSampleAnnotation.Intervals
             }
         }
 
-        private double lowerDepth = 0;
+        private double lowerDepth = double.NaN;
         /// <summary>
         /// A depth (positive value) in meters of the loweret extraction point
         /// </summary>
