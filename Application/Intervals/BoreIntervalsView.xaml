@@ -21,10 +21,12 @@
                     <ColumnDefinition SharedSizeGroup="intervals_2"></ColumnDefinition>
                     <ColumnDefinition SharedSizeGroup="intervals_3"></ColumnDefinition>
                     <ColumnDefinition SharedSizeGroup="intervals_4"></ColumnDefinition>
+                    <ColumnDefinition SharedSizeGroup="intervals_5"></ColumnDefinition>
                 </Grid.ColumnDefinitions>
-                <TextBlock TextAlignment="Left" Grid.Column="0"  FontSize="20" Margin="20,0" HorizontalAlignment="Stretch">Верхняя граница (м)</TextBlock>
-                <TextBlock TextAlignment="Left" Grid.Column="1" FontSize="20" Margin="20,0" HorizontalAlignment="Stretch">Нижняя граница (м)</TextBlock>
-                <TextBlock TextAlignment="Left" Grid.Column="2" FontSize="20" Margin="20,0" HorizontalAlignment="Stretch">Выход (м)</TextBlock>
+                <TextBlock TextAlignment="Left" Grid.Column="0"  FontSize="15" Margin="20,0" HorizontalAlignment="Stretch">Верхняя граница (м)</TextBlock>
+                <TextBlock TextAlignment="Left" Grid.Column="1" FontSize="15" Margin="20,0" HorizontalAlignment="Stretch">Нижняя граница (м)</TextBlock>
+                <TextBlock TextAlignment="Left" Grid.Column="2" FontSize="15" Margin="20,0" HorizontalAlignment="Stretch">Измеренный Выход (м)</TextBlock>
+                <TextBlock TextAlignment="Left" Grid.Column="3" FontSize="15" Margin="20,0" HorizontalAlignment="Stretch">Выделенно участков на фото (%)</TextBlock>
             </Grid>
             <ItemsControl ItemsSource="{Binding Intervals}">
                 <ItemsControl.ItemTemplate>
@@ -36,16 +38,18 @@
                                 <ColumnDefinition SharedSizeGroup="intervals_2"></ColumnDefinition>
                                 <ColumnDefinition SharedSizeGroup="intervals_3"></ColumnDefinition>
                                 <ColumnDefinition SharedSizeGroup="intervals_4"></ColumnDefinition>
+                                <ColumnDefinition SharedSizeGroup="intervals_5"></ColumnDefinition>
                             </Grid.ColumnDefinitions>
-                            <app:TextInput MinWidth="50" HintText="Введите верхнюю границу" HintFontSize="15" InputFontSize="20"  Grid.Column="0" Text="{Binding UpperDepth, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource nanToEmptyStringDoubleConverter}}" />
-                            <app:TextInput MinWidth="50" HintText="Введите нижнюю границу" HintFontSize="15" InputFontSize="20"  Grid.Column="1" Text="{Binding LowerDepth, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource nanToEmptyStringDoubleConverter}}" />
-                            <app:TextInput MinWidth="100" HintText="Введите выход" HintFontSize="15" InputFontSize="20"  Grid.Column="2" Text="{Binding ExtractedLength, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource nanToEmptyStringDoubleConverter}}" />
-                            <Button Grid.Column="3" Margin="20,0" VerticalAlignment="Center" FontSize="15" Style="{StaticResource MetroButton}" Content="{Binding ImagesButtonText}" CommandParameter="{Binding}">
+                            <app:TextInput Grid.Column="0" MinWidth="50" HintText="Введите верхнюю границу" HintFontSize="15" InputFontSize="20" Text="{Binding UpperDepth, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource nanToEmptyStringDoubleConverter}}" />
+                            <app:TextInput Grid.Column="1" MinWidth="50" HintText="Введите нижнюю границу" HintFontSize="15" InputFontSize="20"  Text="{Binding LowerDepth, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource nanToEmptyStringDoubleConverter}}" />
+                            <app:TextInput Grid.Column="2" MinWidth="100" HintText="Введите выход" HintFontSize="15" InputFontSize="20"  Text="{Binding ExtractedLength, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource nanToEmptyStringDoubleConverter}}" />
+                            <TextBlock Grid.Column="3" Text="{Binding AnnotatedPercentage, StringFormat={}{0:0.#} %}" FontSize="20" VerticalAlignment="Center" HorizontalAlignment="Center"></TextBlock>
+                            <Button Grid.Column="4" Margin="20,0" VerticalAlignment="Center" FontSize="15" Style="{StaticResource MetroButton}" Content="{Binding ImagesButtonText}" CommandParameter="{Binding}">
                                 <Button.Command>
                                     <Binding RelativeSource="{RelativeSource AncestorType=ItemsControl}" Path="DataContext.EffectiveActivateIntervalImagesCommand" />
                                 </Button.Command>
                             </Button>
-                            <Button Grid.Column="4" Width="50" Height="50" Margin="20,0" CommandParameter="{Binding}">
+                            <Button Grid.Column="5" Width="50" Height="50" Margin="20,0" CommandParameter="{Binding}">
                                 <Button.Command>
                                     <Binding RelativeSource="{RelativeSource AncestorType=ItemsControl}" Path="DataContext.RemoveIntervalCommand" />
                                 </Button.Command>

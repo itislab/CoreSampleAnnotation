@@ -19,20 +19,22 @@ namespace CoreSampleAnnotation.Intervals
         /// </summary>
         public double AnnotatedLength
         {
-            get { return regions.Sum(r => r.Length) * 0.01; }
+            get { return imageRegions.Sum(arr => arr.Sum(r => r.Length)) * 0.01; }
         }
 
         public double AnnotatedPercentage
         {
             get
             {
-                return AnnotatedLength / ExtractionLength * 100.0;
+                if (double.IsNaN(ExtractedLength) || double.IsNaN(AnnotatedLength) || (ExtractionLength==0.0))
+                    return 0.0;
+                else
+                    return AnnotatedLength / ExtractionLength * 100.0;
             }
         }
 
-        private IEnumerable<CalibratedRegionVM> regions = new List<CalibratedRegionVM>();
-
         private List<Transform> imageTransforms = new List<Transform>();
+        private List<IEnumerable<CalibratedRegionVM>> imageRegions = new List<IEnumerable<CalibratedRegionVM>>();
 
         public Transform ImageTransform
         {
@@ -58,17 +60,44 @@ namespace CoreSampleAnnotation.Intervals
 
         public IEnumerable<CalibratedRegionVM> CalibratedRegions
         {
-            get { return regions; }
+            get
+            {
+                if (imageRegions.Count > 0)
+                    return imageRegions[curImageIdx];
+                else
+                    return null;
+            }
             set
             {
-                if (regions != value)
+                if (imageRegions[curImageIdx] != value)
                 {
-                    regions = value;
+                    if (imageRegions[curImageIdx] != null)
+                        foreach(CalibratedRegionVM crCM in imageRegions[curImageIdx]) 
+                            crCM.PropertyChanged -= CalibratedRegion_PropertyChanged;                        
+                    if(value != null)
+                        foreach (CalibratedRegionVM crCM in value)
+                            crCM.PropertyChanged += CalibratedRegion_PropertyChanged;
+
+                    imageRegions[curImageIdx] = value;
                     RaisePropertyChanged(nameof(CalibratedRegions));
                     RaisePropertyChanged(nameof(ImagesButtonText));
                     RaisePropertyChanged(nameof(AnnotatedLength));
                     RaisePropertyChanged(nameof(AnnotatedPercentage));
                 }
+            }
+        }
+
+        private void CalibratedRegion_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            CalibratedRegionVM vm = sender as CalibratedRegionVM;
+            if(vm != null)
+            {
+                switch (e.PropertyName) {
+                    case nameof(vm.Length):
+                        RaisePropertyChanged(nameof(AnnotatedLength));
+                        RaisePropertyChanged(nameof(AnnotatedPercentage));
+                        break;
+                    }
             }
         }
 
@@ -98,7 +127,8 @@ namespace CoreSampleAnnotation.Intervals
         private int curImageIdx = 0;
         private List<string> imagePaths = new List<string>();
 
-        public int ImagesCount {
+        public int ImagesCount
+        {
             get { return imagePaths.Count; }
         }
 
@@ -113,6 +143,7 @@ namespace CoreSampleAnnotation.Intervals
                     RaisePropertyChanged(nameof(CurImageIdx));
                     RaisePropertyChanged(nameof(ImagePath));
                     RaisePropertyChanged(nameof(ImageTransform));
+                    RaisePropertyChanged(nameof(CalibratedRegions));
                 }
             }
         }
@@ -147,11 +178,6 @@ namespace CoreSampleAnnotation.Intervals
 
         public ICommand RemoveCurrentImageCommand { get; private set; }
 
-        public int AvailableImagesCount
-        {
-            get { return imagePaths.Count; }
-        }
-
         public PhotoCalibratedBoreIntervalVM()
         {
             base.PropertyChanged += PhotoCalibratedBoreIntervalVM_PropertyChanged;
@@ -165,12 +191,16 @@ namespace CoreSampleAnnotation.Intervals
                 {
                     imagePaths.Add(fileCandidate);
                     imageTransforms.Add(Transform.Identity);
-                    RaisePropertyChanged(nameof(AvailableImagesCount));
+                    imageRegions.Add(new List<CalibratedRegionVM>());
 
-                    curImageIdx = imagePaths.Count - 1;
-                    RaisePropertyChanged(nameof(ImagePath));
-                    RaisePropertyChanged(nameof(ImageTransform));
+                    CurImageIdx = imagePaths.Count - 1;
                     RaisePropertyChanged(nameof(ImagesCount));
+                    if (imagePaths.Count == 1)
+                    {
+                        RaisePropertyChanged(nameof(ImagePath));
+                        RaisePropertyChanged(nameof(ImageTransform));
+                        RaisePropertyChanged(nameof(CalibratedRegions));
+                    }
                 }
             });
 
@@ -190,15 +220,20 @@ namespace CoreSampleAnnotation.Intervals
                 ImageTransform = new MatrixTransform(orig * additional);
             });
 
-            RemoveCurrentImageCommand = new DelegateCommand(() => {
+            RemoveCurrentImageCommand = new DelegateCommand(() =>
+            {
                 int idxToRemove = curImageIdx;
-                CurImageIdx = (curImageIdx + 1) % imagePaths.Count;
-
                 imagePaths.RemoveAt(idxToRemove);
                 imageTransforms.RemoveAt(idxToRemove);
+                imageRegions.RemoveAt(idxToRemove);
+
+                if (imagePaths.Count > 0)
+                    CurImageIdx = (curImageIdx) % imagePaths.Count;
 
                 RaisePropertyChanged(nameof(ImagePath));
                 RaisePropertyChanged(nameof(ImageTransform));
+                RaisePropertyChanged(nameof(CalibratedRegions));
+
                 RaisePropertyChanged(nameof(ImagesCount));
             });
         }
@@ -210,7 +245,7 @@ namespace CoreSampleAnnotation.Intervals
             {
                 case nameof(base.LowerDepth):
                 case nameof(base.UpperDepth):
-                    RaisePropertyChanged(nameof(AnnotatedPercentage));                    
+                    RaisePropertyChanged(nameof(AnnotatedPercentage));
                     break;
             }
         }
