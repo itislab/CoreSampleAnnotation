@@ -81,7 +81,7 @@ namespace CoreSampleAnnotation.PhotoMarkup
         }
 
 
-        private int order = 0;
+        private int order = -1;
         /// <summary>
         /// The order according to which the core sample parts are aligned between each other
         /// </summary>
@@ -123,6 +123,9 @@ namespace CoreSampleAnnotation.PhotoMarkup
                 }
             }
         }
+        public bool CanMoveUp {
+            get { return MoveUp.CanExecute(Order); }
+        }
 
         private ICommand moveDown;
         public ICommand MoveDown {
@@ -133,6 +136,35 @@ namespace CoreSampleAnnotation.PhotoMarkup
                     RaisePropertyChanged(nameof(MoveDown));
                 }
             }
+        }
+        public bool CanMoveDown
+        {
+            get { return MoveDown.CanExecute(Order); }
+
+        }
+
+        private ICommand remove;
+        public ICommand RemoveCommand {
+            get { return remove; }
+            set {
+                if (remove != value) {
+                    remove = value;
+                    RaisePropertyChanged(nameof(RemoveCommand));
+                }
+            }
+        }
+
+        public void RecalcMoveRelatedProps() {
+            DelegateCommand dc = MoveDown as DelegateCommand;
+            if(dc != null)
+                dc.RaiseCanExecuteChanged();
+            dc = MoveUp as DelegateCommand;
+            if (dc != null)
+                dc.RaiseCanExecuteChanged();
+
+
+            RaisePropertyChanged(nameof(CanMoveDown));
+            RaisePropertyChanged(nameof(CanMoveUp));
         }
 
         public CalibratedRegionVM()

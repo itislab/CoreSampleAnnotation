@@ -4,19 +4,35 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:CoreSampleAnnotation.PhotoMarkup"
+             xmlns:media="clr-namespace:CoreSampleAnnotation.Media"
+             xmlns:app="clr-namespace:CoreSampleAnnotation"
              mc:Ignorable="d" 
              d:DesignHeight="100" d:DesignWidth="900">
-    <Border CornerRadius="15" Background="White" Padding="15" Margin="15" Opacity="0.95">
+    <UserControl.Resources>
+        <app:VisibilityHiddenConverter x:Key="visibilityHiddenConverter"/>
+        <app:NanToEmptyStringDoubleConverter x:Key="nanToEmptyStringDoubleConverter"/>
+    </UserControl.Resources>
+    <Border CornerRadius="0" Background="White" Padding="15" Margin="15" Opacity="0.95">
         <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
             <TextBlock FontSize="30" Grid.Column="0" Margin="10">
                 <Run Text="Участок №"/>
                 <Run Text="{Binding Order, FallbackValue=1}"/>
             </TextBlock>
-            <TextBlock FontSize="30" Margin="10">сдвинуть:</TextBlock>
-            <Button Margin="2,10,2,10" FontSize="20" Command="{Binding MoveUp}" CommandParameter="{Binding Order}">Вверх</Button>
-            <Button Margin="2,10,10,10" FontSize="20" Command="{Binding MoveDown}"  CommandParameter="{Binding Order}">Вниз</Button>
-            <TextBlock FontSize="30" Grid.Column="2" Text="длина (см):" Margin="10,10,0,10"/>
-            <TextBox  FontSize="30" Grid.Column="3" Width="70" HorizontalAlignment="Left" Text="{Binding Length, FallbackValue=100, UpdateSourceTrigger=PropertyChanged}"  Margin="0,10,10,10"></TextBox>            
+            <app:TextInput HintText="Веедите длину участка (см)" Text="{Binding Length, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource nanToEmptyStringDoubleConverter}}" MinWidth="350"></app:TextInput>
+            <Button Margin="2,10" FontSize="20" Visibility="{Binding CanMoveUp,Converter={StaticResource visibilityHiddenConverter}}" Command="{Binding MoveUp}" CommandParameter="{Binding Order}" Style="{StaticResource MetroButton}" Width="50">
+                <media:Arrow_In_circle>
+                </media:Arrow_In_circle>
+            </Button>
+            <Button Margin="2,10" FontSize="20" Visibility="{Binding CanMoveDown,Converter={StaticResource visibilityHiddenConverter}}" Command="{Binding MoveDown}"  CommandParameter="{Binding Order}" Style="{StaticResource MetroButton}" Width="50">
+                <Button.LayoutTransform>
+                    <RotateTransform Angle="180"/>
+                </Button.LayoutTransform>
+                <media:Arrow_In_circle>
+                </media:Arrow_In_circle>
+            </Button>
+            <Button Margin="2,10" FontSize="20" Command="{Binding RemoveCommand}"  CommandParameter="{Binding Order}" Style="{StaticResource MetroButton}" Width="50">
+                <media:CrossIcon/>
+            </Button>
         </StackPanel>
     </Border>
 </UserControl>

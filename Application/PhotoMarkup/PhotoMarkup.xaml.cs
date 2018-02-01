@@ -38,8 +38,7 @@ namespace CoreSampleAnnotation.PhotoMarkup
         private Dictionary<AnnotatedPolygon, CalibratedRegionVM> polygonDict = new Dictionary<AnnotatedPolygon, CalibratedRegionVM>();
 
         private List<PhotoCalibrationMarker> regionDraft = new List<PhotoCalibrationMarker>();        
-        private List<Action> canMoveChangedActivations = new List<Action>();
-
+        
         private double angle = 0.0;
 
         private Point touchPoint;
@@ -94,7 +93,6 @@ namespace CoreSampleAnnotation.PhotoMarkup
                 var polygons = pm.canvasPolygons.ToArray();
                 foreach (var p in polygons)
                     pm.canvasPolygons.Remove(p);
-                pm.canMoveChangedActivations.Clear();
 
                 //setting up internal state according to the new CalibratedRegions
                 IEnumerable<CalibratedRegionVM> vms = arg.NewValue as IEnumerable<CalibratedRegionVM>;
@@ -117,36 +115,7 @@ namespace CoreSampleAnnotation.PhotoMarkup
                         pm.canvasMarkers.Add(bottomMarker);
                         pm.canvasMarkers.Add(sideMarker);
 
-                        pm.polygonDict.Add(rect, vm);
-
-                        var canMoveUp = new Predicate<object>(obj1 => {
-                            if (obj1 != null)
-                            {
-                                int order = (int)obj1;
-                                return order > 1;
-                            }
-                            else
-                                return false;
-                        });
-
-                        var canMoveDown = new Predicate<object>(obj1 => {
-                            if (obj1 != null)
-                            {
-                                int order = (int)obj1;
-                                return order < pm.CalibratedRegions.Count();
-                            }
-                            else
-                                return false;
-                        });
-
-                        var delComUp = new DelegateCommand(obj1 => pm.MoveRegionOrder((int)obj1, OrderMoveDirection.Up), canMoveUp);
-                        var delComDown = new DelegateCommand(obj1 => pm.MoveRegionOrder((int)obj1, OrderMoveDirection.Down), canMoveDown);
-                        vm.MoveUp = delComUp;
-                        vm.MoveDown = delComDown;
-
-
-                        pm.canMoveChangedActivations.Add(() => delComUp.RaiseCanExecuteChanged());
-                        pm.canMoveChangedActivations.Add(() => delComDown.RaiseCanExecuteChanged());
+                        pm.polygonDict.Add(rect, vm);                        
                     }
                 }
             }));
@@ -280,39 +249,14 @@ namespace CoreSampleAnnotation.PhotoMarkup
         {
             RegionInfoView.Visibility = Visibility.Visible;
             RegionInfoView.DataContext = vm;
+            vm.RecalcMoveRelatedProps();
         }
 
         private void CommonCanvas_MouseRightButtonUp(object sender, MouseButtonEventArgs e)
         {
             Point position = e.GetPosition(CommonCanvas);
             PlaceMarker(position);
-        }
-
-        public void MoveRegionOrder(int regionToMove,OrderMoveDirection direction) {
-            int addition = (direction == OrderMoveDirection.Up) ? (-1) : 1;
-            int toSwapWithIdx = regionToMove +addition;
-            CalibratedRegionVM toSwapWith = null, target = null;
-            foreach (CalibratedRegionVM vm in CalibratedRegions) {
-                if (vm.Order == regionToMove)
-                {
-                    target = vm;                    
-                }
-                else if (vm.Order == toSwapWithIdx) {
-                    toSwapWith = vm;                    
-                }
-            }
-
-            target.Order = toSwapWithIdx;
-            toSwapWith.Order = regionToMove;
-            System.Diagnostics.Debug.WriteLine("swapped {0} and {1}", toSwapWithIdx, regionToMove);
-            RaiseCanOrderMoveChanged();
-        }
-
-        private void RaiseCanOrderMoveChanged() {
-            foreach (Action act in canMoveChangedActivations)
-                act();
-            System.Diagnostics.Debug.WriteLine("Triggered can move changed");
-        }
+        }        
 
         private void PlaceMarker(Point position)
         {
@@ -341,7 +285,7 @@ namespace CoreSampleAnnotation.PhotoMarkup
                 //draft is ready
                 
                 CalibratedRegionVM vm = new CalibratedRegionVM();
-                vm.Order = polygonDict.Count + 1;                
+                vm.Length = double.NaN;
                 vm.Up = regionDraft[0].CentreLocation;
                 vm.Bottom = regionDraft[1].CentreLocation;
                 vm.Side = regionDraft[2].CentreLocation;
@@ -356,7 +300,6 @@ namespace CoreSampleAnnotation.PhotoMarkup
                 
                 AttachRegionViewToRegion(vm);
                 vm.IsFocused = true;
-                RaiseCanOrderMoveChanged();
             }
             else
             {
@@ -398,7 +341,6 @@ namespace CoreSampleAnnotation.PhotoMarkup
             vm.IsFocused = true;
 
             AttachRegionViewToRegion(vm);
-            RaiseCanOrderMoveChanged();
         }
 
         private void Poly_MouseRightButtonUp(object sender, MouseButtonEventArgs e)

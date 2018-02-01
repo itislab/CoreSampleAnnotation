@@ -26,10 +26,10 @@ namespace CoreSampleAnnotation.Intervals
         {
             get
             {
-                if (double.IsNaN(ExtractedLength) || double.IsNaN(AnnotatedLength) || (ExtractionLength==0.0))
+                if (double.IsNaN(ExtractedLength) || double.IsNaN(AnnotatedLength) || (MaxPossibleExtractionLength == 0.0))
                     return 0.0;
                 else
-                    return AnnotatedLength / ExtractionLength * 100.0;
+                    return AnnotatedLength / MaxPossibleExtractionLength * 100.0;
             }
         }
 
@@ -71,14 +71,80 @@ namespace CoreSampleAnnotation.Intervals
             {
                 if (imageRegions[curImageIdx] != value)
                 {
+                    //unsubscribing from old regions
                     if (imageRegions[curImageIdx] != null)
-                        foreach(CalibratedRegionVM crCM in imageRegions[curImageIdx]) 
-                            crCM.PropertyChanged -= CalibratedRegion_PropertyChanged;                        
-                    if(value != null)
-                        foreach (CalibratedRegionVM crCM in value)
-                            crCM.PropertyChanged += CalibratedRegion_PropertyChanged;
+                    {
+                        if (canMoveRegionChangedActivations.ContainsKey(curImageIdx))
+                            canMoveRegionChangedActivations[curImageIdx].Clear();
+
+                        foreach (CalibratedRegionVM crCM in imageRegions[curImageIdx])
+                            crCM.PropertyChanged -= CalibratedRegion_PropertyChanged;
+                    }
 
                     imageRegions[curImageIdx] = value;
+
+                    //subscribing to new regions
+                    if (value != null)
+                    {
+                        var canMoveUp = new Predicate<object>(obj1 =>
+                        {
+                            if (obj1 != null)
+                            {
+                                int order = (int)obj1;
+                                return order > 1;
+                            }
+                            else
+                                return false;
+                        });
+
+                        var canMoveDown = new Predicate<object>(obj1 =>
+                        {
+                            if (obj1 != null)
+                            {
+                                int order = (int)obj1;
+                                return order < imageRegions.SelectMany(i => i).Count();
+                            }
+                            else
+                                return false;
+                        });
+                        foreach (CalibratedRegionVM crCM in value)
+                        {
+                            if (crCM.Order == -1)
+                            {
+                                //not assigned yet, assigning
+                                crCM.Order = imageRegions.SelectMany(i => i).Where(vm => vm.Order != -1).Count() + 1;
+                            }
+
+                            crCM.RemoveCommand = new DelegateCommand((obj) =>
+                            {
+                                int idx = (int)obj;
+
+                                List<IEnumerable<CalibratedRegionVM>> newImageRegs = new List<IEnumerable<CalibratedRegionVM>>();
+                                foreach (var imageRegs in imageRegions)
+                                    newImageRegs.Add(imageRegs.Where(r => r.Order != idx).ToArray()); //excluding VM with order==idx
+                                imageRegions = newImageRegs;
+
+                                foreach (var region in imageRegions.SelectMany(i => i).Where(r => r.Order > idx))
+                                    region.Order--;
+
+                                RaisePropertyChanged(nameof(CalibratedRegions));
+                            });
+
+                            crCM.PropertyChanged += CalibratedRegion_PropertyChanged;
+
+                            var delComUp = new DelegateCommand(obj1 => MoveRegionOrder((int)obj1, OrderMoveDirection.Up), canMoveUp);
+                            var delComDown = new DelegateCommand(obj1 => MoveRegionOrder((int)obj1, OrderMoveDirection.Down), canMoveDown);
+                            crCM.MoveUp = delComUp;
+                            crCM.MoveDown = delComDown;
+
+                            if (!canMoveRegionChangedActivations.ContainsKey(curImageIdx))
+                                canMoveRegionChangedActivations[curImageIdx] = new List<Action>();
+                            canMoveRegionChangedActivations[curImageIdx].Add(() => delComUp.RaiseCanExecuteChanged());
+                            canMoveRegionChangedActivations[curImageIdx].Add(() => delComDown.RaiseCanExecuteChanged());
+                        }
+                    }
+
+                    RaiseCanOrderMoveChanged();
                     RaisePropertyChanged(nameof(CalibratedRegions));
                     RaisePropertyChanged(nameof(ImagesButtonText));
                     RaisePropertyChanged(nameof(AnnotatedLength));
@@ -87,17 +153,58 @@ namespace CoreSampleAnnotation.Intervals
             }
         }
 
+        private Dictionary<int, List<Action>> canMoveRegionChangedActivations = new Dictionary<int, List<Action>>();
+
+        private void RaiseCanOrderMoveChanged()
+        {
+            foreach (var pair in canMoveRegionChangedActivations)
+                foreach (Action act in pair.Value)
+                    act();
+        }
+
+        public void MoveRegionOrder(int regionToMove, OrderMoveDirection direction)
+        {
+            int addition = (direction == OrderMoveDirection.Up) ? (-1) : 1;
+            int toSwapWithIdx = regionToMove + addition;
+            CalibratedRegionVM toSwapWith = null, target = null;
+            foreach (CalibratedRegionVM vm in imageRegions.SelectMany(im => im))
+            {
+                if (vm.Order == regionToMove)
+                {
+                    target = vm;
+                }
+                else if (vm.Order == toSwapWithIdx)
+                {
+                    toSwapWith = vm;
+                }
+            }
+
+            target.Order = toSwapWithIdx;
+            toSwapWith.Order = regionToMove;
+            System.Diagnostics.Debug.WriteLine("swapped {0} and {1}", toSwapWithIdx, regionToMove);
+            RaiseCanOrderMoveChanged();
+            target.RecalcMoveRelatedProps();
+            toSwapWith.RecalcMoveRelatedProps();
+
+        }
+
+
         private void CalibratedRegion_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
             CalibratedRegionVM vm = sender as CalibratedRegionVM;
-            if(vm != null)
+            if (vm != null)
             {
-                switch (e.PropertyName) {
+                switch (e.PropertyName)
+                {
                     case nameof(vm.Length):
                         RaisePropertyChanged(nameof(AnnotatedLength));
                         RaisePropertyChanged(nameof(AnnotatedPercentage));
                         break;
-                    }
+                    case nameof(vm.Order):
+                        RaiseCanOrderMoveChanged();
+                        vm.RecalcMoveRelatedProps();
+                        break;
+                }
             }
         }
 

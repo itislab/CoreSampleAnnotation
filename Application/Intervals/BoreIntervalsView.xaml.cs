@@ -25,44 +25,5 @@ namespace CoreSampleAnnotation.Intervals
         {
             InitializeComponent();
         }
-    }
-
-    /// <summary>
-    /// Uses default culture (not invariant culture!)
-    /// </summary>
-    public class NanToEmptyStringDoubleConverter : IValueConverter
-    {
-        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
-        {
-            double? d = value as double?;
-            if (d.HasValue) {
-                if (double.IsNaN(d.Value))
-                    return "";
-                else
-                    return d.Value.ToString();
-            }
-            else
-                return "";
-        }
-
-        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
-        {
-            string str = value as string;
-            if (str != null)
-            {
-                if (str == string.Empty)
-                    return null;
-                else
-                {
-                    double result;
-                    if (double.TryParse(str, out result))
-                        return result;
-                    else
-                        return null;
-                }
-            }
-            else
-                return null;
-        }
-    }    
+    }   
 }

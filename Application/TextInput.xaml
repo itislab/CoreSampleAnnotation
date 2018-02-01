@@ -9,8 +9,8 @@
     <UserControl.Resources>
         <local:CollapsedConverter x:Key="VisibilityCollapsedConverter" />
     </UserControl.Resources>
-    <Grid HorizontalAlignment="Center" VerticalAlignment="Top"  >
-        <TextBlock Name="HintBlock" FontSize="{Binding}" Margin="20"
+    <Grid>
+        <TextBlock Name="HintBlock" FontSize="{Binding}" Margin="20" TextAlignment="Left"
                    Foreground="DimGray" Visibility="{Binding ElementName=InputBox, Path=Text.IsEmpty, Converter={StaticResource VisibilityCollapsedConverter}}" />
         <TextBox TextAlignment="Left" BorderThickness="0" Margin="20" FontSize="25" Name="InputBox" Background="Transparent" />
     </Grid>

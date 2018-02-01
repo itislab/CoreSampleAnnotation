@@ -7,7 +7,7 @@
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300">
     <Viewbox xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" Stretch="Uniform">
-        <Canvas Name="svg4503" Canvas.Left="0" Canvas.Top="0" Width="100" Height="100" Background="{StaticResource ColorPrimary}">
+        <Canvas Name="svg4503" Canvas.Left="0" Canvas.Top="0" Width="100" Height="100" Background="Transparent">
             <Canvas.RenderTransform>
                 <TranslateTransform X="0" Y="0"/>
             </Canvas.RenderTransform>

@@ -43,7 +43,7 @@ namespace CoreSampleAnnotation.Intervals
                 {
                     upperDepth = value;
                     RaisePropertyChanged(nameof(UpperDepth));
-                    RaisePropertyChanged(nameof(ExtractionLength));                    
+                    RaisePropertyChanged(nameof(MaxPossibleExtractionLength));                    
                 }
             }
         }
@@ -65,12 +65,12 @@ namespace CoreSampleAnnotation.Intervals
                 {
                     lowerDepth = value;
                     RaisePropertyChanged(nameof(LowerDepth));
-                    RaisePropertyChanged(nameof(ExtractionLength));
+                    RaisePropertyChanged(nameof(MaxPossibleExtractionLength));
                 }
             }
         }
         
-        public double ExtractionLength {
+        public double MaxPossibleExtractionLength {
             get {
                 return (LowerDepth - UpperDepth);
             }
