@@ -54,7 +54,7 @@ namespace CoreSampleAnnotation
 
             menuVM.ActivateAnnotationPlaneCommand = new DelegateCommand(() =>
             {
-                vm.ActiveSectionVM = new AnnotationPlaneStubVM();
+                vm.ActiveSectionVM = vm.CurrentProjectVM.PlaneVM;
             });
 
             menuVM.ActivateReportGenerationCommand = new DelegateCommand(obj => { }, obj => false);

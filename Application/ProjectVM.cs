@@ -36,5 +36,19 @@ namespace CoreSampleAnnotation
                 }
             }
         }
+
+        private AnnotationPlane.PlaneVM planeVM = new AnnotationPlane.PlaneVM();
+
+        public AnnotationPlane.PlaneVM PlaneVM {
+            get {
+                return planeVM;
+            }
+            set {
+                if (value != planeVM) {
+                    planeVM = value;
+                    RaisePropertyChanged(nameof(PlaneVM));
+                }
+            }
+        }
     }
 }

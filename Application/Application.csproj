@@ -35,8 +35,37 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="InteractiveDataDisplay.WPF, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\App\packages\InteractiveDataDisplay.WPF.1.0.0\lib\net452\InteractiveDataDisplay.WPF.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.Maps.MapControl.WPF, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\App\packages\Microsoft.Maps.MapControl.WPF.1.0.0.3\lib\net40-Client\Microsoft.Maps.MapControl.WPF.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Reactive.Core, Version=3.0.1000.0, Culture=neutral, PublicKeyToken=94bc3704cddfc263, processorArchitecture=MSIL">
+      <HintPath>..\App\packages\System.Reactive.Core.3.1.1\lib\net45\System.Reactive.Core.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Reactive.Interfaces, Version=3.0.1000.0, Culture=neutral, PublicKeyToken=94bc3704cddfc263, processorArchitecture=MSIL">
+      <HintPath>..\App\packages\System.Reactive.Interfaces.3.1.1\lib\net45\System.Reactive.Interfaces.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Reactive.Linq, Version=3.0.1000.0, Culture=neutral, PublicKeyToken=94bc3704cddfc263, processorArchitecture=MSIL">
+      <HintPath>..\App\packages\System.Reactive.Linq.3.1.1\lib\net45\System.Reactive.Linq.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Reactive.PlatformServices, Version=3.0.1000.0, Culture=neutral, PublicKeyToken=94bc3704cddfc263, processorArchitecture=MSIL">
+      <HintPath>..\App\packages\System.Reactive.PlatformServices.3.1.1\lib\net45\System.Reactive.PlatformServices.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Reactive.Windows.Threading, Version=3.0.1000.0, Culture=neutral, PublicKeyToken=94bc3704cddfc263, processorArchitecture=MSIL">
+      <HintPath>..\App\packages\System.Reactive.Windows.Threading.3.1.1\lib\net45\System.Reactive.Windows.Threading.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Windows" />
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Core" />
@@ -55,6 +84,40 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="AnnotationPlane\AnnotationGrid.xaml.cs">
+      <DependentUpon>AnnotationGrid.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="AnnotationPlane\AnnotationGridVM.cs" />
+    <Compile Include="AnnotationPlane\ClassificationView.xaml.cs">
+      <DependentUpon>ClassificationView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="AnnotationPlane\ClassificationVM.cs" />
+    <Compile Include="AnnotationPlane\ColumnScaleAdapters.cs" />
+    <Compile Include="AnnotationPlane\ColumnScaleController.cs" />
+    <Compile Include="AnnotationPlane\ColumnView.xaml.cs">
+      <DependentUpon>ColumnView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="AnnotationPlane\ColumnVM.cs" />
+    <Compile Include="AnnotationPlane\DepthAxisView.xaml.cs">
+      <DependentUpon>DepthAxisView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="AnnotationPlane\ImageColumnView.xaml.cs">
+      <DependentUpon>ImageColumnView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="AnnotationPlane\LayerDepthPropertyView.xaml.cs">
+      <DependentUpon>LayerDepthPropertyView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="AnnotationPlane\LayeredColumnView.xaml.cs">
+      <DependentUpon>LayeredColumnView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="AnnotationPlane\LayerPropertyVM.cs" />
+    <Compile Include="AnnotationPlane\LayerSynchronizer.cs" />
+    <Compile Include="AnnotationPlane\Plane.xaml.cs">
+      <DependentUpon>Plane.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="AnnotationPlane\PlaneVM.cs" />
+    <Compile Include="AnnotationPlane\syncronizerColumnAdapter.cs" />
+    <Compile Include="AnnotationPlane\SyncronizerScaleAdapter.cs" />
     <Compile Include="Intervals\BoreIntervalsView.xaml.cs">
       <DependentUpon>BoreIntervalsView.xaml</DependentUpon>
     </Compile>
@@ -111,6 +174,38 @@
     </Compile>
     <Compile Include="ViewModel.cs" />
     <Compile Include="ViewModelStubs.cs" />
+    <Page Include="AnnotationPlane\AnnotationGrid.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="AnnotationPlane\ClassificationView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="AnnotationPlane\ColumnView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="AnnotationPlane\DepthAxisView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="AnnotationPlane\ImageColumnView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="AnnotationPlane\LayerDepthPropertyView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="AnnotationPlane\LayeredColumnView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="AnnotationPlane\Plane.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Intervals\BoreIntervalsView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -199,6 +294,7 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+    <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
@@ -226,6 +322,7 @@
   <ItemGroup>
     <Resource Include="Media\checkerboard.jpg" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

@@ -9,9 +9,5 @@ namespace CoreSampleAnnotation
 {
     public class PhotoMarkupStubVM: ViewModel
     {
-    }
-
-    public class AnnotationPlaneStubVM : ViewModel
-    {
     }    
 }

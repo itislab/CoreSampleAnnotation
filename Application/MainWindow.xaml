@@ -5,14 +5,15 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:CoreSampleAnnotation"
         xmlns:intervals="clr-namespace:CoreSampleAnnotation.Intervals"
+        xmlns:plane="clr-namespace:CoreSampleAnnotation.AnnotationPlane"
         mc:Ignorable="d"
         Title="Керн" Height="350" Width="525" WindowStyle="None" ResizeMode="NoResize" WindowState="Maximized">
     <Window.Resources>
         <DataTemplate DataType="{x:Type local:ProjectMenuVM}">
             <local:ProjectMenuView DataContext="{Binding}"/>
         </DataTemplate>
-        <DataTemplate DataType="{x:Type local:AnnotationPlaneStubVM}">
-            <TextBlock>UI полотна работы с керном</TextBlock>
+        <DataTemplate DataType="{x:Type plane:PlaneVM}">
+            <plane:Plane PointSelected="{Binding PointSelected}"/>
         </DataTemplate>
         <DataTemplate DataType="{x:Type local:ViewModel}">
             <TextBlock>Нет View для данного типа VM</TextBlock>
