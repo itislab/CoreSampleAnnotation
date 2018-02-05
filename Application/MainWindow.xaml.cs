@@ -54,6 +54,14 @@ namespace CoreSampleAnnotation
 
             menuVM.ActivateAnnotationPlaneCommand = new DelegateCommand(() =>
             {
+                var test = ((Intervals.PhotoCalibratedBoreIntervalVM)vm.CurrentProjectVM.BoreIntervalsVM.Intervals[0]).GetRegions();
+
+                vm.CurrentProjectVM.PlaneVM = new AnnotationPlane.PlaneVM();
+                vm.CurrentProjectVM.PlaneVM.ColScaleController.UpperDepth = vm.CurrentProjectVM.BoreIntervalsVM.Intervals.Select(i => i.UpperDepth).Min();
+                vm.CurrentProjectVM.PlaneVM.ColScaleController.UpperDepth = vm.CurrentProjectVM.BoreIntervalsVM.Intervals.Select(i => i.UpperDepth).Min();
+                vm.CurrentProjectVM.PlaneVM.ColScaleController.LowerDepth = vm.CurrentProjectVM.BoreIntervalsVM.Intervals.Select(i => i.LowerDepth).Max();
+                vm.CurrentProjectVM.PlaneVM.ColScaleController.LowerDepth = vm.CurrentProjectVM.BoreIntervalsVM.Intervals.Select(i => i.LowerDepth).Max();
+                vm.CurrentProjectVM.PlaneVM.Init();
                 vm.ActiveSectionVM = vm.CurrentProjectVM.PlaneVM;
             });
 

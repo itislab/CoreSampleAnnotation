@@ -53,61 +53,7 @@ namespace CoreSampleAnnotation.AnnotationPlane
             }
         }
 
-        public PlaneVM()
-        {
-            AnnoGridVM = new AnnotationGridVM();
-            classificationVM = new ClassificationVM();
-            
-            PointSelected = new DelegateCommand(obj => {
-                PointSelectedEventArgs psea = obj as PointSelectedEventArgs;
-                System.Diagnostics.Debug.WriteLine("Selected point with offset {0} in {1} column", psea.WpfTopOffset, psea.ColumnIdx);
-
-                Type[] newLayerTypes = new Type[] { typeof(ImageColumnVM), typeof(DepthAxisColumnVM) };
-                ColumnVM relatedVM = AnnoGridVM.Columns[psea.ColumnIdx];
-                Type relatedVmType = relatedVM.GetType();
-                if (newLayerTypes.Contains(relatedVmType))
-                {
-                    System.Diagnostics.Debug.WriteLine("Layer split requested");
-                    layerSyncController.SplitLayer(psea.WpfTopOffset);
-                }
-                else if (typeof(LayeredColumnVM) == relatedVmType)
-                {
-                    LayeredColumnVM lcvm = (LayeredColumnVM)relatedVM;
-                    int layerIdx = layerSyncController.GetLayerIndex(psea.WpfTopOffset);
-                    ClassificationLayerVM clmv = lcvm.Layers[layerIdx] as ClassificationLayerVM;
-                    if (clmv != null)
-                    {
-                        classificationVM.LayerVM = clmv;
-                        classificationVM.IsVisible = true;
-                    }
-                }
-            });
-
-            LayerSyncController.PropertyChanged += LayerSyncController_PropertyChanged;
-            ColScaleController.PropertyChanged += ColScaleController_PropertyChanged;
-
-            ColScaleController.UpperDepth = 2800;
-            ColScaleController.LowerDepth = 2830;
-            ColScaleController.ScaleFactor = 3000.0;
-
-            classificationVM = new ClassificationVM();
-            classificationVM.CloseCommand = new DelegateCommand(() => classificationVM.IsVisible = false);
-            classificationVM.ClassSelectedCommand = new DelegateCommand(sender =>
-            {
-                FrameworkElement fe = sender as FrameworkElement;
-                LayerClass lc = (LayerClass)fe.DataContext;
-                classificationVM.LayerVM.CurrentClass = lc;
-            });
-
-            classificationVM.IsVisible = false;
-
-            DepthAxisColumnVM depthColumnVm = new DepthAxisColumnVM("Шкала глубин");
-
-            ImageColumnVM imageColumnVm = new ImageColumnVM("Фото керна");
-            imageColumnVm.Source = new System.Windows.Media.Imaging.BitmapImage(new Uri("core_part.jpg", UriKind.Relative));
-            imageColumnVm.ImageUpperDepth = 2801;
-            imageColumnVm.ImageLowerDepth = 2802;
-
+        public void Init() {
             LayerRealLengthColumnVM layerLengthVM = new LayerRealLengthColumnVM("Мощность эл-та цикла");
             layerLengthVM.Layers.Add(new LengthLayerVM() { Length = (ColScaleController.LowerDepth - ColScaleController.UpperDepth) * ColScaleController.ScaleFactor });
 
@@ -174,8 +120,6 @@ namespace CoreSampleAnnotation.AnnotationPlane
             textureLayer.PossibleClasses.Add(new LayerClass("нб", "Нарушенная брекчированием"));
             contentColumnVM.Layers.Add(textureLayer);
 
-            AnnoGridVM.Columns.Add(depthColumnVm);
-            AnnoGridVM.Columns.Add(imageColumnVm);
             AnnoGridVM.Columns.Add(layerLengthVM);
             AnnoGridVM.Columns.Add(colorColumnVM);
             AnnoGridVM.Columns.Add(textureColumnVM);
@@ -183,8 +127,6 @@ namespace CoreSampleAnnotation.AnnotationPlane
             AnnoGridVM.Columns.Add(bioColumnVM);
 
 
-            ColScaleController.AttachToColumn(new ColVMAdapter(depthColumnVm));
-            ColScaleController.AttachToColumn(new ColVMAdapter(imageColumnVm));
             ColScaleController.AttachToColumn(new ColVMAdapter(layerLengthVM));
             ColScaleController.AttachToColumn(new ColVMAdapter(colorColumnVM));
             ColScaleController.AttachToColumn(new ColVMAdapter(textureColumnVM));
@@ -196,6 +138,69 @@ namespace CoreSampleAnnotation.AnnotationPlane
             LayerSyncController.RegisterLayer(new SyncronizerColumnAdapter(textureColumnVM));
             LayerSyncController.RegisterLayer(new SyncronizerColumnAdapter(contentColumnVM));
             LayerSyncController.RegisterLayer(new SyncronizerColumnAdapter(bioColumnVM));
+        }
+
+        public PlaneVM()
+        {
+            AnnoGridVM = new AnnotationGridVM();
+            classificationVM = new ClassificationVM();
+            
+            PointSelected = new DelegateCommand(obj => {
+                PointSelectedEventArgs psea = obj as PointSelectedEventArgs;
+                System.Diagnostics.Debug.WriteLine("Selected point with offset {0} in {1} column", psea.WpfTopOffset, psea.ColumnIdx);
+
+                Type[] newLayerTypes = new Type[] { typeof(ImageColumnVM), typeof(DepthAxisColumnVM) };
+                ColumnVM relatedVM = AnnoGridVM.Columns[psea.ColumnIdx];
+                Type relatedVmType = relatedVM.GetType();
+                if (newLayerTypes.Contains(relatedVmType))
+                {
+                    System.Diagnostics.Debug.WriteLine("Layer split requested");
+                    layerSyncController.SplitLayer(psea.WpfTopOffset);
+                }
+                else if (typeof(LayeredColumnVM) == relatedVmType)
+                {
+                    LayeredColumnVM lcvm = (LayeredColumnVM)relatedVM;
+                    int layerIdx = layerSyncController.GetLayerIndex(psea.WpfTopOffset);
+                    ClassificationLayerVM clmv = lcvm.Layers[layerIdx] as ClassificationLayerVM;
+                    if (clmv != null)
+                    {
+                        classificationVM.LayerVM = clmv;
+                        classificationVM.IsVisible = true;
+                    }
+                }
+            });
+
+            LayerSyncController.PropertyChanged += LayerSyncController_PropertyChanged;
+            ColScaleController.PropertyChanged += ColScaleController_PropertyChanged;
+
+            ColScaleController.UpperDepth = 2800;
+            ColScaleController.LowerDepth = 2830;
+            ColScaleController.ScaleFactor = 3000.0;
+
+            classificationVM = new ClassificationVM();
+            classificationVM.CloseCommand = new DelegateCommand(() => classificationVM.IsVisible = false);
+            classificationVM.ClassSelectedCommand = new DelegateCommand(sender =>
+            {
+                FrameworkElement fe = sender as FrameworkElement;
+                LayerClass lc = (LayerClass)fe.DataContext;
+                classificationVM.LayerVM.CurrentClass = lc;
+            });
+
+            classificationVM.IsVisible = false;
+
+            DepthAxisColumnVM depthColumnVm = new DepthAxisColumnVM("Шкала глубин");
+
+            ImageColumnVM imageColumnVm = new ImageColumnVM("Фото керна");
+            imageColumnVm.Source = new System.Windows.Media.Imaging.BitmapImage(new Uri("core_part.jpg", UriKind.Relative));
+            imageColumnVm.ImageUpperDepth = 2801;
+            imageColumnVm.ImageLowerDepth = 2802;
+
+            AnnoGridVM.Columns.Add(depthColumnVm);
+            AnnoGridVM.Columns.Add(imageColumnVm);
+
+            ColScaleController.AttachToColumn(new ColVMAdapter(depthColumnVm));
+            ColScaleController.AttachToColumn(new ColVMAdapter(imageColumnVm));
+
         }
 
         private void ColScaleController_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)

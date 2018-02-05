@@ -20,6 +20,7 @@ namespace CoreSampleAnnotation.PhotoMarkup
             set { SetValue(CoordsTransformProperty, value); }
         }
 
+        
         // Using a DependencyProperty as the backing store for CoordsTransform.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty CoordsTransformProperty =
             DependencyProperty.Register("CoordsTransform", typeof(Transform), typeof(CoordTransformedCanvas), new PropertyMetadata(null, (obj, args) => {

@@ -2,9 +2,11 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
@@ -54,6 +56,20 @@ namespace CoreSampleAnnotation.Intervals
                         imageTransforms[curImageIdx] = value;
                         RaisePropertyChanged(nameof(ImageTransform));
                     }
+                }
+            }
+        }
+
+        private bool isImageTransformTracked = true;
+        /// <summary>
+        /// Whether the image transforms happen due to user manipulation
+        /// </summary>
+        public bool IsImageTransformTracked {
+            get { return isImageTransformTracked; }
+            set {
+                if (value != isImageTransformTracked) {
+                    isImageTransformTracked = value;
+                    RaisePropertyChanged(nameof(IsImageTransformTracked));
                 }
             }
         }
@@ -188,6 +204,82 @@ namespace CoreSampleAnnotation.Intervals
 
         }
 
+        public PhotoRegion[] GetRegions() {
+            List<PhotoRegion> result = new List<PhotoRegion>();
+            int N = ImagesCount;
+            int counter = 0;
+            for (int i = 0; i < N; i++) {
+                var regions = imageRegions[i];
+                var transform = imageTransforms[i];
+                var backTransform = transform.Inverse;
+                foreach (CalibratedRegionVM regVM in regions) {
+                    Point up = backTransform.Transform(regVM.Up);
+                    Point down = backTransform.Transform(regVM.Bottom);
+                    Point side = backTransform.Transform(regVM.Side);
+                    
+                    Point M = Calc.FindNormalIntersection(down, up, side);
+                    Vector sideV = side - M;
+                    //todo: coerce side point side
+
+                    double height = (up - down).Length;
+                    double width = (sideV * 2.0).Length;
+
+                    Vector downUp = up - down;
+                    Vector downUpNorm = new Vector(downUp.Y, -downUp.X);
+
+                    if (sideV * downUpNorm > 0.0)
+                        sideV.Negate();
+                    
+
+                    TransformGroup tg = new TransformGroup();
+                    
+                    Point upperLeft = up - sideV;
+
+                    tg.Children.Add(new TranslateTransform(-upperLeft.X,-upperLeft.Y));
+
+                    if (sideV.X == 0)
+                    {
+                        throw new NotImplementedException();
+                    }
+                    else {
+                        double angle = Vector.AngleBetween(sideV, new Vector(1.0, 0.0));
+                        tg.Children.Add(new RotateTransform(angle));
+                    }
+
+                    Canvas canvas = new Canvas();
+                    Image img = new Image();
+                    img.Source = new BitmapImage(new Uri(imagePaths[i]));
+
+                    canvas.Children.Add(img);
+
+                    img.RenderTransform = tg;
+
+                    canvas.Measure(new Size(width, height));
+                    canvas.Arrange(new Rect(new Size(width, height)));
+                    
+                    RenderTargetBitmap bmp = new RenderTargetBitmap((int)width, (int)height, 96, 96, PixelFormats.Pbgra32);
+
+                    bmp.Render(canvas);
+
+                    var encoder = new PngBitmapEncoder();
+
+                    encoder.Frames.Add(BitmapFrame.Create(bmp));
+
+                    MemoryStream stm = new MemoryStream();
+                    using (Stream stm2 = File.Create(@"test"+(counter++)+".png"))
+                        encoder.Save(stm2);
+
+                    result.Add(new PhotoRegion(stm, new Size(width, height), regVM.Order, regVM.Order));
+                }
+
+                //transforming order into real depth
+                var orederedRegions = result.OrderBy(r => r.LowerBound).ToList();
+                double prevBound = UpperDepth;
+                result = new List<PhotoRegion>();
+                //for(int i=0;i< orederedRegions.Count;i+)
+            }
+            return result.ToArray();
+        }
 
         private void CalibratedRegion_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
@@ -247,10 +339,12 @@ namespace CoreSampleAnnotation.Intervals
                 if (curImageIdx != value)
                 {
                     curImageIdx = value;
+                    IsImageTransformTracked = false;
                     RaisePropertyChanged(nameof(CurImageIdx));
                     RaisePropertyChanged(nameof(ImagePath));
                     RaisePropertyChanged(nameof(ImageTransform));
                     RaisePropertyChanged(nameof(CalibratedRegions));
+                    IsImageTransformTracked = true;
                 }
             }
         }
@@ -314,7 +408,9 @@ namespace CoreSampleAnnotation.Intervals
             NextImageCommand = new DelegateCommand(() =>
             {
                 if (imagePaths.Count > 0)
+                {
                     CurImageIdx = (curImageIdx + 1) % imagePaths.Count;
+                }
             });
 
             rotateCurrentImageCommand = new DelegateCommand(() =>

@@ -67,18 +67,7 @@ namespace CoreSampleAnnotation.PhotoMarkup
                 }
             }
         }
-
-        private Transform imageTransform = Transform.Identity;
-
-        public Transform ImageTransform {
-            get { return imageTransform; }
-            set {
-                if (imageTransform != value) {
-                    imageTransform = value;
-                    RaisePropertyChanged(nameof(ImageTransform));
-                }
-            }
-        }
+        
 
 
         private int order = -1;

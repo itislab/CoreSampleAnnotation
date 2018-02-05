@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -59,11 +60,7 @@ namespace CoreSampleAnnotation.PhotoMarkup
 
             this.canvasMarkers.CollectionChanged += Markers_CollectionChanged;
             this.canvasPolygons.CollectionChanged += Polygons_CollectionChanged;
-
-            var coordsTransformBinding = new Binding("RenderTransform");
-            coordsTransformBinding.Source = Image;
-            CommonCanvas.SetBinding(CoordTransformedCanvas.CoordsTransformProperty, coordsTransformBinding);
-
+            
             //temp: for emulating long touch
             this.CommonCanvas.MouseRightButtonUp += CommonCanvas_MouseRightButtonUp;
             this.Image.MouseWheel += Image_MouseWheel;
@@ -478,5 +475,28 @@ namespace CoreSampleAnnotation.PhotoMarkup
         }
 
         #endregion        
+    }
+
+    public class SwitchibleTransformBinding : IMultiValueConverter
+    {
+        public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (values.Length == 2)
+            {
+                bool? switchedOn = (values[0]) as bool?;
+                if (switchedOn.HasValue && switchedOn.Value)
+                    return values[1] as Transform;
+                else
+                    return null;
+                
+            }
+            else
+                return null;
+        }
+
+        public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

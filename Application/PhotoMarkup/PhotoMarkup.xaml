@@ -6,7 +6,16 @@
              xmlns:local="clr-namespace:CoreSampleAnnotation.PhotoMarkup"
              mc:Ignorable="d" 
              d:DesignHeight="400" d:DesignWidth="600" Background="CornflowerBlue">
+    <UserControl.Resources>
+        <local:SwitchibleTransformBinding x:Key="switchibleTransformBinding" />
+    </UserControl.Resources>
     <local:CoordTransformedCanvas HorizontalAlignment="Stretch" VerticalAlignment="Stretch" x:Name="CommonCanvas" ClipToBounds="True" Background="Transparent">
+        <local:CoordTransformedCanvas.CoordsTransform>
+            <MultiBinding Converter="{StaticResource switchibleTransformBinding}" >
+                <Binding Path="IsImageTransformTracked" />
+                <Binding Path="ImageTransform" />
+            </MultiBinding>
+        </local:CoordTransformedCanvas.CoordsTransform>
         <Image Source="{Binding ImagePath, FallbackValue='pack://application:,,,/CoreSampleAnnotation;component/Media/checkerboard.jpg'}" RenderTransform="{Binding ImageTransform, Mode=TwoWay}" IsManipulationEnabled="True" HorizontalAlignment="Left" VerticalAlignment="Top" Name="Image"/>
         <local:CalibratedRegionInfoView Panel.ZIndex="20" x:Name="RegionInfoView"></local:CalibratedRegionInfoView>
     </local:CoordTransformedCanvas>

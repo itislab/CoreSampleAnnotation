@@ -9,7 +9,7 @@
              d:DesignHeight="300" d:DesignWidth="300">
     <Grid>
         <StackPanel Orientation="Vertical" VerticalAlignment="Center" HorizontalAlignment="Center">
-            <local:TextInput MinWidth="400" HintText="Введите название скважены" Text="{Binding ProjectVM.BoreName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+            <local:TextInput MinWidth="400" HintText="Введите название скважины" Text="{Binding ProjectVM.BoreName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
             <Button Style="{StaticResource MetroButton}" Command="{Binding ActivateBoreIntervalsCommand}">Интервалы отбора</Button>
             <Button Style="{StaticResource MetroButton}" Command="{Binding ActivateAnnotationPlaneCommand}">Разметка слоев</Button>
             <Button Style="{StaticResource MetroButton}" Command="{Binding ActivateTemplateEditorCommand}">Редактор шаблона</Button>
