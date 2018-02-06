@@ -204,7 +204,7 @@ namespace CoreSampleAnnotation.Intervals
 
         }
 
-        public PhotoRegion[] GetRegions() {
+        public PhotoRegion[] GetRegionImages() {
             List<PhotoRegion> result = new List<PhotoRegion>();
             int N = ImagesCount;
             int counter = 0;
@@ -265,18 +265,32 @@ namespace CoreSampleAnnotation.Intervals
 
                     encoder.Frames.Add(BitmapFrame.Create(bmp));
 
-                    MemoryStream stm = new MemoryStream();
-                    using (Stream stm2 = File.Create(@"test"+(counter++)+".png"))
-                        encoder.Save(stm2);
+                    var bitmap = new BitmapImage();
 
-                    result.Add(new PhotoRegion(stm, new Size(width, height), regVM.Order, regVM.Order));
+                    using (MemoryStream stm = new MemoryStream()) {
+                        encoder.Save(stm);
+                        stm.Seek(0, SeekOrigin.Begin);
+
+                        bitmap.BeginInit();
+                        bitmap.StreamSource = stm;
+                        bitmap.CacheOption = BitmapCacheOption.OnLoad;
+                        bitmap.EndInit();
+                        bitmap.Freeze();
+                    }                    
+
+                    result.Add(new PhotoRegion(bitmap, new Size(width, height), regVM.Order, regVM.Length*0.01)); //for now upper and lower are just placeholders holding order and length
                 }
 
                 //transforming order into real depth
-                var orederedRegions = result.OrderBy(r => r.LowerBound).ToList();
+                var reorderedRegions = result.OrderBy(r => r.ImageUpperDepth).ToList();
                 double prevBound = UpperDepth;
                 result = new List<PhotoRegion>();
-                //for(int i=0;i< orederedRegions.Count;i+)
+                for(int j=0; j< reorderedRegions.Count; j++)
+                {
+                    PhotoRegion curReg = reorderedRegions[j];
+                    result.Add(new PhotoRegion(curReg.BitmapImage, curReg.ImageSize, prevBound, prevBound + curReg.ImageLowerDepth));
+                    prevBound = prevBound + curReg.ImageLowerDepth;
+                }
             }
             return result.ToArray();
         }

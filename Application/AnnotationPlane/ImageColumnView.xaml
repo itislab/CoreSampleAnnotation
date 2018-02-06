@@ -9,27 +9,43 @@
     <UserControl.Resources>
         <local:ImageCanvasTopConverter x:Key="topConverter" />
         <local:ImageCanvasHeightConverter x:Key="heightConverter" />
+        <local:IdentityConverter x:Key="identityConverter" />
     </UserControl.Resources>
-    <Canvas Height="{Binding ColumnHeight}" Background="LightGray" Width="{Binding ElementName=CoreImage, Path=ActualWidth}">
-        <Image Source="{Binding Source}" Name="CoreImage">
-            <Canvas.Top>
-                <MultiBinding Converter="{StaticResource topConverter}">
-                    <Binding Path="ImageUpperDepth" />
-                    <Binding Path="ImageLowerDepth" />
-                    <Binding Path="UpperBound" />
-                    <Binding Path="LowerBound" />
-                    <Binding Path="ColumnHeight" />
-                </MultiBinding>
-            </Canvas.Top>
-            <Image.Height>
-                <MultiBinding Converter="{StaticResource heightConverter}">
-                    <Binding Path="ImageUpperDepth" />
-                    <Binding Path="ImageLowerDepth" />
-                    <Binding Path="UpperBound" />
-                    <Binding Path="LowerBound" />
-                    <Binding Path="ColumnHeight" />
-                </MultiBinding>
-            </Image.Height>
-        </Image>
-    </Canvas>
+    <ItemsControl ItemsSource="{Binding ImageRegions}"  Height="{Binding ColumnHeight}" Width="{Binding MaxImageWidth}">
+        <ItemsControl.ItemsPanel>
+            <ItemsPanelTemplate>
+                <Canvas />
+            </ItemsPanelTemplate>
+        </ItemsControl.ItemsPanel>
+        <ItemsControl.ItemContainerStyle>
+            <Style TargetType="ContentPresenter">
+                <Setter Property="Canvas.Top">
+                    <Setter.Value>
+                        <MultiBinding Converter="{StaticResource topConverter}">
+                            <Binding Path="ImageUpperDepth" />
+                            <Binding Path="ImageLowerDepth" />
+                            <Binding RelativeSource="{RelativeSource AncestorType=ItemsControl}" Path="DataContext.UpperBound" />
+                            <Binding RelativeSource="{RelativeSource AncestorType=ItemsControl}" Path="DataContext.LowerBound" />
+                            <Binding RelativeSource="{RelativeSource AncestorType=ItemsControl}" Path="DataContext.ColumnHeight" />
+                        </MultiBinding>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+        </ItemsControl.ItemContainerStyle>
+        <ItemsControl.ItemTemplate>
+            <DataTemplate>
+                <local:RegionImage Source="{Binding BitmapImage}" ActualWidth2="{Binding WpfWidth, Mode=OneWayToSource, Converter={StaticResource identityConverter}}">
+                    <Image.Height>
+                        <MultiBinding Converter="{StaticResource heightConverter}">
+                            <Binding Path="ImageUpperDepth" />
+                            <Binding Path="ImageLowerDepth" />
+                            <Binding RelativeSource="{RelativeSource AncestorType=ItemsControl}" Path="DataContext.UpperBound" />
+                            <Binding RelativeSource="{RelativeSource AncestorType=ItemsControl}" Path="DataContext.LowerBound" />
+                            <Binding RelativeSource="{RelativeSource AncestorType=ItemsControl}" Path="DataContext.ColumnHeight" />
+                        </MultiBinding>
+                    </Image.Height>
+                </local:RegionImage>
+            </DataTemplate>
+        </ItemsControl.ItemTemplate>
+    </ItemsControl>
 </UserControl>

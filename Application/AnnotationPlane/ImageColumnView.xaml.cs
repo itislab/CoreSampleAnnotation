@@ -56,6 +56,21 @@ namespace CoreSampleAnnotation.AnnotationPlane
         }
     }
 
+    public class IdentityConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            System.Diagnostics.Debug.WriteLine("source to target: {0}",(value!=null)?value.ToString():"null");
+            return value;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            System.Diagnostics.Debug.WriteLine("target to source: {0}", (value != null) ? value.ToString() : "null");
+            return value;
+        }
+    }
+
     /// <summary>
     /// Interaction logic for ImageColumnView.xaml
     /// </summary>

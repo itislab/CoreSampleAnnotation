@@ -101,9 +101,7 @@
     <Compile Include="AnnotationPlane\DepthAxisView.xaml.cs">
       <DependentUpon>DepthAxisView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="AnnotationPlane\ImageColumnView.xaml.cs">
-      <DependentUpon>ImageColumnView.xaml</DependentUpon>
-    </Compile>
+    <Compile Include="AnnotationPlane\ImageColumnView.xaml.cs" />
     <Compile Include="AnnotationPlane\LayerDepthPropertyView.xaml.cs">
       <DependentUpon>LayerDepthPropertyView.xaml</DependentUpon>
     </Compile>
@@ -112,10 +110,14 @@
     </Compile>
     <Compile Include="AnnotationPlane\LayerPropertyVM.cs" />
     <Compile Include="AnnotationPlane\LayerSynchronizer.cs" />
+    <Compile Include="AnnotationPlane\PhotoRegion.xaml.cs">
+      <DependentUpon>PhotoRegion.xaml</DependentUpon>
+    </Compile>
     <Compile Include="AnnotationPlane\Plane.xaml.cs">
       <DependentUpon>Plane.xaml</DependentUpon>
     </Compile>
     <Compile Include="AnnotationPlane\PlaneVM.cs" />
+    <Compile Include="AnnotationPlane\RegionImage.cs" />
     <Compile Include="AnnotationPlane\syncronizerColumnAdapter.cs" />
     <Compile Include="AnnotationPlane\SyncronizerScaleAdapter.cs" />
     <Compile Include="Intervals\BoreIntervalsView.xaml.cs">
@@ -202,6 +204,10 @@
     <Page Include="AnnotationPlane\LayeredColumnView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="AnnotationPlane\PhotoRegion.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="AnnotationPlane\Plane.xaml">
       <SubType>Designer</SubType>

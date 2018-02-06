@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CoreSampleAnnotation.AnnotationPlane;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -54,13 +55,20 @@ namespace CoreSampleAnnotation
 
             menuVM.ActivateAnnotationPlaneCommand = new DelegateCommand(() =>
             {
-                var test = ((Intervals.PhotoCalibratedBoreIntervalVM)vm.CurrentProjectVM.BoreIntervalsVM.Intervals[0]).GetRegions();
+                var regions = vm.CurrentProjectVM.BoreIntervalsVM.Intervals.SelectMany(i => ((Intervals.PhotoCalibratedBoreIntervalVM)i).GetRegionImages()).ToArray();
 
-                vm.CurrentProjectVM.PlaneVM = new AnnotationPlane.PlaneVM();
+                vm.CurrentProjectVM.PlaneVM = new PlaneVM();
                 vm.CurrentProjectVM.PlaneVM.ColScaleController.UpperDepth = vm.CurrentProjectVM.BoreIntervalsVM.Intervals.Select(i => i.UpperDepth).Min();
-                vm.CurrentProjectVM.PlaneVM.ColScaleController.UpperDepth = vm.CurrentProjectVM.BoreIntervalsVM.Intervals.Select(i => i.UpperDepth).Min();
+                vm.CurrentProjectVM.PlaneVM.LayerSyncController.UpperDepth = vm.CurrentProjectVM.BoreIntervalsVM.Intervals.Select(i => i.UpperDepth).Min();
                 vm.CurrentProjectVM.PlaneVM.ColScaleController.LowerDepth = vm.CurrentProjectVM.BoreIntervalsVM.Intervals.Select(i => i.LowerDepth).Max();
-                vm.CurrentProjectVM.PlaneVM.ColScaleController.LowerDepth = vm.CurrentProjectVM.BoreIntervalsVM.Intervals.Select(i => i.LowerDepth).Max();
+                vm.CurrentProjectVM.PlaneVM.LayerSyncController.LowerDepth = vm.CurrentProjectVM.BoreIntervalsVM.Intervals.Select(i => i.LowerDepth).Max();
+
+                ImageColumnVM imColVM = new ImageColumnVM("Фото курна");
+                imColVM.ImageRegions = regions;
+                vm.CurrentProjectVM.PlaneVM.AnnoGridVM.Columns.Add(imColVM);
+                vm.CurrentProjectVM.PlaneVM.ColScaleController.AttachToColumn(new ColVMAdapter(imColVM));
+                
+
                 vm.CurrentProjectVM.PlaneVM.Init();
                 vm.ActiveSectionVM = vm.CurrentProjectVM.PlaneVM;
             });

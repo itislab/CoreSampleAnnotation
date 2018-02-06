@@ -53,6 +53,8 @@ namespace CoreSampleAnnotation.AnnotationPlane
             }
         }
 
+        public ImageColumnVM ImageColumnVM { get; private set; } 
+
         public void Init() {
             LayerRealLengthColumnVM layerLengthVM = new LayerRealLengthColumnVM("Мощность эл-та цикла");
             layerLengthVM.Layers.Add(new LengthLayerVM() { Length = (ColScaleController.LowerDepth - ColScaleController.UpperDepth) * ColScaleController.ScaleFactor });
@@ -189,17 +191,10 @@ namespace CoreSampleAnnotation.AnnotationPlane
             classificationVM.IsVisible = false;
 
             DepthAxisColumnVM depthColumnVm = new DepthAxisColumnVM("Шкала глубин");
+            
+            AnnoGridVM.Columns.Add(depthColumnVm);            
 
-            ImageColumnVM imageColumnVm = new ImageColumnVM("Фото керна");
-            imageColumnVm.Source = new System.Windows.Media.Imaging.BitmapImage(new Uri("core_part.jpg", UriKind.Relative));
-            imageColumnVm.ImageUpperDepth = 2801;
-            imageColumnVm.ImageLowerDepth = 2802;
-
-            AnnoGridVM.Columns.Add(depthColumnVm);
-            AnnoGridVM.Columns.Add(imageColumnVm);
-
-            ColScaleController.AttachToColumn(new ColVMAdapter(depthColumnVm));
-            ColScaleController.AttachToColumn(new ColVMAdapter(imageColumnVm));
+            ColScaleController.AttachToColumn(new ColVMAdapter(depthColumnVm));            
 
         }
 
