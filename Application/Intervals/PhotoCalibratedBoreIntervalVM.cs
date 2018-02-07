@@ -245,6 +245,7 @@ namespace CoreSampleAnnotation.Intervals
             int counter = 0;
             for (int i = 0; i < N; i++)
             {
+                List<PhotoRegion> subResult = new List<PhotoRegion>();
                 var regions = imageRegions[i];
                 var transform = imageTransforms[i];
                 var backTransform = transform.Inverse;
@@ -317,13 +318,12 @@ namespace CoreSampleAnnotation.Intervals
                         bitmap.Freeze();
                     }
 
-                    result.Add(new PhotoRegion(bitmap, new Size(width, height), regVM.Order, regVM.Length * 0.01)); //for now upper and lower are just placeholders holding order and length
+                    subResult.Add(new PhotoRegion(bitmap, new Size(width, height), regVM.Order, regVM.Length * 0.01)); //for now upper and lower are just placeholders holding order and length
                 }
 
                 //transforming order into real depth
-                var reorderedRegions = result.OrderBy(r => r.ImageUpperDepth).ToList();
-                double prevBound = UpperDepth;
-                result = new List<PhotoRegion>();
+                var reorderedRegions = subResult.OrderBy(r => r.ImageUpperDepth).ToList();
+                double prevBound = UpperDepth;                
                 for (int j = 0; j < reorderedRegions.Count; j++)
                 {
                     PhotoRegion curReg = reorderedRegions[j];
