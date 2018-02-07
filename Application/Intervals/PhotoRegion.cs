@@ -8,7 +8,7 @@ using System.Windows;
 using System.Windows.Media.Imaging;
 
 namespace CoreSampleAnnotation.Intervals
-{
+{    
     public class PhotoRegion: ViewModel
     {
         public BitmapImage BitmapImage { get; private set; }
@@ -45,5 +45,7 @@ namespace CoreSampleAnnotation.Intervals
             ImageUpperDepth = upper;
             ImageLowerDepth = lower;
         }
+
+        
     }
 }

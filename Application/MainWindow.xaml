@@ -24,6 +24,9 @@
         <DataTemplate DataType="{x:Type intervals:PhotoCalibratedBoreIntervalVM}">
             <intervals:IntervalImages />
         </DataTemplate>
+        <DataTemplate DataType="{x:Type local:StartupMenuVM}">
+            <local:StartupMenu />
+        </DataTemplate>
         <local:MenuButtonVisibilityConverter x:Key="menuButtonVisibilityConverter" />
     </Window.Resources>
     <Grid Background="LightGray">

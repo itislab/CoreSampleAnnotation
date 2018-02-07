@@ -15,8 +15,13 @@
             <Button Style="{StaticResource MetroButton}" Command="{Binding ActivateTemplateEditorCommand}">Редактор шаблона</Button>
             <Button Style="{StaticResource MetroButton}" Command="{Binding ActivateReportGenerationCommand}">Отчеты</Button>
         </StackPanel>
-        <Button Style="{StaticResource MetroButton}" HorizontalAlignment="Left" VerticalAlignment="Bottom" Command="{Binding ExitAppCommand}">
+        <StackPanel HorizontalAlignment="Left" VerticalAlignment="Bottom" Orientation="Horizontal">
+        <Button Style="{StaticResource MetroButton}" Command="{Binding ExitAppCommand}">
             <media:ExitIcon Width="50" Height="50" />
         </Button>
+            <Button Style="{StaticResource MetroButton}" Command="{Binding SaveCommand}">
+                <media:SaveIcon Width="50" Height="50" />
+            </Button>
+        </StackPanel>
     </Grid>
 </UserControl>

@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -14,7 +15,8 @@ namespace CoreSampleAnnotation.PhotoMarkup
     /// <summary>
     /// Represents a region on the photo that correponds to the part of the core sample
     /// </summary>
-    public class CalibratedRegionVM :ViewModel
+    [Serializable]
+    public class CalibratedRegionVM :ViewModel, ISerializable
     {
         private Point up;
         public Point Up {
@@ -155,10 +157,30 @@ namespace CoreSampleAnnotation.PhotoMarkup
             RaisePropertyChanged(nameof(CanMoveDown));
             RaisePropertyChanged(nameof(CanMoveUp));
         }
-
+        
         public CalibratedRegionVM()
         {
 
         }
+
+        #region Serialization
+        public CalibratedRegionVM(SerializationInfo info, StreamingContext context) {
+            up = (Point)info.GetValue("Up", typeof(Point));
+            bottom = (Point)info.GetValue("Bottom", typeof(Point));
+            side = (Point)info.GetValue("Side", typeof(Point));
+            order = info.GetInt32("Order");
+            length = info.GetDouble("Length");
+        }
+
+        public void GetObjectData(SerializationInfo info, StreamingContext context)
+        {
+            info.AddValue("Up", Up);
+            info.AddValue("Bottom", Bottom);
+            info.AddValue("Side", Side);
+            info.AddValue("Order", Order);
+            info.AddValue("Length", length);
+        }
+
+        #endregion
     }
 }

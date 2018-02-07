@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--This file is NOT compatible with Silverlight-->
+<Viewbox xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" Stretch="Uniform">
+  <Canvas Name="svg4493" Canvas.Left="0" Canvas.Top="0" Width="100" Height="125">
+    <Canvas.RenderTransform>
+      <TranslateTransform X="0" Y="0"/>
+    </Canvas.RenderTransform>
+    <Canvas.Resources/>
+    <!--Unknown tag: metadata-->
+    <!--Unknown tag: sodipodi:namedview-->
+    <Canvas Name="g4491">
+      <Path xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" Name="path4485" Fill="#000000">
+        <Path.Data>
+          <PathGeometry Figures="M96.198 21.159L78.695 3.657c-0.42-0.42-0.989-0.655-1.583-0.655H5.384c-1.236 0-2.238 1.002-2.238 2.238v89.52   c0 1.235 1.002 2.238 2.238 2.238h17.617H77h17.616c1.235 0 2.238-1.003 2.238-2.238V22.742   C96.854 22.148 96.618 21.579 96.198 21.159z M25.239 7.478h36.325V26.53H25.239V7.478z M74.762 92.521H25.239V51.206h49.522   V92.521z M92.378 92.521h-13.14V48.968c0-1.236-1.003-2.238-2.238-2.238H23.001c-1.236 0-2.238 1.002-2.238 2.238v43.553H7.622   V7.478h13.141v21.29c0 1.236 1.002 2.238 2.238 2.238h40.802c1.235 0 2.238-1.002 2.238-2.238V7.478h10.145l16.192 16.191V92.521z" FillRule="NonZero"/>
+        </Path.Data>
+      </Path>
+      <Path xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" Name="path4487" Fill="#000000">
+        <Path.Data>
+          <PathGeometry Figures="M36.899 66.324h26.204c1.235 0 2.237-1.002 2.237-2.238c0-1.235-1.002-2.238-2.237-2.238H36.899   c-1.237 0-2.238 1.003-2.238 2.238C34.661 65.322 35.662 66.324 36.899 66.324z" FillRule="NonZero"/>
+        </Path.Data>
+      </Path>
+      <Path xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" Name="path4489" Fill="#000000">
+        <Path.Data>
+          <PathGeometry Figures="M36.899 81.624h26.204c1.235 0 2.237-1.003 2.237-2.238s-1.002-2.238-2.237-2.238H36.899c-1.237 0-2.238 1.003-2.238 2.238   S35.662 81.624 36.899 81.624z" FillRule="NonZero"/>
+        </Path.Data>
+      </Path>
+    </Canvas>
+  </Canvas>
+</Viewbox>

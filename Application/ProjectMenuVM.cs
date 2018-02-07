@@ -14,6 +14,7 @@ namespace CoreSampleAnnotation
         private ICommand activateAnnotationPlane = null;
         private ICommand activateTemplateEditor = null;
         private ICommand activateReportGeneration = null;
+        private ICommand save = null;
         private ICommand exit = null;
 
         public ProjectVM ProjectVM
@@ -96,7 +97,15 @@ namespace CoreSampleAnnotation
                 }
             }
         }
-
+        public ICommand SaveCommand {
+            get { return save; }
+            set {
+                if (save != value) {
+                    save = value;
+                    RaisePropertyChanged(nameof(SaveCommand));
+                }
+            }
+        }
         public ProjectMenuVM(ProjectVM project)
         {
             projectVM = project;

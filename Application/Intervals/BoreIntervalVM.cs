@@ -1,12 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace CoreSampleAnnotation.Intervals
 {
-    public class BoreIntervalVM : ViewModel
+    [Serializable]
+    public class BoreIntervalVM : ViewModel, ISerializable
     {
         private double extractedLength = double.NaN;
         /// <summary>
@@ -74,6 +76,24 @@ namespace CoreSampleAnnotation.Intervals
             get {
                 return (LowerDepth - UpperDepth);
             }
-        }        
+        }
+
+        public BoreIntervalVM() {
+        }
+
+        #region serialization
+        public BoreIntervalVM(SerializationInfo info, StreamingContext context) {
+            ExtractedLength = info.GetDouble("ExtractedLength");
+            UpperDepth = info.GetDouble("UpperDepth");
+            LowerDepth = info.GetDouble("LowerDepth");
+        }
+
+        public virtual void GetObjectData(SerializationInfo info, StreamingContext context)
+        {
+            info.AddValue("ExtractedLength", ExtractedLength);
+            info.AddValue("UpperDepth", UpperDepth);
+            info.AddValue("LowerDepth", LowerDepth);
+        }
+        #endregion
     }
 }

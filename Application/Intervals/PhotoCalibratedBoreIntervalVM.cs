@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
+using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -14,7 +15,8 @@ using System.Windows.Media.Imaging;
 
 namespace CoreSampleAnnotation.Intervals
 {
-    public class PhotoCalibratedBoreIntervalVM : BoreIntervalVM
+    [Serializable]
+    public class PhotoCalibratedBoreIntervalVM : BoreIntervalVM, ISerializable
     {
         /// <summary>
         /// A total length in meters of all annotated parts of the core sample
@@ -64,15 +66,22 @@ namespace CoreSampleAnnotation.Intervals
         /// <summary>
         /// Whether the image transforms happen due to user manipulation
         /// </summary>
-        public bool IsImageTransformTracked {
+        public bool IsImageTransformTracked
+        {
             get { return isImageTransformTracked; }
-            set {
-                if (value != isImageTransformTracked) {
+            set
+            {
+                if (value != isImageTransformTracked)
+                {
                     isImageTransformTracked = value;
                     RaisePropertyChanged(nameof(IsImageTransformTracked));
                 }
             }
         }
+
+        private Predicate<object> canMoveUp;
+        private Predicate<object> canMoveDown;
+        private DelegateCommand delComUp, delComDown;
 
         public IEnumerable<CalibratedRegionVM> CalibratedRegions
         {
@@ -102,27 +111,6 @@ namespace CoreSampleAnnotation.Intervals
                     //subscribing to new regions
                     if (value != null)
                     {
-                        var canMoveUp = new Predicate<object>(obj1 =>
-                        {
-                            if (obj1 != null)
-                            {
-                                int order = (int)obj1;
-                                return order > 1;
-                            }
-                            else
-                                return false;
-                        });
-
-                        var canMoveDown = new Predicate<object>(obj1 =>
-                        {
-                            if (obj1 != null)
-                            {
-                                int order = (int)obj1;
-                                return order < imageRegions.SelectMany(i => i).Count();
-                            }
-                            else
-                                return false;
-                        });
                         foreach (CalibratedRegionVM crCM in value)
                         {
                             if (crCM.Order == -1)
@@ -131,27 +119,7 @@ namespace CoreSampleAnnotation.Intervals
                                 crCM.Order = imageRegions.SelectMany(i => i).Where(vm => vm.Order != -1).Count() + 1;
                             }
 
-                            crCM.RemoveCommand = new DelegateCommand((obj) =>
-                            {
-                                int idx = (int)obj;
-
-                                List<IEnumerable<CalibratedRegionVM>> newImageRegs = new List<IEnumerable<CalibratedRegionVM>>();
-                                foreach (var imageRegs in imageRegions)
-                                    newImageRegs.Add(imageRegs.Where(r => r.Order != idx).ToArray()); //excluding VM with order==idx
-                                imageRegions = newImageRegs;
-
-                                foreach (var region in imageRegions.SelectMany(i => i).Where(r => r.Order > idx))
-                                    region.Order--;
-
-                                RaisePropertyChanged(nameof(CalibratedRegions));
-                            });
-
-                            crCM.PropertyChanged += CalibratedRegion_PropertyChanged;
-
-                            var delComUp = new DelegateCommand(obj1 => MoveRegionOrder((int)obj1, OrderMoveDirection.Up), canMoveUp);
-                            var delComDown = new DelegateCommand(obj1 => MoveRegionOrder((int)obj1, OrderMoveDirection.Down), canMoveDown);
-                            crCM.MoveUp = delComUp;
-                            crCM.MoveDown = delComDown;
+                            AttachHandlersToRegionVM(crCM);
 
                             if (!canMoveRegionChangedActivations.ContainsKey(curImageIdx))
                                 canMoveRegionChangedActivations[curImageIdx] = new List<Action>();
@@ -167,6 +135,47 @@ namespace CoreSampleAnnotation.Intervals
                     RaisePropertyChanged(nameof(AnnotatedPercentage));
                 }
             }
+        }
+
+        /// <summary>
+        /// Safely removes the calibrated regions by recalulating indices of other regions
+        /// </summary>
+        /// <param name="regionIdx"></param>
+        private void RemoveRegionByIndex(int regionIdx) {
+            List<IEnumerable<CalibratedRegionVM>> newImageRegs = new List<IEnumerable<CalibratedRegionVM>>();
+            foreach (var imageRegs in imageRegions)
+                newImageRegs.Add(imageRegs.Where(r => r.Order != regionIdx).ToArray()); //excluding VM with order==idx
+            imageRegions = newImageRegs;
+
+            foreach (var region in imageRegions.SelectMany(i => i).Where(r => r.Order > regionIdx))
+                region.Order--;
+
+            RaisePropertyChanged(nameof(CalibratedRegions));
+        }
+
+        private void AttachHandlersToRegionVM(CalibratedRegionVM crCM)
+        {
+            crCM.RemoveCommand = new DelegateCommand((obj) =>
+            {
+                int idx = (int)obj;
+
+                var mbResult = MessageBox.Show("Удалить отмеченный участок керна?","Подтверждение удаления участка",MessageBoxButton.YesNo,MessageBoxImage.Question);
+                switch (mbResult) {
+                    case MessageBoxResult.Yes:
+                        RemoveRegionByIndex(idx);
+                        break;
+                    case MessageBoxResult.No:
+                        break;
+                    default: throw new NotImplementedException();
+                }
+
+                
+            });
+
+            crCM.PropertyChanged += CalibratedRegion_PropertyChanged;
+
+            crCM.MoveUp = delComUp;
+            crCM.MoveDown = delComDown;
         }
 
         private Dictionary<int, List<Action>> canMoveRegionChangedActivations = new Dictionary<int, List<Action>>();
@@ -204,19 +213,22 @@ namespace CoreSampleAnnotation.Intervals
 
         }
 
-        public PhotoRegion[] GetRegionImages() {
+        public PhotoRegion[] GetRegionImages()
+        {
             List<PhotoRegion> result = new List<PhotoRegion>();
             int N = ImagesCount;
             int counter = 0;
-            for (int i = 0; i < N; i++) {
+            for (int i = 0; i < N; i++)
+            {
                 var regions = imageRegions[i];
                 var transform = imageTransforms[i];
                 var backTransform = transform.Inverse;
-                foreach (CalibratedRegionVM regVM in regions) {
+                foreach (CalibratedRegionVM regVM in regions)
+                {
                     Point up = backTransform.Transform(regVM.Up);
                     Point down = backTransform.Transform(regVM.Bottom);
                     Point side = backTransform.Transform(regVM.Side);
-                    
+
                     Point M = Calc.FindNormalIntersection(down, up, side);
                     Vector sideV = side - M;
                     //todo: coerce side point side
@@ -229,19 +241,20 @@ namespace CoreSampleAnnotation.Intervals
 
                     if (sideV * downUpNorm > 0.0)
                         sideV.Negate();
-                    
+
 
                     TransformGroup tg = new TransformGroup();
-                    
+
                     Point upperLeft = up - sideV;
 
-                    tg.Children.Add(new TranslateTransform(-upperLeft.X,-upperLeft.Y));
+                    tg.Children.Add(new TranslateTransform(-upperLeft.X, -upperLeft.Y));
 
                     if (sideV.X == 0)
                     {
                         throw new NotImplementedException();
                     }
-                    else {
+                    else
+                    {
                         double angle = Vector.AngleBetween(sideV, new Vector(1.0, 0.0));
                         tg.Children.Add(new RotateTransform(angle));
                     }
@@ -256,7 +269,7 @@ namespace CoreSampleAnnotation.Intervals
 
                     canvas.Measure(new Size(width, height));
                     canvas.Arrange(new Rect(new Size(width, height)));
-                    
+
                     RenderTargetBitmap bmp = new RenderTargetBitmap((int)width, (int)height, 96, 96, PixelFormats.Pbgra32);
 
                     bmp.Render(canvas);
@@ -267,7 +280,8 @@ namespace CoreSampleAnnotation.Intervals
 
                     var bitmap = new BitmapImage();
 
-                    using (MemoryStream stm = new MemoryStream()) {
+                    using (MemoryStream stm = new MemoryStream())
+                    {
                         encoder.Save(stm);
                         stm.Seek(0, SeekOrigin.Begin);
 
@@ -276,16 +290,16 @@ namespace CoreSampleAnnotation.Intervals
                         bitmap.CacheOption = BitmapCacheOption.OnLoad;
                         bitmap.EndInit();
                         bitmap.Freeze();
-                    }                    
+                    }
 
-                    result.Add(new PhotoRegion(bitmap, new Size(width, height), regVM.Order, regVM.Length*0.01)); //for now upper and lower are just placeholders holding order and length
+                    result.Add(new PhotoRegion(bitmap, new Size(width, height), regVM.Order, regVM.Length * 0.01)); //for now upper and lower are just placeholders holding order and length
                 }
 
                 //transforming order into real depth
                 var reorderedRegions = result.OrderBy(r => r.ImageUpperDepth).ToList();
                 double prevBound = UpperDepth;
                 result = new List<PhotoRegion>();
-                for(int j=0; j< reorderedRegions.Count; j++)
+                for (int j = 0; j < reorderedRegions.Count; j++)
                 {
                     PhotoRegion curReg = reorderedRegions[j];
                     result.Add(new PhotoRegion(curReg.BitmapImage, curReg.ImageSize, prevBound, prevBound + curReg.ImageLowerDepth));
@@ -393,9 +407,35 @@ namespace CoreSampleAnnotation.Intervals
 
         public ICommand RemoveCurrentImageCommand { get; private set; }
 
-        public PhotoCalibratedBoreIntervalVM()
+        private void Initialize()
         {
             base.PropertyChanged += PhotoCalibratedBoreIntervalVM_PropertyChanged;
+
+            canMoveUp = new Predicate<object>(obj1 =>
+            {
+                if (obj1 != null)
+                {
+                    int order = (int)obj1;
+                    return order > 1;
+                }
+                else
+                    return false;
+            });
+
+            canMoveDown = new Predicate<object>(obj1 =>
+            {
+                if (obj1 != null)
+                {
+                    int order = (int)obj1;
+                    return order < imageRegions.SelectMany(i => i).Count();
+                }
+                else
+                    return false;
+            });
+
+            delComUp = new DelegateCommand(obj1 => MoveRegionOrder((int)obj1, OrderMoveDirection.Up), canMoveUp);
+            delComDown = new DelegateCommand(obj1 => MoveRegionOrder((int)obj1, OrderMoveDirection.Down), canMoveDown);
+
 
             addNewImageCommand = new DelegateCommand(() =>
             {
@@ -439,22 +479,41 @@ namespace CoreSampleAnnotation.Intervals
 
             RemoveCurrentImageCommand = new DelegateCommand(() =>
             {
-                int idxToRemove = curImageIdx;
-                imagePaths.RemoveAt(idxToRemove);
-                imageTransforms.RemoveAt(idxToRemove);
-                imageRegions.RemoveAt(idxToRemove);
+                var mbResult = MessageBox.Show("Удалить текущую фотографию из проекта? Все отмеченные на ней интервалы будут потеряны.", "Подтверждение удаления фотографии", MessageBoxButton.YesNo, MessageBoxImage.Question);
+                switch (mbResult) {
+                    case MessageBoxResult.Yes:
+                        int idxToRemove = curImageIdx;
 
-                if (imagePaths.Count > 0)
-                    CurImageIdx = (curImageIdx) % imagePaths.Count;
+                        var relatedRegions = imageRegions[idxToRemove];
+                        foreach (var region in relatedRegions) {
+                            RemoveRegionByIndex(region.Order);
+                        }
 
-                RaisePropertyChanged(nameof(ImagePath));
-                RaisePropertyChanged(nameof(ImageTransform));
-                RaisePropertyChanged(nameof(CalibratedRegions));
+                        imagePaths.RemoveAt(idxToRemove);
+                        imageTransforms.RemoveAt(idxToRemove);
+                        imageRegions.RemoveAt(idxToRemove);
 
-                RaisePropertyChanged(nameof(ImagesCount));
+                        if (imagePaths.Count > 0)
+                            CurImageIdx = (curImageIdx) % imagePaths.Count;
+
+                        RaisePropertyChanged(nameof(ImagePath));
+                        RaisePropertyChanged(nameof(ImageTransform));
+                        RaisePropertyChanged(nameof(CalibratedRegions));
+
+                        RaisePropertyChanged(nameof(ImagesCount));
+                        break;
+                    case MessageBoxResult.No:
+                        break;
+                    default: throw new NotImplementedException();
+                }
+                
             });
         }
 
+        public PhotoCalibratedBoreIntervalVM()
+        {
+            Initialize();
+        }
 
         private void PhotoCalibratedBoreIntervalVM_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
@@ -466,5 +525,41 @@ namespace CoreSampleAnnotation.Intervals
                     break;
             }
         }
+
+        #region serialization
+
+        public PhotoCalibratedBoreIntervalVM(SerializationInfo info, StreamingContext context) : base(info, context)
+        {
+            Matrix[] matrices = (Matrix[])info.GetValue("Transforms", typeof(Matrix[]));
+            imageTransforms = matrices.Select(m => (Transform)(new MatrixTransform(m))).ToList();
+
+            List<List<CalibratedRegionVM>> regionsList = (List<List<CalibratedRegionVM>>)info.GetValue("Regions", typeof(List<List<CalibratedRegionVM>>));
+            imageRegions = regionsList.Select(im => (IEnumerable<CalibratedRegionVM>)im).ToList();
+            
+            imagePaths = (List<string>)info.GetValue("ImagePaths", typeof(List<string>));
+
+            //restoring commands and event subscriptions
+            Initialize();
+            
+            foreach (var image in imageRegions)
+                foreach (var region in image)
+                    AttachHandlersToRegionVM(region);
+
+        }
+
+        public override void GetObjectData(SerializationInfo info, StreamingContext context)
+        {
+            Matrix[] matrices = imageTransforms.Select(t => t.Value).ToArray();
+            info.AddValue("Transforms", matrices);
+
+            List<List<CalibratedRegionVM>> regionsList = imageRegions.Select(im => im.ToList()).ToList();
+            info.AddValue("Regions", regionsList);
+
+            info.AddValue("ImagePaths", imagePaths);
+
+            base.GetObjectData(info, context);
+        }
+
+        #endregion
     }
 }

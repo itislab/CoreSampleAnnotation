@@ -2,12 +2,14 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace CoreSampleAnnotation
 {
-    public class ProjectVM: ViewModel
+    [Serializable]
+    public class ProjectVM : ViewModel, ISerializable
     {
         private string boreName = string.Empty;
 
@@ -26,7 +28,7 @@ namespace CoreSampleAnnotation
             }
         }
 
-        private BoreIntervalsVM boreIntervalsVM = new BoreIntervalsVM();
+        private BoreIntervalsVM boreIntervalsVM;
         public BoreIntervalsVM BoreIntervalsVM {
             get { return boreIntervalsVM; }
             set {
@@ -50,5 +52,23 @@ namespace CoreSampleAnnotation
                 }
             }
         }
+
+        public ProjectVM() {
+            boreIntervalsVM = new BoreIntervalsVM();
+        }
+
+        #region Serialization
+
+        public ProjectVM(SerializationInfo info, StreamingContext context) {
+            boreName = info.GetString("BoreName");
+            boreIntervalsVM = (BoreIntervalsVM)info.GetValue("Intervals", typeof(BoreIntervalsVM));
+        }
+
+        public void GetObjectData(SerializationInfo info, StreamingContext context)
+        {
+            info.AddValue("BoreName", BoreName);
+            info.AddValue("Intervals", BoreIntervalsVM);
+        }
+        #endregion
     }
 }
