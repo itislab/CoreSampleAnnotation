@@ -10,6 +10,8 @@ namespace CoreSampleAnnotation.Persistence
 {
     class FolderPersisterFactory : IProjectPersisterFactory
     {
+        readonly private string imagesDirectory = "Photos";
+
         public bool TryCreateNew(out IProjectPersister persister)
         {
             var dialog = new CommonOpenFileDialog();
@@ -39,8 +41,12 @@ namespace CoreSampleAnnotation.Persistence
                             }                            
                         }
                         persister = new FolderPersister(path);
-                        persister.SaveProject(new ProjectVM()); //new clean project
+                        var imageStorage = new FolderImageStorage(System.IO.Path.Combine(path, imagesDirectory));
 
+                        System.IO.Directory.SetCurrentDirectory(path); //after this the paths in project will be relative
+
+                        persister.SaveProject(new ProjectVM(imageStorage)); //new clean project is dumped to disk
+                        
                         return true;
                     default:
                         done = true;
@@ -64,7 +70,9 @@ namespace CoreSampleAnnotation.Persistence
 
                     string path = dialog.FileName;
                     
-                    persister = new FolderPersister(path);                    
+                    persister = new FolderPersister(path);
+
+                    System.IO.Directory.SetCurrentDirectory(path);
 
                     return true;
                 default:

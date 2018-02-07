@@ -52,16 +52,17 @@ namespace CoreSampleAnnotation
                 }
             }
         }
+        
 
-        public ProjectVM() {
-            boreIntervalsVM = new BoreIntervalsVM();
+        public ProjectVM(IImageStorage imageStorage) {            
+            boreIntervalsVM = new BoreIntervalsVM(imageStorage);
         }
 
         #region Serialization
 
         public ProjectVM(SerializationInfo info, StreamingContext context) {
             boreName = info.GetString("BoreName");
-            boreIntervalsVM = (BoreIntervalsVM)info.GetValue("Intervals", typeof(BoreIntervalsVM));
+            boreIntervalsVM = (BoreIntervalsVM)info.GetValue("Intervals", typeof(BoreIntervalsVM));                        
         }
 
         public void GetObjectData(SerializationInfo info, StreamingContext context)

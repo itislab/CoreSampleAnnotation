@@ -15,6 +15,27 @@ using System.Windows.Media.Imaging;
 
 namespace CoreSampleAnnotation.Intervals
 {
+    public interface IImageStorage
+    {
+        /// <summary>
+        /// Returns the absolute path that can be used to access the image file
+        /// </summary>
+        /// <param name="imageID"></param>
+        /// <returns></returns>
+        string GetFilePath(Guid imageID);
+        /// <summary>
+        /// Returns the idx of newly added image
+        /// </summary>
+        /// <returns></returns>
+        Guid AddNewImage();
+
+        /// <summary>
+        /// Removes the image from storage
+        /// </summary>
+        /// <param name="id"></param>
+        void RemoveImage(Guid id);
+    }
+
     [Serializable]
     public class PhotoCalibratedBoreIntervalVM : BoreIntervalVM, ISerializable
     {
@@ -36,6 +57,8 @@ namespace CoreSampleAnnotation.Intervals
                     return AnnotatedLength / MaxPossibleExtractionLength * 100.0;
             }
         }
+
+        private IImageStorage imageStorage;
 
         private List<Transform> imageTransforms = new List<Transform>();
         private List<IEnumerable<CalibratedRegionVM>> imageRegions = new List<IEnumerable<CalibratedRegionVM>>();
@@ -141,7 +164,8 @@ namespace CoreSampleAnnotation.Intervals
         /// Safely removes the calibrated regions by recalulating indices of other regions
         /// </summary>
         /// <param name="regionIdx"></param>
-        private void RemoveRegionByIndex(int regionIdx) {
+        private void RemoveRegionByIndex(int regionIdx)
+        {
             List<IEnumerable<CalibratedRegionVM>> newImageRegs = new List<IEnumerable<CalibratedRegionVM>>();
             foreach (var imageRegs in imageRegions)
                 newImageRegs.Add(imageRegs.Where(r => r.Order != regionIdx).ToArray()); //excluding VM with order==idx
@@ -159,8 +183,9 @@ namespace CoreSampleAnnotation.Intervals
             {
                 int idx = (int)obj;
 
-                var mbResult = MessageBox.Show("Удалить отмеченный участок керна?","Подтверждение удаления участка",MessageBoxButton.YesNo,MessageBoxImage.Question);
-                switch (mbResult) {
+                var mbResult = MessageBox.Show("Удалить отмеченный участок керна?", "Подтверждение удаления участка", MessageBoxButton.YesNo, MessageBoxImage.Question);
+                switch (mbResult)
+                {
                     case MessageBoxResult.Yes:
                         RemoveRegionByIndex(idx);
                         break;
@@ -169,7 +194,7 @@ namespace CoreSampleAnnotation.Intervals
                     default: throw new NotImplementedException();
                 }
 
-                
+
             });
 
             crCM.PropertyChanged += CalibratedRegion_PropertyChanged;
@@ -261,7 +286,7 @@ namespace CoreSampleAnnotation.Intervals
 
                     Canvas canvas = new Canvas();
                     Image img = new Image();
-                    img.Source = new BitmapImage(new Uri(imagePaths[i]));
+                    img.Source = new BitmapImage(new Uri(imageStorage.GetFilePath(imageIDs[i])));
 
                     canvas.Children.Add(img);
 
@@ -332,7 +357,7 @@ namespace CoreSampleAnnotation.Intervals
         {
             get
             {
-                int count = imagePaths.Count;
+                int count = imageIDs.Count;
                 string ending = "";
                 int mod = count % 10;
                 switch (mod)
@@ -352,11 +377,11 @@ namespace CoreSampleAnnotation.Intervals
         }
 
         private int curImageIdx = 0;
-        private List<string> imagePaths = new List<string>();
+        private List<Guid> imageIDs = new List<Guid>();
 
         public int ImagesCount
         {
-            get { return imagePaths.Count; }
+            get { return imageIDs.Count; }
         }
 
         public int CurImageIdx
@@ -370,9 +395,26 @@ namespace CoreSampleAnnotation.Intervals
                     IsImageTransformTracked = false;
                     RaisePropertyChanged(nameof(CurImageIdx));
                     RaisePropertyChanged(nameof(ImagePath));
+                    RaisePropertyChanged(nameof(ImageSource));
                     RaisePropertyChanged(nameof(ImageTransform));
                     RaisePropertyChanged(nameof(CalibratedRegions));
                     IsImageTransformTracked = true;
+                }
+            }
+        }
+
+        public ImageSource ImageSource {
+            get {
+                if (imageIDs.Count == 0) return null;
+                else
+                {
+                    Uri uri = new Uri(ImagePath);
+                    var bitmap = new BitmapImage();
+                    bitmap.BeginInit();
+                    bitmap.UriSource = uri;
+                    bitmap.CacheOption = BitmapCacheOption.OnLoad;
+                    bitmap.EndInit();
+                    return bitmap;
                 }
             }
         }
@@ -381,9 +423,12 @@ namespace CoreSampleAnnotation.Intervals
         {
             get
             {
-                if (imagePaths.Count == 0) return null;
+                if (imageIDs.Count == 0) return null;
                 else
-                    return imagePaths[curImageIdx];
+                {
+                    return Path.GetFullPath(imageStorage.GetFilePath(imageIDs[curImageIdx]));
+                    
+                }
             }
         }
 
@@ -436,23 +481,23 @@ namespace CoreSampleAnnotation.Intervals
             delComUp = new DelegateCommand(obj1 => MoveRegionOrder((int)obj1, OrderMoveDirection.Up), canMoveUp);
             delComDown = new DelegateCommand(obj1 => MoveRegionOrder((int)obj1, OrderMoveDirection.Down), canMoveDown);
 
-
             addNewImageCommand = new DelegateCommand(() =>
             {
-                Microsoft.Win32.OpenFileDialog ofd = new Microsoft.Win32.OpenFileDialog();
-                ofd.ShowDialog();
-                string fileCandidate = ofd.FileName;
+                Guid id = imageStorage.AddNewImage();
+                string fileCandidate = imageStorage.GetFilePath(id);
+
                 if (System.IO.File.Exists(fileCandidate))
                 {
-                    imagePaths.Add(fileCandidate);
+                    imageIDs.Add(id);
                     imageTransforms.Add(Transform.Identity);
                     imageRegions.Add(new List<CalibratedRegionVM>());
 
-                    CurImageIdx = imagePaths.Count - 1;
+                    CurImageIdx = imageIDs.Count - 1;
                     RaisePropertyChanged(nameof(ImagesCount));
-                    if (imagePaths.Count == 1)
+                    if (imageIDs.Count == 1)
                     {
                         RaisePropertyChanged(nameof(ImagePath));
+                        RaisePropertyChanged(nameof(ImageSource));
                         RaisePropertyChanged(nameof(ImageTransform));
                         RaisePropertyChanged(nameof(CalibratedRegions));
                     }
@@ -461,9 +506,9 @@ namespace CoreSampleAnnotation.Intervals
 
             NextImageCommand = new DelegateCommand(() =>
             {
-                if (imagePaths.Count > 0)
+                if (imageIDs.Count > 0)
                 {
-                    CurImageIdx = (curImageIdx + 1) % imagePaths.Count;
+                    CurImageIdx = (curImageIdx + 1) % imageIDs.Count;
                 }
             });
 
@@ -480,23 +525,28 @@ namespace CoreSampleAnnotation.Intervals
             RemoveCurrentImageCommand = new DelegateCommand(() =>
             {
                 var mbResult = MessageBox.Show("Удалить текущую фотографию из проекта? Все отмеченные на ней интервалы будут потеряны.", "Подтверждение удаления фотографии", MessageBoxButton.YesNo, MessageBoxImage.Question);
-                switch (mbResult) {
+                switch (mbResult)
+                {
                     case MessageBoxResult.Yes:
                         int idxToRemove = curImageIdx;
 
                         var relatedRegions = imageRegions[idxToRemove];
-                        foreach (var region in relatedRegions) {
+                        foreach (var region in relatedRegions)
+                        {
                             RemoveRegionByIndex(region.Order);
                         }
 
-                        imagePaths.RemoveAt(idxToRemove);
+                        imageStorage.RemoveImage(imageIDs[idxToRemove]);
+
+                        imageIDs.RemoveAt(idxToRemove);
                         imageTransforms.RemoveAt(idxToRemove);
                         imageRegions.RemoveAt(idxToRemove);
 
-                        if (imagePaths.Count > 0)
-                            CurImageIdx = (curImageIdx) % imagePaths.Count;
+                        if (imageIDs.Count > 0)
+                            CurImageIdx = (curImageIdx) % imageIDs.Count;
 
                         RaisePropertyChanged(nameof(ImagePath));
+                        RaisePropertyChanged(nameof(ImageSource));
                         RaisePropertyChanged(nameof(ImageTransform));
                         RaisePropertyChanged(nameof(CalibratedRegions));
 
@@ -506,12 +556,13 @@ namespace CoreSampleAnnotation.Intervals
                         break;
                     default: throw new NotImplementedException();
                 }
-                
+
             });
         }
 
-        public PhotoCalibratedBoreIntervalVM()
+        public PhotoCalibratedBoreIntervalVM(IImageStorage imageStorage) : base()
         {
+            this.imageStorage = imageStorage;
             Initialize();
         }
 
@@ -535,12 +586,15 @@ namespace CoreSampleAnnotation.Intervals
 
             List<List<CalibratedRegionVM>> regionsList = (List<List<CalibratedRegionVM>>)info.GetValue("Regions", typeof(List<List<CalibratedRegionVM>>));
             imageRegions = regionsList.Select(im => (IEnumerable<CalibratedRegionVM>)im).ToList();
-            
-            imagePaths = (List<string>)info.GetValue("ImagePaths", typeof(List<string>));
+
+            imageIDs = (List<Guid>)info.GetValue(nameof(imageIDs), typeof(List<Guid>));
+
+            //TODO: avoid usage of explicit derived type here
+            imageStorage = (IImageStorage)info.GetValue(nameof(imageStorage),typeof(Persistence.FolderImageStorage));
 
             //restoring commands and event subscriptions
             Initialize();
-            
+
             foreach (var image in imageRegions)
                 foreach (var region in image)
                     AttachHandlersToRegionVM(region);
@@ -555,7 +609,10 @@ namespace CoreSampleAnnotation.Intervals
             List<List<CalibratedRegionVM>> regionsList = imageRegions.Select(im => im.ToList()).ToList();
             info.AddValue("Regions", regionsList);
 
-            info.AddValue("ImagePaths", imagePaths);
+            info.AddValue(nameof(imageIDs), imageIDs);
+
+            //TODO: avoid usage of explicit derived type here
+            info.AddValue(nameof(imageStorage), (Persistence.FolderImageStorage)imageStorage);
 
             base.GetObjectData(info, context);
         }

@@ -95,11 +95,11 @@ namespace CoreSampleAnnotation.Intervals
 
             intervals.CollectionChanged += Intervals_CollectionChanged;
 
-            Intervals.Add(new PhotoCalibratedBoreIntervalVM());
+            Intervals.Add(new PhotoCalibratedBoreIntervalVM(imageStorage));
 
             AddNewCommand = new DelegateCommand(() =>
             {
-                Intervals.Add(new PhotoCalibratedBoreIntervalVM());
+                Intervals.Add(new PhotoCalibratedBoreIntervalVM(imageStorage));
             });
 
             RemoveIntervalCommand = new DelegateCommand((arg) =>
@@ -120,8 +120,11 @@ namespace CoreSampleAnnotation.Intervals
             });
         }
 
-        public BoreIntervalsVM()
+        private IImageStorage imageStorage;
+
+        public BoreIntervalsVM(IImageStorage imageStorage)
         {
+            this.imageStorage = imageStorage;
             Initialize();
         }
 
@@ -164,6 +167,9 @@ namespace CoreSampleAnnotation.Intervals
             PhotoCalibratedBoreIntervalVM[] intervalsArray = (PhotoCalibratedBoreIntervalVM[])info.GetValue("Intervals", typeof(PhotoCalibratedBoreIntervalVM[]));
             intervals = new ObservableCollection<BoreIntervalVM>(intervalsArray.Select(i => (BoreIntervalVM)i));
 
+            //TODO: avoid usage of explicit derived type here
+            imageStorage = (IImageStorage)info.GetValue(nameof(imageStorage), typeof(Persistence.FolderImageStorage));
+
             Initialize();
         }
 
@@ -171,6 +177,9 @@ namespace CoreSampleAnnotation.Intervals
         {
             PhotoCalibratedBoreIntervalVM[] intervalsArray = Intervals.Where(i => !(double.IsNaN(i.LowerDepth) && double.IsNaN(i.UpperDepth))).Select(i => (PhotoCalibratedBoreIntervalVM)i).ToArray();
             info.AddValue("Intervals", intervalsArray);
+
+            //TODO: avoid usage of explicit derived type here
+            info.AddValue(nameof(imageStorage), (Persistence.FolderImageStorage)imageStorage);
         }
         #endregion
     }

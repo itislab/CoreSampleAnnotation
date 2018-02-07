@@ -16,7 +16,7 @@
                 <Binding Path="ImageTransform" />
             </MultiBinding>
         </local:CoordTransformedCanvas.CoordsTransform>
-        <Image Source="{Binding ImagePath, FallbackValue='pack://application:,,,/CoreSampleAnnotation;component/Media/checkerboard.jpg'}" RenderTransform="{Binding ImageTransform, Mode=TwoWay}" IsManipulationEnabled="True" HorizontalAlignment="Left" VerticalAlignment="Top" Name="Image"/>
+        <Image Source="{Binding ImageSource, FallbackValue='pack://application:,,,/CoreSampleAnnotation;component/Media/checkerboard.jpg'}" RenderTransform="{Binding ImageTransform, Mode=TwoWay}" IsManipulationEnabled="True" HorizontalAlignment="Left" VerticalAlignment="Top" Name="Image"/>
         <local:CalibratedRegionInfoView Panel.ZIndex="20" x:Name="RegionInfoView"></local:CalibratedRegionInfoView>
     </local:CoordTransformedCanvas>
 </UserControl>
