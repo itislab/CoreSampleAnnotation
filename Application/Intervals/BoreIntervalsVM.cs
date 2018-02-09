@@ -162,7 +162,7 @@ namespace CoreSampleAnnotation.Intervals
         }
 
         #region serialization
-        public BoreIntervalsVM(SerializationInfo info, StreamingContext context)
+        protected BoreIntervalsVM(SerializationInfo info, StreamingContext context)
         {
             PhotoCalibratedBoreIntervalVM[] intervalsArray = (PhotoCalibratedBoreIntervalVM[])info.GetValue("Intervals", typeof(PhotoCalibratedBoreIntervalVM[]));
             intervals = new ObservableCollection<BoreIntervalVM>(intervalsArray.Select(i => (BoreIntervalVM)i));
@@ -173,7 +173,7 @@ namespace CoreSampleAnnotation.Intervals
             Initialize();
         }
 
-        public void GetObjectData(SerializationInfo info, StreamingContext context)
+        public virtual void GetObjectData(SerializationInfo info, StreamingContext context)
         {
             PhotoCalibratedBoreIntervalVM[] intervalsArray = Intervals.Where(i => !(double.IsNaN(i.LowerDepth) && double.IsNaN(i.UpperDepth))).Select(i => (PhotoCalibratedBoreIntervalVM)i).ToArray();
             info.AddValue("Intervals", intervalsArray);

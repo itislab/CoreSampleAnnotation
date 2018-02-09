@@ -6,6 +6,7 @@
         xmlns:local="clr-namespace:CoreSampleAnnotation"
         xmlns:intervals="clr-namespace:CoreSampleAnnotation.Intervals"
         xmlns:plane="clr-namespace:CoreSampleAnnotation.AnnotationPlane"
+        xmlns:planeSettings="clr-namespace:CoreSampleAnnotation.AnnotationPlane.ColumnSettings"
         mc:Ignorable="d"
         Title="Керн" Height="350" Width="525" WindowStyle="None" ResizeMode="NoResize" WindowState="Maximized">
     <Window.Resources>
@@ -26,6 +27,9 @@
         </DataTemplate>
         <DataTemplate DataType="{x:Type local:StartupMenuVM}">
             <local:StartupMenu />
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type planeSettings:ColumnSettingsVM}">
+            <planeSettings:ColumnSettingsView />
         </DataTemplate>
         <local:MenuButtonVisibilityConverter x:Key="menuButtonVisibilityConverter" />
     </Window.Resources>

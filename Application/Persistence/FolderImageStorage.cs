@@ -91,11 +91,11 @@ namespace CoreSampleAnnotation.Persistence
 
         #region serialization
 
-        public FolderImageStorage(SerializationInfo info, StreamingContext context) {
+        protected FolderImageStorage(SerializationInfo info, StreamingContext context) {
             FolderPath = Path.Combine(Directory.GetCurrentDirectory(), info.GetString("Folder"));
         }
 
-        public void GetObjectData(SerializationInfo info, StreamingContext context)
+        public virtual void GetObjectData(SerializationInfo info, StreamingContext context)
         {
             string relativePath = MakeRelativePath(Directory.GetCurrentDirectory() + "\\", FolderPath);
             info.AddValue("Folder", relativePath);

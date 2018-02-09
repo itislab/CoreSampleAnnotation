@@ -1,4 +1,5 @@
-﻿using CoreSampleAnnotation.Intervals;
+﻿using CoreSampleAnnotation.AnnotationPlane.ColumnSettings;
+using CoreSampleAnnotation.Intervals;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -52,7 +53,18 @@ namespace CoreSampleAnnotation
                 }
             }
         }
-        
+
+        private ColumnSettingsVM planeColumnSettingsVM = new ColumnSettingsVM();
+
+        public ColumnSettingsVM PlaneColumnSettingsVM {
+            get { return planeColumnSettingsVM; }
+            set {
+                if (planeColumnSettingsVM != value) {
+                    planeColumnSettingsVM = value;
+                    RaisePropertyChanged(nameof(PlaneColumnSettingsVM));
+                }
+            }
+        }
 
         public ProjectVM(IImageStorage imageStorage) {            
             boreIntervalsVM = new BoreIntervalsVM(imageStorage);
@@ -60,12 +72,12 @@ namespace CoreSampleAnnotation
 
         #region Serialization
 
-        public ProjectVM(SerializationInfo info, StreamingContext context) {
+        protected ProjectVM(SerializationInfo info, StreamingContext context) {
             boreName = info.GetString("BoreName");
             boreIntervalsVM = (BoreIntervalsVM)info.GetValue("Intervals", typeof(BoreIntervalsVM));                        
         }
 
-        public void GetObjectData(SerializationInfo info, StreamingContext context)
+        public virtual void GetObjectData(SerializationInfo info, StreamingContext context)
         {
             info.AddValue("BoreName", BoreName);
             info.AddValue("Intervals", BoreIntervalsVM);

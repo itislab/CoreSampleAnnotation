@@ -1,0 +1,49 @@
+﻿<UserControl x:Class="CoreSampleAnnotation.AnnotationPlane.ColumnSettings.ColumnDefinitionView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:CoreSampleAnnotation.AnnotationPlane.ColumnSettings"
+             xmlns:media="clr-namespace:CoreSampleAnnotation.Media"
+             xmlns:core="clr-namespace:CoreSampleAnnotation"
+             mc:Ignorable="d" 
+             d:DesignHeight="300" d:DesignWidth="300">
+    <UserControl.Resources>
+        <DataTemplate DataType="{x:Type local:LayeredMultipurposeColumnDefinitionVM}">
+            <local:LayeredMultipurposeColumnDefinitionView />
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type local:PhotoColumnDefinitionVM}">
+            <local:PhotoColumnDefinitionView />
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type local:DepthColumnDefinitionVM}">
+            <local:DepthColumnDefinitionView />
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type local:LayerLengthColumnDefinitionVM}">
+            <local:LayerLengthColumnDefinitionView />
+        </DataTemplate>
+        <core:VisibilityHiddenConverter x:Key="visibilityHiddenConverter" />
+    </UserControl.Resources>
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="auto" SharedSizeGroup="ColumnDefinitionWidth1"/>
+            <ColumnDefinition Width="auto" SharedSizeGroup="ColumnDefinitionWidth2"/>
+            <ColumnDefinition Width="auto" SharedSizeGroup="ColumnDefinitionWidth3"/>
+            <ColumnDefinition Width="auto" SharedSizeGroup="ColumnDefinitionWidth4"/>
+        </Grid.ColumnDefinitions>
+        <Button FontSize="20" Grid.Column="0" Visibility="{Binding CanMoveLeft,Converter={StaticResource visibilityHiddenConverter}}" CommandParameter="{Binding ColumnOrder}" Command="{Binding MoveLeft}" Style="{StaticResource MetroButton}" Width="50" VerticalAlignment="Center">
+            <media:Arrow_In_circle>
+            </media:Arrow_In_circle>
+        </Button>
+        <Button FontSize="20" Grid.Column="1" Visibility="{Binding CanMoveRight,Converter={StaticResource visibilityHiddenConverter}}" CommandParameter="{Binding ColumnOrder}" Command="{Binding MoveRight}"  Style="{StaticResource MetroButton}" Width="50" VerticalAlignment="Center">
+            <Button.LayoutTransform>
+                <RotateTransform Angle="180"/>
+            </Button.LayoutTransform>
+            <media:Arrow_In_circle>
+            </media:Arrow_In_circle>
+        </Button>
+        <ContentPresenter Grid.Column="2"  Content="{Binding .}" Margin="3" />
+        <Button FontSize="20" Grid.Column="3" Command="{Binding RemoveCommand}"  CommandParameter="{Binding ColumnOrder}" Style="{StaticResource MetroButton}" Width="50" VerticalAlignment="Center">
+            <media:CrossIcon/>
+        </Button>
+    </Grid>
+</UserControl>

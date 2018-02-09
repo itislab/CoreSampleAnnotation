@@ -164,7 +164,7 @@ namespace CoreSampleAnnotation.PhotoMarkup
         }
 
         #region Serialization
-        public CalibratedRegionVM(SerializationInfo info, StreamingContext context) {
+        protected CalibratedRegionVM(SerializationInfo info, StreamingContext context) {
             up = (Point)info.GetValue("Up", typeof(Point));
             bottom = (Point)info.GetValue("Bottom", typeof(Point));
             side = (Point)info.GetValue("Side", typeof(Point));
@@ -172,7 +172,7 @@ namespace CoreSampleAnnotation.PhotoMarkup
             length = info.GetDouble("Length");
         }
 
-        public void GetObjectData(SerializationInfo info, StreamingContext context)
+        public virtual void GetObjectData(SerializationInfo info, StreamingContext context)
         {
             info.AddValue("Up", Up);
             info.AddValue("Bottom", Bottom);

@@ -82,7 +82,7 @@ namespace CoreSampleAnnotation.Intervals
         }
 
         #region serialization
-        public BoreIntervalVM(SerializationInfo info, StreamingContext context) {
+        protected BoreIntervalVM(SerializationInfo info, StreamingContext context) {
             ExtractedLength = info.GetDouble("ExtractedLength");
             UpperDepth = info.GetDouble("UpperDepth");
             LowerDepth = info.GetDouble("LowerDepth");

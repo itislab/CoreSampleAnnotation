@@ -106,6 +106,27 @@
     <Compile Include="AnnotationPlane\ClassificationVM.cs" />
     <Compile Include="AnnotationPlane\ColumnScaleAdapters.cs" />
     <Compile Include="AnnotationPlane\ColumnScaleController.cs" />
+    <Compile Include="AnnotationPlane\ColumnSettings\ColumnDefinitionView.xaml.cs">
+      <DependentUpon>ColumnDefinitionView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="AnnotationPlane\ColumnSettings\ColumnDefinitionVM.cs" />
+    <Compile Include="AnnotationPlane\ColumnSettings\ColumnSettingsView.xaml.cs">
+      <DependentUpon>ColumnSettingsView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="AnnotationPlane\ColumnSettings\ColumnSettingsVM.cs" />
+    <Compile Include="AnnotationPlane\ColumnSettings\DepthColumnDefinitionView.xaml.cs">
+      <DependentUpon>DepthColumnDefinitionView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="AnnotationPlane\ColumnSettings\LayeredMultipurposeColumnDefinitionView.xaml.cs">
+      <DependentUpon>LayeredMultipurposeColumnDefinitionView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="AnnotationPlane\ColumnSettings\LayeredMultipurposeColumnDefinitionVM.cs" />
+    <Compile Include="AnnotationPlane\ColumnSettings\LayerLengthColumnDefinitionView.xaml.cs">
+      <DependentUpon>LayerLengthColumnDefinitionView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="AnnotationPlane\ColumnSettings\PhotoColumnDefinitionView.xaml.cs">
+      <DependentUpon>PhotoColumnDefinitionView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="AnnotationPlane\ColumnView.xaml.cs">
       <DependentUpon>ColumnView.xaml</DependentUpon>
     </Compile>
@@ -132,6 +153,9 @@
     <Compile Include="AnnotationPlane\RegionImage.cs" />
     <Compile Include="AnnotationPlane\syncronizerColumnAdapter.cs" />
     <Compile Include="AnnotationPlane\SyncronizerScaleAdapter.cs" />
+    <Compile Include="AnnotationPlane\Template\Class.cs" />
+    <Compile Include="AnnotationPlane\Template\InputField.cs" />
+    <Compile Include="AnnotationPlane\Template\Property.cs" />
     <Compile Include="Intervals\BoreIntervalsView.xaml.cs">
       <DependentUpon>BoreIntervalsView.xaml</DependentUpon>
     </Compile>
@@ -155,6 +179,9 @@
     </Compile>
     <Compile Include="Media\ExitIcon.xaml.cs">
       <DependentUpon>ExitIcon.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Media\GearsIcon.xaml.cs">
+      <DependentUpon>GearsIcon.xaml</DependentUpon>
     </Compile>
     <Compile Include="Media\RotateIcon.xaml.cs">
       <DependentUpon>RotateIcon.xaml</DependentUpon>
@@ -206,6 +233,30 @@
     <Page Include="AnnotationPlane\ClassificationView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="AnnotationPlane\ColumnSettings\ColumnDefinitionView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="AnnotationPlane\ColumnSettings\ColumnSettingsView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="AnnotationPlane\ColumnSettings\DepthColumnDefinitionView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="AnnotationPlane\ColumnSettings\LayeredMultipurposeColumnDefinitionView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="AnnotationPlane\ColumnSettings\LayerLengthColumnDefinitionView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="AnnotationPlane\ColumnSettings\PhotoColumnDefinitionView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="AnnotationPlane\ColumnView.xaml">
       <Generator>MSBuild:Compile</Generator>
@@ -271,6 +322,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Media\GearsIcon.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Media\RotateIcon.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -331,6 +386,7 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+    <Compile Include="AnnotationPlane\ColumnSettings\SimpleColumnDefinitionVMs.cs" />
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
@@ -361,6 +417,9 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="credits\save_icon.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="credits\gears_icon.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

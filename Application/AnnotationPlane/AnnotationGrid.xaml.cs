@@ -292,7 +292,7 @@ namespace CoreSampleAnnotation.AnnotationPlane
         //todo: handle column removal        
     }
 
-    public class PointSelectedEventArgs
+    public class PointSelectedEventArgs: EventArgs
     {
         private double wpfTopOffset;
         private int columnIdx;

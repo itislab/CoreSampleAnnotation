@@ -241,8 +241,7 @@ namespace CoreSampleAnnotation.Intervals
         public PhotoRegion[] GetRegionImages()
         {
             List<PhotoRegion> result = new List<PhotoRegion>();
-            int N = ImagesCount;
-            int counter = 0;
+            int N = ImagesCount;            
             for (int i = 0; i < N; i++)
             {
                 List<PhotoRegion> subResult = new List<PhotoRegion>();
@@ -579,7 +578,7 @@ namespace CoreSampleAnnotation.Intervals
 
         #region serialization
 
-        public PhotoCalibratedBoreIntervalVM(SerializationInfo info, StreamingContext context) : base(info, context)
+        protected PhotoCalibratedBoreIntervalVM(SerializationInfo info, StreamingContext context) : base(info, context)
         {
             Matrix[] matrices = (Matrix[])info.GetValue("Transforms", typeof(Matrix[]));
             imageTransforms = matrices.Select(m => (Transform)(new MatrixTransform(m))).ToList();

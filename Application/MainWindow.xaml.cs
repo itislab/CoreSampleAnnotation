@@ -44,6 +44,7 @@ namespace CoreSampleAnnotation
                     vm.ActiveSectionVM = intervalVM;
                 });
 
+
             menuVM.ActivateBoreIntervalsCommand = new DelegateCommand(() =>
             {
                 vm.ActiveSectionVM = vm.CurrentProjectVM.BoreIntervalsVM;
@@ -72,6 +73,10 @@ namespace CoreSampleAnnotation
                 vm.CurrentProjectVM.PlaneVM.AnnoGridVM.Columns.Add(imColVM);
                 vm.CurrentProjectVM.PlaneVM.ColScaleController.AttachToColumn(new ColVMAdapter(imColVM));
 
+
+                vm.CurrentProjectVM.PlaneVM.ActivateSettingsCommand = new DelegateCommand(() => {
+                    vm.ActiveSectionVM = vm.CurrentProjectVM.PlaneColumnSettingsVM;
+                });
 
                 vm.CurrentProjectVM.PlaneVM.Init();
                 vm.ActiveSectionVM = vm.CurrentProjectVM.PlaneVM;
@@ -139,7 +144,7 @@ namespace CoreSampleAnnotation
                     {
                         LoadProjectWithPersister(restoredPersister);
                     }
-                    catch (System.IO.FileNotFoundException ex1) {
+                    catch (System.IO.FileNotFoundException) {
                         MessageBox.Show("Выбранная вами папка не является папкой проекта описания скважины. Проверьте, правильную ли папку вы выбрали.", "Не папка проекта", MessageBoxButton.OK, MessageBoxImage.Exclamation);
                     }
                     catch (Exception ex)

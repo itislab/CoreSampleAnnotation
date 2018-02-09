@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CoreSampleAnnotation.AnnotationPlane.ColumnSettings;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -22,9 +23,9 @@ namespace CoreSampleAnnotation
 
     public class MainWindowVM : ViewModel
     {
-        private ProjectVM currentProjectVM = null;        
+        private ProjectVM currentProjectVM = null;
         private StartupMenuVM startupVM = new StartupMenuVM();
-        private ViewModel activeSectionVM = null;
+        private ViewModel activeSectionVM = null;        
         public IProjectPersister ActivePersister { get; set; }
         public IProjectPersisterFactory ProjectPersisterFactory { get; private set; }
 
