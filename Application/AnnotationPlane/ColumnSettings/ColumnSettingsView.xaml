@@ -16,7 +16,7 @@
             <ItemsControl ItemsSource="{Binding OrderedColumnDefinitions}" Grid.Row="0" VerticalAlignment="Top"  Grid.IsSharedSizeScope="True">
         </ItemsControl>
         <StackPanel Grid.Row="1" Orientation="Horizontal" VerticalAlignment="Center">
-            <TextBlock VerticalAlignment="Center">Добавить колонку:</TextBlock>
+            <TextBlock VerticalAlignment="Center" FontSize="20">Добавить колонку:</TextBlock>
             <Button Style="{StaticResource MetroButton}" Command="{Binding AddDepthCommand}">шкала глубин</Button>
             <Button Style="{StaticResource MetroButton}" Command="{Binding AddPhotoCommand}">фото</Button>
             <Button Style="{StaticResource MetroButton}" Command="{Binding AddLayerLengthCommand}">мощность слоя</Button>

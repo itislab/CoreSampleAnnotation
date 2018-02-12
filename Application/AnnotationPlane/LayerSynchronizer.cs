@@ -35,7 +35,6 @@ namespace CoreSampleAnnotation.AnnotationPlane.LayerSyncronization
     public class Controller : ViewModel
     {
         private List<ILayersColumn> columns = new List<ILayersColumn>();
-
         
         private double upperDepth = 0.0;
         /// <summary>
@@ -116,8 +115,7 @@ namespace CoreSampleAnnotation.AnnotationPlane.LayerSyncronization
             }
             return idx;
         }
-
-
+        
         public void RegisterLayer(ILayersColumn column) {
             double[] layerHeights = column.GetLayerHeights();
             if (depthBoundaries == null)
@@ -137,6 +135,48 @@ namespace CoreSampleAnnotation.AnnotationPlane.LayerSyncronization
             }
             columns.Add(column);
 
+        }
+
+        /// <summary>
+        /// Converts real depth in meters to WPF units on the annotation plane
+        /// </summary>
+        /// <param name="depth">in meters (positive value)</param>
+        /// <returns></returns>
+        public double DepthToWPF(double depth) {
+            return (depth - upperDepth) * scaleFactor;
+        }
+
+        /// <summary>
+        /// Converts the length in WPF coords on the annotation plane to the real length in meters
+        /// </summary>
+        /// <param name="depth">in WPF units</param>
+        /// <returns></returns>
+        public double WpfToLength(double length) {
+            return (length / scaleFactor);
+        }
+
+        /// <summary>
+        /// Converts real length in meters to length WPF units on the annotation plane
+        /// </summary>
+        /// <param name="depth">in meters (positive value)</param>
+        /// <returns></returns>
+        public double LengthToWPF(double length)
+        {
+            return (length) * scaleFactor;
+        }
+
+        /// <summary>
+        /// Converts WPF vertical coord on the annotation plane to the real depth in meters
+        /// </summary>
+        /// <param name="depth">in WPF units</param>
+        /// <returns></returns>
+        public double WpfToDepth(double depth)
+        {
+            return (depth / scaleFactor) + upperDepth;
+        }
+
+        public void SetColumnDepth(double upper, double lower) {
+            depthBoundaries = new double[] { upper, lower};
         }
 
         /// <summary>

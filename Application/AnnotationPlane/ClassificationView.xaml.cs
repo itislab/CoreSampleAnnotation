@@ -56,8 +56,8 @@ namespace CoreSampleAnnotation.AnnotationPlane
         {
             if ((values != null) && (values.Length == 2))
             {
-                LayerClass selected = values[0] as LayerClass;
-                LayerClass current = values[1] as LayerClass;
+                LayerClassVM selected = values[0] as LayerClassVM;
+                LayerClassVM current = values[1] as LayerClassVM;
 
                 if (selected == current)
                     return new SolidColorBrush(Color.FromRgb(255,61,0));
@@ -79,8 +79,8 @@ namespace CoreSampleAnnotation.AnnotationPlane
         {
             if ((values != null) && (values.Length == 2))
             {
-                LayerClass selected = values[0] as LayerClass;
-                LayerClass current = values[1] as LayerClass;
+                LayerClassVM selected = values[0] as LayerClassVM;
+                LayerClassVM current = values[1] as LayerClassVM;
 
                 if (selected == current)
                     return new SolidColorBrush(Color.FromRgb(0,0,0));

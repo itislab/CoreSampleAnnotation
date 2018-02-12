@@ -21,5 +21,7 @@ namespace CoreSampleAnnotation.AnnotationPlane.Template
         public bool IsMulticlass { get; set; }
 
         public string Name { get; set; }
+
+        public string ID { get; set; }
     }    
 }

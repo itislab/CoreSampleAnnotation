@@ -4,53 +4,65 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Media;
 
 namespace CoreSampleAnnotation.AnnotationPlane
-{    
-    public class LayerVM: ViewModel
+{
+    public class LayerVM : ViewModel
     {
         private double length = 0;
         /// <summary>
         /// Length of the layer in WPF units
         /// </summary>
-        public double Length {
-            get {
+        public double Length
+        {
+            get
+            {
                 return length;
             }
-            set {
-                if (length != value) {
+            set
+            {
+                if (length != value)
+                {
                     length = value;
                     RaisePropertyChanged(nameof(Length));
                 }
             }
         }
 
-        public virtual LayerVM DeepClone() {
+        public virtual LayerVM DeepClone()
+        {
             var result = new LayerVM();
             result.Length = Length;
             return result;
         }
     }
 
-    public class LengthLayerVM : LayerVM {
+    public class LengthLayerVM : LayerVM
+    {
         private double realLength = 0.0;
 
         /// <summary>
         /// In meters
         /// </summary>
-        public double RealLength {
-            get {
+        public double RealLength
+        {
+            get
+            {
                 return realLength;
             }
-            set {
-                if (realLength != value) {
+            set
+            {
+                if (realLength != value)
+                {
                     realLength = value;
                     RaisePropertyChanged(nameof(RealLength));
                 }
             }
         }
 
-        public override LayerVM DeepClone() {
+        public override LayerVM DeepClone()
+        {
             var result = new LengthLayerVM();
             result.Length = Length;
             result.RealLength = RealLength;
@@ -59,34 +71,41 @@ namespace CoreSampleAnnotation.AnnotationPlane
         }
     }
 
-    public class IconLayerVM : LayerVM {
+    public class IconLayerVM : LayerVM
+    {
         public override LayerVM DeepClone()
         {
             var result = new IconLayerVM();
-            result.Length = Length;            
+            result.Length = Length;
             return result;
         }
     }
 
-    public class ClassificationLayerVM : LayerVM {
-        private LayerClass currentClass = null;
+    public class ClassificationLayerVM : LayerVM
+    {
+        private LayerClassVM currentClass = null;
 
-        public LayerClass CurrentClass
+        public LayerClassVM CurrentClass
         {
             get { return currentClass; }
-            set {
-                if (currentClass != value) {
+            set
+            {
+                if (currentClass != value)
+                {
                     currentClass = value;
                     RaisePropertyChanged(nameof(CurrentClass));
                 }
             }
         }
 
-        private ObservableCollection<LayerClass> possibleClasses = new ObservableCollection<LayerClass>();
-        public ObservableCollection<LayerClass> PossibleClasses {
+        private ObservableCollection<LayerClassVM> possibleClasses = new ObservableCollection<LayerClassVM>();
+        public ObservableCollection<LayerClassVM> PossibleClasses
+        {
             get { return possibleClasses; }
-            set {
-                if (possibleClasses != value) {
+            set
+            {
+                if (possibleClasses != value)
+                {
                     possibleClasses = value;
                     RaisePropertyChanged(nameof(PossibleClasses));
                 }
@@ -97,22 +116,46 @@ namespace CoreSampleAnnotation.AnnotationPlane
         {
             var result = new ClassificationLayerVM();
             result.CurrentClass = CurrentClass;
-            result.PossibleClasses = new ObservableCollection<LayerClass>(PossibleClasses);
+            result.PossibleClasses = new ObservableCollection<LayerClassVM>(PossibleClasses);
             return result;
         }
     }
 
-    public class LayerClass : ViewModel {
-        public LayerClass(string acronym, string description) {
-            this.acronym = acronym;
-            this.description = description;
+    public class LayerClassVM : ViewModel
+    {
+        public string ID { private set; get; }
+
+        public LayerClassVM(string id)
+        {
+            this.ID = id;
+        }
+
+        public Func<Color> BackgroundColorExtractor { get; set; }
+        public Color BackgroundColor
+        {
+            get
+            {
+                return BackgroundColorExtractor();
+            }
+        }
+
+        public Func<LayerClassVM, string> CenterTextExtractor { get; set; }
+        public string CenterText
+        {
+            get
+            {
+                return CenterTextExtractor(this);
+            }
         }
 
         private string acronym;
-        public string Acronym {
+        public string Acronym
+        {
             get { return acronym; }
-            set {
-                if (acronym != value) {
+            set
+            {
+                if (acronym != value)
+                {
                     acronym = value;
                     RaisePropertyChanged(nameof(Acronym));
                 }
@@ -120,14 +163,46 @@ namespace CoreSampleAnnotation.AnnotationPlane
         }
 
         private string description;
-        public string Description {
+        public string Description
+        {
             get { return description; }
-            set {
-                if (description != value) {
+            set
+            {
+                if (description != value)
+                {
                     description = value;
                     RaisePropertyChanged(nameof(Description));
                 }
             }
         }
+
+        private string shortName;
+        public string ShortName
+        {
+            get { return shortName; }
+            set
+            {
+                if (shortName != value)
+                {
+                    shortName = value;
+                    RaisePropertyChanged(nameof(ShortName));
+                }
+            }
+        }
+
+        private Color color;
+        public Color Color
+        {
+            get { return color; }
+            set
+            {
+                if (color != value)
+                {
+                    color = value;
+                    RaisePropertyChanged(nameof(Color));
+                }
+            }
+        }
     }
 }
+

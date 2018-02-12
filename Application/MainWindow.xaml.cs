@@ -62,23 +62,22 @@ namespace CoreSampleAnnotation
             {
                 var regions = vm.CurrentProjectVM.BoreIntervalsVM.Intervals.SelectMany(i => ((Intervals.PhotoCalibratedBoreIntervalVM)i).GetRegionImages()).ToArray();
 
-                vm.CurrentProjectVM.PlaneVM = new PlaneVM();
-                vm.CurrentProjectVM.PlaneVM.ColScaleController.UpperDepth = vm.CurrentProjectVM.BoreIntervalsVM.Intervals.Where(i => !double.IsNaN(i.UpperDepth) && !double.IsNaN(i.LowerDepth)).Select(i => i.UpperDepth).Min();
-                vm.CurrentProjectVM.PlaneVM.LayerSyncController.UpperDepth = vm.CurrentProjectVM.BoreIntervalsVM.Intervals.Where(i => !double.IsNaN(i.UpperDepth) && !double.IsNaN(i.LowerDepth)).Select(i => i.UpperDepth).Min();
-                vm.CurrentProjectVM.PlaneVM.ColScaleController.LowerDepth = vm.CurrentProjectVM.BoreIntervalsVM.Intervals.Where(i => !double.IsNaN(i.UpperDepth) && !double.IsNaN(i.LowerDepth)).Select(i => i.LowerDepth).Max();
-                vm.CurrentProjectVM.PlaneVM.LayerSyncController.LowerDepth = vm.CurrentProjectVM.BoreIntervalsVM.Intervals.Where(i => !double.IsNaN(i.UpperDepth) && !double.IsNaN(i.LowerDepth)).Select(i => i.LowerDepth).Max();
+                double upperBoundary = vm.CurrentProjectVM.BoreIntervalsVM.Intervals.Where(i => !double.IsNaN(i.UpperDepth) && !double.IsNaN(i.LowerDepth)).Select(i => i.UpperDepth).Min();
+                double lowerBoundary = vm.CurrentProjectVM.BoreIntervalsVM.Intervals.Where(i => !double.IsNaN(i.UpperDepth) && !double.IsNaN(i.LowerDepth)).Select(i => i.LowerDepth).Max();                
 
-                ImageColumnVM imColVM = new ImageColumnVM("Фото керна");
-                imColVM.ImageRegions = regions;
-                vm.CurrentProjectVM.PlaneVM.AnnoGridVM.Columns.Add(imColVM);
-                vm.CurrentProjectVM.PlaneVM.ColScaleController.AttachToColumn(new ColVMAdapter(imColVM));
-
-
+                vm.CurrentProjectVM.PlaneVM = PlaneHalpers.BuildPlane(
+                    new LayersAnnotation() {
+                        LayerBoundaries = new double[] { upperBoundary,lowerBoundary},
+                        LayerAnnotation = new Dictionary<string, string[]>[] { new Dictionary<string, string[]>()}
+                    },
+                    vm.CurrentProjectVM.ActiveLayerTemplate,
+                    vm.CurrentProjectVM.PlaneColumnSettingsVM,
+                    regions);
+                
                 vm.CurrentProjectVM.PlaneVM.ActivateSettingsCommand = new DelegateCommand(() => {
                     vm.ActiveSectionVM = vm.CurrentProjectVM.PlaneColumnSettingsVM;
                 });
-
-                vm.CurrentProjectVM.PlaneVM.Init();
+                
                 vm.ActiveSectionVM = vm.CurrentProjectVM.PlaneVM;
             });
 

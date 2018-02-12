@@ -70,7 +70,7 @@ namespace CoreSampleAnnotation.AnnotationPlane.ColumnSettings
             column.MoveRight = MoveColumnRight;
         }
 
-        public ColumnSettingsVM()
+        public ColumnSettingsVM(Template.Property[] template)
         {
             ColumnDefinitions = new ColumnDefinitionVM[0];
 
@@ -104,7 +104,7 @@ namespace CoreSampleAnnotation.AnnotationPlane.ColumnSettings
             AddLayerPropCommand = new DelegateCommand(() =>
             {
                 List<ColumnDefinitionVM> result = new List<ColumnDefinitionVM>(ColumnDefinitions);
-                ColumnDefinitionVM column = new LayeredMultipurposeColumnDefinitionVM();
+                ColumnDefinitionVM column = new LayeredTextColumnDefinitionVM(template);
                 InitializeColumn(column);
                 result.Add(column);
                 ColumnDefinitions = result.ToArray();
