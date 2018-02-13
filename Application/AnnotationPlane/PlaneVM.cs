@@ -34,6 +34,19 @@ namespace CoreSampleAnnotation.AnnotationPlane
         public AnnotationGridVM AnnoGridVM { private set; get; }
         public ClassificationVM classificationVM { private set; get; }
 
+        private ICommand saveImageCommand;
+
+        public ICommand SaveImageCommand {
+            get { return saveImageCommand; }
+            set {
+                if (saveImageCommand != value) {
+                    saveImageCommand = value;
+                    RaisePropertyChanged(nameof(SaveImageCommand));
+                }
+            }
+        }
+
+
         public ICommand PointSelected { private set; get; }
 
         private ICommand activateSettingsCommand;
@@ -84,14 +97,14 @@ namespace CoreSampleAnnotation.AnnotationPlane
                     System.Diagnostics.Debug.WriteLine("Layer split requested");
                     layerSyncController.SplitLayer(psea.WpfTopOffset);
                 }
-                else if (typeof(LayeredColumnVM) == relatedVmType)
+                else if (typeof(LayeredPresentationColumnVM) == relatedVmType)
                 {
-                    LayeredColumnVM lcvm = (LayeredColumnVM)relatedVM;
+                    LayeredPresentationColumnVM lpvm = (LayeredPresentationColumnVM)relatedVM;
                     int layerIdx = layerSyncController.GetLayerIndex(psea.WpfTopOffset);
-                    ClassificationLayerVM clmv = lcvm.Layers[layerIdx] as ClassificationLayerVM;
-                    if (clmv != null)
+                    ClassificationLayerPresentingVM clpmv = lpvm.Layers[layerIdx] as ClassificationLayerPresentingVM;
+                    if (clpmv != null)
                     {
-                        classificationVM.LayerVM = clmv;
+                        classificationVM.LayerVM = clpmv.ClassificationVM;
                         classificationVM.IsVisible = true;
                     }
                 }

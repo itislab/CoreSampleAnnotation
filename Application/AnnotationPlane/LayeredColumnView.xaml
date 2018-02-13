@@ -7,17 +7,14 @@
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300">
     <UserControl.Resources>
-        <DataTemplate DataType="{x:Type local:ClassificationLayerVM}">
-            <TextBlock Text="{Binding CurrentClass.CenterText, FallbackValue=Н/З}" VerticalAlignment="Center" HorizontalAlignment="Center"></TextBlock>
+        <DataTemplate DataType="{x:Type local:ClassificationLayerTextPresentingVM}">
+            <TextBlock Text="{Binding Text, FallbackValue=Н/З}" VerticalAlignment="Center" HorizontalAlignment="Center"></TextBlock>
         </DataTemplate>
         <DataTemplate DataType="{x:Type local:LengthLayerVM}">
             <TextBlock Text="{Binding RealLength, StringFormat={}{0:0.00} м}" VerticalAlignment="Center" HorizontalAlignment="Center"></TextBlock>
         </DataTemplate>
-        <DataTemplate DataType="{x:Type local:IconLayerVM}">
-            <Canvas Width="25" Height="25">
-            <Ellipse Width="10" Height="10" Stroke="Aqua" StrokeThickness="5"></Ellipse>
-            <Rectangle Width="15" Height="15" Stroke="BurlyWood" StrokeThickness="5" Fill="CornflowerBlue" StrokeDashCap="Triangle"></Rectangle>
-            </Canvas>
+        <DataTemplate DataType="{x:Type local:LayerVM}">
+            <TextBlock Text="LayerVM template is not set"></TextBlock>
         </DataTemplate>
     </UserControl.Resources>
     <ItemsControl ItemsSource="{Binding Layers}" Height="{Binding ColumnHeight}">

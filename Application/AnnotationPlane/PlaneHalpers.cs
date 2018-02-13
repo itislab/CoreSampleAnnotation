@@ -38,6 +38,8 @@ namespace CoreSampleAnnotation.AnnotationPlane
             vm.LayerSyncController.LowerDepth = lowerDepth;
             vm.LayerSyncController.SetColumnDepth(upperDepth,lowerDepth);
 
+            Dictionary<string, LayeredColumnVM> propColumns = new Dictionary<string, LayeredColumnVM>();
+
             double colHeight = vm.LayerSyncController.DepthToWPF(lowerDepth) - vm.LayerSyncController.DepthToWPF(upperDepth);
 
             int layersCount = annotation.LayerBoundaries.Length - 1;
@@ -79,9 +81,56 @@ namespace CoreSampleAnnotation.AnnotationPlane
                     LayeredTextColumnDefinitionVM colDef = (LayeredTextColumnDefinitionVM)columnDefinition;
                     if (colDef.SelectedCentreTextProp != null)
                     {
-                        LayeredColumnVM colVM = new LayeredColumnVM(colDef.SelectedCentreTextProp.TexturalString);
-                        colVM.ColumnHeight = colHeight;                       
-                    
+                        string propID = colDef.SelectedCentreTextProp.PropID;
+                        
+                        LayeredColumnVM propColumnVM; //the one which holds actual prop value, can be shared between multiple presentation columns
+                        //first finding corresponding prop column
+                        if (propColumns.ContainsKey(propID))
+                        {
+                            propColumnVM = propColumns[propID];
+                        }
+                        else { //or creating it, if it is not created yet                            
+                            propColumnVM = new LayeredColumnVM(propID);
+                            propColumnVM.ColumnHeight = colHeight;
+                            propColumns.Add(propID, propColumnVM);
+
+                            //preparing available classes                        
+                            Property prop = template.Where(p => p.ID == propID).Single();
+                            List<LayerClassVM> availableClasses = new List<LayerClassVM>();
+                            foreach (Class cl in prop.Classes)
+                            {
+                                LayerClassVM lcVM = ClassToClassVM(cl);
+                                availableClasses.Add(lcVM);
+                            }
+
+                            //setting selected class
+                            for (int i = 0; i < layersCount; i++)
+                            {
+                                ClassificationLayerVM clVM = new ClassificationLayerVM();
+                                clVM.Length = vm.LayerSyncController.LengthToWPF(annotation.LayerBoundaries[i + 1] - annotation.LayerBoundaries[i]);
+                                clVM.PossibleClasses = new System.Collections.ObjectModel.ObservableCollection<LayerClassVM>(availableClasses);
+                                var layerAnnotation = annotation.LayerAnnotation[i];
+
+                                if (layerAnnotation.ContainsKey(prop.ID))
+                                {
+                                    string[] selected = layerAnnotation[prop.ID];
+                                    if (selected.Length > 1)
+                                        throw new NotSupportedException();
+                                    string selected1 = selected[0];
+                                    clVM.CurrentClass = availableClasses.Find(e => e.ID == selected1);
+                                }
+
+                                propColumnVM.Layers.Add(clVM);
+                            }
+
+                            vm.LayerSyncController.RegisterLayer(new SyncronizerColumnAdapter(propColumnVM));
+                            vm.ColScaleController.AttachToColumn(new ColVMAdapter(propColumnVM));
+                        }
+
+                        //the prop column (shared between multiple presenations) is ready.
+
+                        //Creating presentation column.
+
                         //here is the actual displayed text is set
                         Func<LayerClassVM, string> centreTextExtractor;
                         switch (colDef.SelectedCentreTextProp.Presentation)
@@ -93,39 +142,14 @@ namespace CoreSampleAnnotation.AnnotationPlane
                             default: throw new NotImplementedException();
                         }
 
-                        //preparing available classes
-                        string propID = colDef.SelectedCentreTextProp.PropID;
-                        Property prop = template.Where(p => p.ID == propID).Single();
-                        List<LayerClassVM> availableClasses = new List<LayerClassVM>();
-                        foreach (Class cl in prop.Classes)
-                        {
-                            LayerClassVM lcVM = ClassToClassVM(cl);
-                            lcVM.CenterTextExtractor = centreTextExtractor;
-                            availableClasses.Add(lcVM);
-                        }
-                        
-                        //setting selected class
-                        for (int i = 0; i < layersCount; i++)
-                        {
-                            ClassificationLayerVM clVM = new ClassificationLayerVM();
-                            clVM.Length = vm.LayerSyncController.LengthToWPF(annotation.LayerBoundaries[i + 1] - annotation.LayerBoundaries[i]);
-                            clVM.PossibleClasses = new System.Collections.ObjectModel.ObservableCollection<LayerClassVM>(availableClasses);
-                            var layerAnnotation = annotation.LayerAnnotation[i];
+                        LayeredPresentationColumnVM colVM = new LayeredPresentationColumnVM(
+                            colDef.SelectedCentreTextProp.TexturalString,
+                            propColumnVM,
+                            lVM => new ClassificationLayerTextPresentingVM((ClassificationLayerVM)lVM) { TextExtractor = centreTextExtractor });
 
-                            if (layerAnnotation.ContainsKey(prop.ID))
-                            {
-                                string[] selected = layerAnnotation[prop.ID];
-                                if (selected.Length > 1)
-                                    throw new NotSupportedException();
-                                string selected1 = selected[0];
-                                clVM.CurrentClass = availableClasses.Find(e => e.ID == selected1);
-                            }
+                        colVM.ColumnHeight = colHeight;
 
-                            colVM.Layers.Add(clVM);
-                        }
-                        vm.AnnoGridVM.Columns.Add(colVM);
-                        vm.ColScaleController.AttachToColumn(new ColVMAdapter(colVM));
-                        vm.LayerSyncController.RegisterLayer(new SyncronizerColumnAdapter(colVM));
+                        vm.AnnoGridVM.Columns.Add(colVM);                                
                     }                    
                 }
                 else throw new NotSupportedException("Незнакомое определение колонки");

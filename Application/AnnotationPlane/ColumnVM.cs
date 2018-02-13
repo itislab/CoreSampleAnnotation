@@ -146,6 +146,65 @@ namespace CoreSampleAnnotation.AnnotationPlane
         public LayeredColumnVM(string heading) : base(heading) { }
     }
 
+    /// <summary>
+    /// Wraps LayeredColumnVM, presenting each LayerVM as adapter wrapped
+    /// </summary>
+    public class LayeredPresentationColumnVM : ColumnVM {
+        private LayeredColumnVM target;
+        private Func<LayerVM, LayerVM> adapter;
+        public LayeredPresentationColumnVM(string heading, LayeredColumnVM target, Func<LayerVM,LayerVM> adapter) : base(heading) {
+            this.target = target;
+            this.adapter = adapter;
+            target.Layers.CollectionChanged += Layers_CollectionChanged;
+            target.PropertyChanged += Target_PropertyChanged;
+            foreach (LayerVM vm in target.Layers)
+                layers.Add(adapter(vm));
+        }
+
+        private void Target_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            switch (e.PropertyName) {
+                case nameof(target.LowerBound):
+                    LowerBound = target.LowerBound;
+                    break;
+                case nameof(target.UpperBound):
+                    UpperBound = target.UpperBound;
+                    break;
+                case nameof(target.ColumnHeight):
+                    ColumnHeight = target.ColumnHeight;
+                    break;
+            }
+        }
+
+        private void Layers_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        {
+            switch (e.Action) {
+                case System.Collections.Specialized.NotifyCollectionChangedAction.Add:
+                    for (int i =0; i<e.NewItems.Count;i++) {
+                        LayerVM addedVM = (LayerVM)e.NewItems[i];
+                        LayerVM craftedVM = adapter(addedVM);
+                        if (e.NewItems.Count == 0)
+                            Layers.Add(craftedVM);
+                        else
+                            Layers.Insert(e.NewStartingIndex+i, craftedVM);
+                    }
+                    break;
+                default:
+                    throw new NotImplementedException();
+            }
+        }
+
+        private ObservableCollection<LayerVM> layers = new ObservableCollection<LayerVM>();
+
+        public ObservableCollection<LayerVM> Layers
+        {
+            get
+            {
+                return layers;
+            }           
+        }
+    }
+
     public class ImageColumnVM : ColumnVM
     {
         public ImageColumnVM(string heading) : base(heading)

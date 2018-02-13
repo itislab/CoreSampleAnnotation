@@ -69,17 +69,7 @@ namespace CoreSampleAnnotation.AnnotationPlane
             return result;
 
         }
-    }
-
-    public class IconLayerVM : LayerVM
-    {
-        public override LayerVM DeepClone()
-        {
-            var result = new IconLayerVM();
-            result.Length = Length;
-            return result;
-        }
-    }
+    }   
 
     public class ClassificationLayerVM : LayerVM
     {
@@ -121,6 +111,68 @@ namespace CoreSampleAnnotation.AnnotationPlane
         }
     }
 
+    public class ClassificationLayerPresentingVM : LayerVM {
+
+        protected ClassificationLayerVM target;
+
+        public ClassificationLayerVM ClassificationVM
+        {
+            get { return target; }
+        }
+
+        public ClassificationLayerPresentingVM(ClassificationLayerVM target)
+        {
+            this.target = target;
+            target.PropertyChanged += Target_PropertyChanged;
+        }
+
+        private void Target_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            ClassificationLayerVM vm = sender as ClassificationLayerVM;
+            switch (e.PropertyName)
+            {                
+                case nameof(vm.Length):
+                    Length = vm.Length;
+                    RaisePropertyChanged(nameof(Length));
+                    break;
+            }
+        }
+    }
+
+    public class ClassificationLayerTextPresentingVM : ClassificationLayerPresentingVM
+    {
+        public Func<LayerClassVM, string> TextExtractor { get; set; }
+        public string Text
+        {
+            get
+            {
+                if (target != null)
+                    if (target.CurrentClass != null)
+                        return TextExtractor(target.CurrentClass);
+                    else
+                        return null;
+                else
+                    return null;
+            }
+        }
+
+        public ClassificationLayerTextPresentingVM(ClassificationLayerVM target):base(target) {
+            target.PropertyChanged += Target_PropertyChanged;
+        }
+
+        private void Target_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            ClassificationLayerVM vm = sender as ClassificationLayerVM;
+            switch (e.PropertyName)
+            {
+                case nameof(vm.CurrentClass):                    
+                    RaisePropertyChanged(nameof(Text));
+                    break;
+            }
+        }
+
+    }
+
     public class LayerClassVM : ViewModel
     {
         public string ID { private set; get; }
@@ -128,24 +180,6 @@ namespace CoreSampleAnnotation.AnnotationPlane
         public LayerClassVM(string id)
         {
             this.ID = id;
-        }
-
-        public Func<Color> BackgroundColorExtractor { get; set; }
-        public Color BackgroundColor
-        {
-            get
-            {
-                return BackgroundColorExtractor();
-            }
-        }
-
-        public Func<LayerClassVM, string> CenterTextExtractor { get; set; }
-        public string CenterText
-        {
-            get
-            {
-                return CenterTextExtractor(this);
-            }
         }
 
         private string acronym;

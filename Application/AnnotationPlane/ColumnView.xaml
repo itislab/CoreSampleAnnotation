@@ -14,6 +14,9 @@
         <DataTemplate DataType="{x:Type local:LayeredColumnVM}">
             <local:LayeredColumnView />
         </DataTemplate>
+        <DataTemplate DataType="{x:Type local:LayeredPresentationColumnVM}">
+            <local:LayeredColumnView />
+        </DataTemplate>
         <DataTemplate DataType="{x:Type local:ImageColumnVM}">
             <local:ImageColumnView />
         </DataTemplate>
