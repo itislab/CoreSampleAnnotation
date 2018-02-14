@@ -84,6 +84,10 @@ namespace CoreSampleAnnotation.AnnotationPlane.ColumnScale
             }
         }
 
+        public void DetachColumn(IColumn column) {
+            controlledColumns.Remove(column);
+        }
+
         public void AttachToColumn(IColumn column) {
             controlledColumns.Add(column);
             column.LowerDepth = LowerDepth;

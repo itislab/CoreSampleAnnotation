@@ -72,6 +72,17 @@ namespace CoreSampleAnnotation.AnnotationPlane.LayerSyncronization
         /// </summary>
         private double[] depthBoundaries = null;
 
+        /// <summary>
+        /// Points in (meters, positive value) where the layer boundary lay
+        /// </summary>
+        public double[] DepthBoundaries
+        {
+            get
+            {
+                return depthBoundaries;
+            }
+        }
+
         private double scaleFactor = 1.0;
         /// <summary>
         /// How many WPF units take 1 real meter of depth
@@ -115,7 +126,11 @@ namespace CoreSampleAnnotation.AnnotationPlane.LayerSyncronization
             }
             return idx;
         }
-        
+
+        public void UnregisterLayer(ILayersColumn column) {
+            columns.Remove(column);
+        }
+
         public void RegisterLayer(ILayersColumn column) {
             double[] layerHeights = column.GetLayerHeights();
             if (depthBoundaries == null)

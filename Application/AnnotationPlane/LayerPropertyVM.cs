@@ -88,8 +88,8 @@ namespace CoreSampleAnnotation.AnnotationPlane
             }
         }
 
-        private ObservableCollection<LayerClassVM> possibleClasses = new ObservableCollection<LayerClassVM>();
-        public ObservableCollection<LayerClassVM> PossibleClasses
+        private IEnumerable<LayerClassVM> possibleClasses;
+        public IEnumerable<LayerClassVM> PossibleClasses
         {
             get { return possibleClasses; }
             set
@@ -124,6 +124,7 @@ namespace CoreSampleAnnotation.AnnotationPlane
         {
             this.target = target;
             target.PropertyChanged += Target_PropertyChanged;
+            Length = target.Length;
         }
 
         private void Target_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)

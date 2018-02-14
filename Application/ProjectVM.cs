@@ -58,7 +58,7 @@ namespace CoreSampleAnnotation
             }
         }
 
-        private AnnotationPlane.PlaneVM planeVM = new AnnotationPlane.PlaneVM();
+        private AnnotationPlane.PlaneVM planeVM = null;
 
         public AnnotationPlane.PlaneVM PlaneVM {
             get {

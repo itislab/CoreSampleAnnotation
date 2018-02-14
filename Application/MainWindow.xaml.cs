@@ -30,8 +30,7 @@ namespace CoreSampleAnnotation
 
         private void LoadProjectWithPersister(IProjectPersister persister)
         {
-            vm.ActivePersister = persister;
-            persister.LoadProject();
+            vm.ActivePersister = persister;            
 
             vm.CurrentProjectVM = persister.LoadProject();
             menuVM = new ProjectMenuVM(vm.CurrentProjectVM);
@@ -63,16 +62,18 @@ namespace CoreSampleAnnotation
                 var regions = vm.CurrentProjectVM.BoreIntervalsVM.Intervals.SelectMany(i => ((Intervals.PhotoCalibratedBoreIntervalVM)i).GetRegionImages()).ToArray();
 
                 double upperBoundary = vm.CurrentProjectVM.BoreIntervalsVM.Intervals.Where(i => !double.IsNaN(i.UpperDepth) && !double.IsNaN(i.LowerDepth)).Select(i => i.UpperDepth).Min();
-                double lowerBoundary = vm.CurrentProjectVM.BoreIntervalsVM.Intervals.Where(i => !double.IsNaN(i.UpperDepth) && !double.IsNaN(i.LowerDepth)).Select(i => i.LowerDepth).Max();                
+                double lowerBoundary = vm.CurrentProjectVM.BoreIntervalsVM.Intervals.Where(i => !double.IsNaN(i.UpperDepth) && !double.IsNaN(i.LowerDepth)).Select(i => i.LowerDepth).Max();
 
-                vm.CurrentProjectVM.PlaneVM = PlaneHalpers.BuildPlane(
-                    new LayersAnnotation() {
-                        LayerBoundaries = new double[] { upperBoundary,lowerBoundary},
-                        LayerAnnotation = new Dictionary<string, string[]>[] { new Dictionary<string, string[]>()}
-                    },
-                    vm.CurrentProjectVM.ActiveLayerTemplate,
-                    vm.CurrentProjectVM.PlaneColumnSettingsVM,
-                    regions);
+                if (vm.CurrentProjectVM.PlaneVM == null) {
+                    LayersAnnotation emptyAnnotation = new LayersAnnotation();
+                    emptyAnnotation.LayerBoundaries = new double[] { upperBoundary , lowerBoundary };
+                    emptyAnnotation.Columns = new ColumnValues[0];
+
+                    vm.CurrentProjectVM.PlaneVM = new PlaneVM(emptyAnnotation, vm.CurrentProjectVM.ActiveLayerTemplate);                  
+                }
+
+                vm.CurrentProjectVM.PlaneVM.SetPresentationColumns(vm.CurrentProjectVM.PlaneColumnSettingsVM,
+                    regions);                
                 
                 vm.CurrentProjectVM.PlaneVM.ActivateSettingsCommand = new DelegateCommand(() => {
                     vm.ActiveSectionVM = vm.CurrentProjectVM.PlaneColumnSettingsVM;
