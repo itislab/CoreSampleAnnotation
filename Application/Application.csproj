@@ -196,6 +196,7 @@
     </Compile>
     <Compile Include="Persistence\FolderImageStorage.cs" />
     <Compile Include="Persistence\FolderPersisterFactory.cs" />
+    <Compile Include="Persistence\HardcodedLayerTemplate.cs" />
     <Compile Include="PhotoMarkup\AnnotatedPolygon.xaml.cs">
       <DependentUpon>AnnotatedPolygon.xaml</DependentUpon>
     </Compile>

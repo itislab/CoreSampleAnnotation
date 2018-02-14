@@ -189,11 +189,7 @@ namespace CoreSampleAnnotation.AnnotationPlane.LayerSyncronization
         {
             return (depth / scaleFactor) + upperDepth;
         }
-
-        public void SetColumnDepth(double upper, double lower) {
-            depthBoundaries = new double[] { upper, lower};
-        }
-
+        
         /// <summary>
         /// Split the layer which contains wpfOffset into 2 separate layers (the content in both layers are copied, it is identical)
         /// </summary>

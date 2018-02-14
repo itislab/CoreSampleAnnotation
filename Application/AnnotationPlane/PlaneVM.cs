@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -11,7 +12,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 
 namespace CoreSampleAnnotation.AnnotationPlane
-{
+{    
     struct FullClassID
     {
         public readonly string PropID;
@@ -25,7 +26,8 @@ namespace CoreSampleAnnotation.AnnotationPlane
     }
 
 
-    public class PlaneVM : ViewModel
+    [Serializable]
+    public class PlaneVM : ViewModel, ISerializable
     {
         private ColumnScale.Controller colScaleController = new ColumnScale.Controller();
         public ColumnScale.Controller ColScaleController
@@ -166,7 +168,7 @@ namespace CoreSampleAnnotation.AnnotationPlane
         {
             this.template = template;
 
-            Init(annotation);
+            Initialize(annotation);
         }
 
         private void ColScaleController_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
@@ -220,7 +222,7 @@ namespace CoreSampleAnnotation.AnnotationPlane
         /// Fills the LayerProps view models with the information passed in annotatioN
         /// </summary>
         /// <param name="annotation"></param>
-        private void Init(LayersAnnotation annotation)
+        private void Initialize(LayersAnnotation annotation)
         {
             //filing up helper structures
             foreach (Property p in template)
@@ -290,8 +292,7 @@ namespace CoreSampleAnnotation.AnnotationPlane
             ColScaleController.UpperDepth = upperDepth;
             LayerSyncController.UpperDepth = upperDepth;
             ColScaleController.LowerDepth = lowerDepth;
-            LayerSyncController.LowerDepth = lowerDepth;
-            LayerSyncController.SetColumnDepth(upperDepth, lowerDepth);
+            LayerSyncController.LowerDepth = lowerDepth;            
 
             double colHeight = LayerSyncController.DepthToWPF(lowerDepth) - LayerSyncController.DepthToWPF(upperDepth);
 
@@ -400,5 +401,39 @@ namespace CoreSampleAnnotation.AnnotationPlane
                 else throw new NotSupportedException("Незнакомое определение колонки");
             }
         }
+
+        #region Persistence
+
+        protected PlaneVM(SerializationInfo info, StreamingContext context) {
+            LayersAnnotation layersAnnotation = (LayersAnnotation)info.GetValue("LayersAnnotation", typeof(LayersAnnotation));
+            template = Persistence.HardcodedLayerTemplate.Instance.Template;
+            Initialize(layersAnnotation);
+        }
+
+        public void GetObjectData(SerializationInfo info, StreamingContext context)
+        {
+            //Dumping layer prop VMs to LayersAnnotation
+            LayersAnnotation layersAnnotation = new LayersAnnotation();
+            layersAnnotation.LayerBoundaries = LayerSyncController.DepthBoundaries;
+            layersAnnotation.Columns = LayerProps.Select(col =>
+            {
+                List<LayerPropertyValue> values = new List<LayerPropertyValue>();
+                foreach (var layer in col.Layers)
+                {
+                    ClassificationLayerVM clVM = layer as ClassificationLayerVM;
+                    LayerPropertyValue v = new LayerPropertyValue();
+                    if (clVM.CurrentClass != null)
+                    {
+                        v.Value = clVM.CurrentClass.ID;
+                    }
+                    values.Add(v);
+                }
+                return new ColumnValues() { PropID = col.Heading, LayerValues = values.ToArray() };
+            }).ToArray();
+
+            info.AddValue("LayersAnnotation", layersAnnotation);
+        }
+
+        #endregion
     }
 }

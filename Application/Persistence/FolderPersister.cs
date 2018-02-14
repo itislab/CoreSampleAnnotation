@@ -11,10 +11,11 @@ namespace CoreSampleAnnotation.Persistence
     public class FolderPersister : IProjectPersister
     {
         private string path;
-        private string IntervalsFilePath
+        private string ProjectFilePath
         {
-            get { return Path.Combine(path, "Intervals.json"); }
-        }
+            get { return Path.Combine(path, "Project.json"); }
+        }        
+
         private string ImagesFolderPath
         {
             get { return Path.Combine(path, "Photos"); }
@@ -34,7 +35,7 @@ namespace CoreSampleAnnotation.Persistence
         public ProjectVM LoadProject()
         {
             string serialized;
-            using (StreamReader sr = new StreamReader(IntervalsFilePath))
+            using (StreamReader sr = new StreamReader(ProjectFilePath))
             {
                 serialized = sr.ReadToEnd();
             }
@@ -46,10 +47,10 @@ namespace CoreSampleAnnotation.Persistence
         {
 
             string serialized = JsonConvert.SerializeObject(project, newtonJsonSettings);
-            using (StreamWriter sw = new StreamWriter(IntervalsFilePath))
+            using (StreamWriter sw = new StreamWriter(ProjectFilePath))
             {
                 sw.Write(serialized);
-            }
+            }            
         }
     }
 }
