@@ -91,7 +91,7 @@ namespace CoreSampleAnnotation.Persistence
                 } }
             };
                 foreach (var c in textureProperty.Classes)
-                    c.ID = c.ShortName;
+                    c.ID = c.ShortName;                               
 
                 return new Property[] { colourProperty, textureProperty };
             }

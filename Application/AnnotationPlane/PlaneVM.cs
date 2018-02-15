@@ -162,11 +162,11 @@ namespace CoreSampleAnnotation.AnnotationPlane
             }
         }
 
-        private readonly Property[] template;
+        private readonly ILayersTemplateSource layersTemplateSource;
 
-        public PlaneVM(LayersAnnotation annotation, Property[] template)
+        public PlaneVM(LayersAnnotation annotation, ILayersTemplateSource layersTemplateSource)
         {
-            this.template = template;
+            this.layersTemplateSource = layersTemplateSource;
 
             Initialize(annotation);
         }
@@ -225,7 +225,7 @@ namespace CoreSampleAnnotation.AnnotationPlane
         private void Initialize(LayersAnnotation annotation)
         {
             //filing up helper structures
-            foreach (Property p in template)
+            foreach (Property p in layersTemplateSource.Template)
             {
                 List<LayerClassVM> availableClassesOfP = new List<LayerClassVM>();
                 foreach (Class cl in p.Classes)
@@ -296,7 +296,7 @@ namespace CoreSampleAnnotation.AnnotationPlane
 
             double colHeight = LayerSyncController.DepthToWPF(lowerDepth) - LayerSyncController.DepthToWPF(upperDepth);
 
-            foreach (var property in template)
+            foreach (var property in layersTemplateSource.Template)
             {
                 LayeredColumnVM columnVM = new LayeredColumnVM(property.ID);
                 for (int i = 0; i < layersCount; i++)
@@ -406,7 +406,7 @@ namespace CoreSampleAnnotation.AnnotationPlane
 
         protected PlaneVM(SerializationInfo info, StreamingContext context) {
             LayersAnnotation layersAnnotation = (LayersAnnotation)info.GetValue("LayersAnnotation", typeof(LayersAnnotation));
-            template = Persistence.HardcodedLayerTemplate.Instance.Template;
+            layersTemplateSource = (ILayersTemplateSource)info.GetValue("LayersTemplate",typeof(ILayersTemplateSource));
             Initialize(layersAnnotation);
         }
 
@@ -432,6 +432,7 @@ namespace CoreSampleAnnotation.AnnotationPlane
             }).ToArray();
 
             info.AddValue("LayersAnnotation", layersAnnotation);
+            info.AddValue("LayersTemplate",layersTemplateSource);
         }
 
         #endregion

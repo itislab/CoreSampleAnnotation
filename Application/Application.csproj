@@ -35,6 +35,10 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="FileHelpers, Version=3.2.7.0, Culture=neutral, PublicKeyToken=3e0c08d59cc3d657, processorArchitecture=MSIL">
+      <HintPath>..\App\packages\FileHelpers.3.2.7\lib\net45\FileHelpers.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="InteractiveDataDisplay.WPF, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\App\packages\InteractiveDataDisplay.WPF.1.0.0\lib\net452\InteractiveDataDisplay.WPF.dll</HintPath>
       <Private>True</Private>
@@ -161,6 +165,7 @@
     <Compile Include="AnnotationPlane\Template\Class.cs" />
     <Compile Include="AnnotationPlane\Template\InputField.cs" />
     <Compile Include="AnnotationPlane\Template\Property.cs" />
+    <Compile Include="ILayersTemplateSource.cs" />
     <Compile Include="Intervals\BoreIntervalsView.xaml.cs">
       <DependentUpon>BoreIntervalsView.xaml</DependentUpon>
     </Compile>
@@ -195,8 +200,11 @@
       <DependentUpon>SaveIcon.xaml</DependentUpon>
     </Compile>
     <Compile Include="Persistence\FolderImageStorage.cs" />
+    <Compile Include="Persistence\FolderLayersTemplateSource.cs" />
     <Compile Include="Persistence\FolderPersisterFactory.cs" />
     <Compile Include="Persistence\HardcodedLayerTemplate.cs" />
+    <Compile Include="Persistence\JsonNetInterfaceBinder.cs" />
+    <Compile Include="Persistence\PathUtils.cs" />
     <Compile Include="PhotoMarkup\AnnotatedPolygon.xaml.cs">
       <DependentUpon>AnnotatedPolygon.xaml</DependentUpon>
     </Compile>

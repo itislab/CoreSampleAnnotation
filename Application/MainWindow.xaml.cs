@@ -69,7 +69,7 @@ namespace CoreSampleAnnotation
                     emptyAnnotation.LayerBoundaries = new double[] { upperBoundary , lowerBoundary };
                     emptyAnnotation.Columns = new ColumnValues[0];
 
-                    vm.CurrentProjectVM.PlaneVM = new PlaneVM(emptyAnnotation, vm.CurrentProjectVM.ActiveLayerTemplate);                  
+                    vm.CurrentProjectVM.PlaneVM = new PlaneVM(emptyAnnotation, vm.CurrentProjectVM.LayersTemplateSource);                  
                 }
 
                 vm.CurrentProjectVM.PlaneVM.SetPresentationColumns(vm.CurrentProjectVM.PlaneColumnSettingsVM,

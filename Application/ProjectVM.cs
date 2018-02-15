@@ -31,17 +31,17 @@ namespace CoreSampleAnnotation
             }
         }
 
-        private Property[] activeLayerTemplate;
+        private ILayersTemplateSource layersTemplateSource;
 
-        public Property[] ActiveLayerTemplate
+        public ILayersTemplateSource LayersTemplateSource
         {
-            get { return activeLayerTemplate; }
+            get { return layersTemplateSource; }
             set
             {
-                if (activeLayerTemplate != value)
+                if (layersTemplateSource != value)
                 {
-                    activeLayerTemplate = value;
-                    RaisePropertyChanged(nameof(ActiveLayerTemplate));
+                    layersTemplateSource = value;
+                    RaisePropertyChanged(nameof(LayersTemplateSource));
                 }
             }
         }
@@ -84,17 +84,15 @@ namespace CoreSampleAnnotation
             }
         }
 
-        public void Initialize() {
-
-            activeLayerTemplate = Persistence.HardcodedLayerTemplate.Instance.Template;
-
-            planeColumnSettingsVM = new ColumnSettingsVM(ActiveLayerTemplate);
+        public void Initialize() {            
+            planeColumnSettingsVM = new ColumnSettingsVM(LayersTemplateSource.Template);
             planeColumnSettingsVM.AddDepthCommand.Execute(null);
             planeColumnSettingsVM.AddPhotoCommand.Execute(null);
         }
 
-        public ProjectVM(IImageStorage imageStorage) {            
+        public ProjectVM(IImageStorage imageStorage,ILayersTemplateSource layersTamplateSource) {            
             boreIntervalsVM = new BoreIntervalsVM(imageStorage);
+            this.layersTemplateSource = layersTamplateSource;
             Initialize();
         }
 
@@ -103,7 +101,8 @@ namespace CoreSampleAnnotation
         protected ProjectVM(SerializationInfo info, StreamingContext context) {
             boreName = info.GetString("BoreName");
             boreIntervalsVM = (BoreIntervalsVM)info.GetValue("Intervals", typeof(BoreIntervalsVM));
-            PlaneVM = (AnnotationPlane.PlaneVM)info.GetValue("Annotation", typeof(AnnotationPlane.PlaneVM));                        
+            PlaneVM = (AnnotationPlane.PlaneVM)info.GetValue("Annotation", typeof(AnnotationPlane.PlaneVM));
+            layersTemplateSource = (ILayersTemplateSource)info.GetValue("LayersTemplateSource",typeof(ILayersTemplateSource));
             Initialize();
         }
 
@@ -112,6 +111,7 @@ namespace CoreSampleAnnotation
             info.AddValue("BoreName", BoreName);
             info.AddValue("Intervals", BoreIntervalsVM);
             info.AddValue("Annotation",PlaneVM);
+            info.AddValue("LayersTemplateSource", LayersTemplateSource);
         }
         #endregion
     }

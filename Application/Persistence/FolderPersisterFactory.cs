@@ -1,6 +1,7 @@
 ﻿using Microsoft.WindowsAPICodePack.Dialogs;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -11,6 +12,7 @@ namespace CoreSampleAnnotation.Persistence
     class FolderPersisterFactory : IProjectPersisterFactory
     {
         readonly private string imagesDirectory = "Photos";
+        readonly private string layersTemplateDirectory = "LayersTemplate";
 
         public bool TryCreateNew(out IProjectPersister persister)
         {
@@ -43,9 +45,14 @@ namespace CoreSampleAnnotation.Persistence
                         persister = new FolderPersister(path);
                         var imageStorage = new FolderImageStorage(System.IO.Path.Combine(path, imagesDirectory));
 
-                        System.IO.Directory.SetCurrentDirectory(path); //after this the paths in project will be relative
+                        //coping default layer template
+                        string defaultTemplatePath = Path.Combine(System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location),"DefaultLayersTemplate");
+                        PathUtils.DeepCopy(defaultTemplatePath, Path.Combine(path, layersTemplateDirectory));
+                        var layersTemplate = new FolderLayersTemplateSource(Path.Combine(path, layersTemplateDirectory));
 
-                        persister.SaveProject(new ProjectVM(imageStorage)); //new clean project is dumped to disk
+                        Directory.SetCurrentDirectory(path); //after this the paths in project will be relative
+
+                        persister.SaveProject(new ProjectVM(imageStorage, layersTemplate)); //new clean project is dumped to disk
                         
                         return true;
                     default:

@@ -7,7 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace CoreSampleAnnotation.Persistence
-{
+{    
     public class FolderPersister : IProjectPersister
     {
         private string path;
@@ -28,8 +28,9 @@ namespace CoreSampleAnnotation.Persistence
 
         private JsonSerializerSettings newtonJsonSettings = new JsonSerializerSettings
         {
-            //TypeNameHandling = TypeNameHandling.Auto,
-            Formatting = Formatting.Indented
+            TypeNameHandling = TypeNameHandling.Auto,            
+            Formatting = Formatting.Indented,
+            SerializationBinder = new Newtonsoft.Json.Serialization.DefaultSerializationBinder()
         };
 
         public ProjectVM LoadProject()

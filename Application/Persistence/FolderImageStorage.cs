@@ -15,34 +15,7 @@ namespace CoreSampleAnnotation.Persistence
     [Serializable]
     public class FolderImageStorage : IImageStorage, ISerializable
     {
-        /// <summary>
-        /// Creates a relative path from one file or folder to another.
-        /// </summary>
-        /// <param name="fromPath">Contains the directory that defines the start of the relative path.</param>
-        /// <param name="toPath">Contains the path that defines the endpoint of the relative path.</param>
-        /// <returns>The relative path from the start directory to the end path or <c>toPath</c> if the paths are not related.</returns>
-        private static String MakeRelativePath(String fromPath, String toPath)
-        {
-            if (String.IsNullOrEmpty(fromPath)) throw new ArgumentNullException("fromPath");
-            if (String.IsNullOrEmpty(toPath)) throw new ArgumentNullException("toPath");
-
-            Uri fromUri = new Uri(fromPath);
-            Uri toUri = new Uri(toPath);
-
-            if (fromUri.Scheme != toUri.Scheme) { return toPath; } // path can't be made relative.
-
-            Uri relativeUri = fromUri.MakeRelativeUri(toUri);
-            String relativePath = Uri.UnescapeDataString(relativeUri.ToString());
-
-            if (toUri.Scheme.Equals("file", StringComparison.InvariantCultureIgnoreCase))
-            {
-                relativePath = relativePath.Replace(Path.AltDirectorySeparatorChar, Path.DirectorySeparatorChar);
-            }
-
-            return relativePath;
-        }
-
-
+        
         private string path;
 
         /// <summary>
@@ -97,7 +70,7 @@ namespace CoreSampleAnnotation.Persistence
 
         public virtual void GetObjectData(SerializationInfo info, StreamingContext context)
         {
-            string relativePath = MakeRelativePath(Directory.GetCurrentDirectory() + "\\", FolderPath);
+            string relativePath = PathUtils.MakeRelativePath(Directory.GetCurrentDirectory() + "\\", FolderPath);
             info.AddValue("Folder", relativePath);
 
         }
