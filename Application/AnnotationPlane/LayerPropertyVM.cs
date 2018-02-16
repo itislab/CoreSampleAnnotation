@@ -69,10 +69,28 @@ namespace CoreSampleAnnotation.AnnotationPlane
             return result;
 
         }
-    }   
+    }
 
-    public class ClassificationLayerVM : LayerVM
+    public abstract class ClassificationLayerVM : LayerVM
     {
+
+
+        private IEnumerable<LayerClassVM> possibleClasses;
+        public IEnumerable<LayerClassVM> PossibleClasses
+        {
+            get { return possibleClasses; }
+            set
+            {
+                if (possibleClasses != value)
+                {
+                    possibleClasses = value;
+                    RaisePropertyChanged(nameof(PossibleClasses));
+                }
+            }
+        }
+    }
+
+    public class SingleClassificationLayerVM : ClassificationLayerVM {
         private LayerClassVM currentClass = null;
 
         public LayerClassVM CurrentClass
@@ -88,25 +106,37 @@ namespace CoreSampleAnnotation.AnnotationPlane
             }
         }
 
-        private IEnumerable<LayerClassVM> possibleClasses;
-        public IEnumerable<LayerClassVM> PossibleClasses
+        public override LayerVM DeepClone()
         {
-            get { return possibleClasses; }
+            SingleClassificationLayerVM result = new SingleClassificationLayerVM();
+            result.PossibleClasses = new ObservableCollection<LayerClassVM>(PossibleClasses);
+            result.CurrentClass = CurrentClass;
+            return result;
+        }
+    }
+
+    public class MultiClassificationLayerVM : ClassificationLayerVM
+    {
+        private IEnumerable<LayerClassVM> currentClasses = null;
+
+        public IEnumerable<LayerClassVM> CurrentClasses
+        {
+            get { return currentClasses; }
             set
             {
-                if (possibleClasses != value)
+                if (currentClasses != value)
                 {
-                    possibleClasses = value;
-                    RaisePropertyChanged(nameof(PossibleClasses));
+                    currentClasses = value;
+                    RaisePropertyChanged(nameof(CurrentClasses));
                 }
             }
         }
 
         public override LayerVM DeepClone()
         {
-            var result = new ClassificationLayerVM();
-            result.CurrentClass = CurrentClass;
+            MultiClassificationLayerVM result = new MultiClassificationLayerVM();
             result.PossibleClasses = new ObservableCollection<LayerClassVM>(PossibleClasses);
+            result.CurrentClasses = new List<LayerClassVM>(CurrentClasses);
             return result;
         }
     }
@@ -131,7 +161,7 @@ namespace CoreSampleAnnotation.AnnotationPlane
         {
             ClassificationLayerVM vm = sender as ClassificationLayerVM;
             switch (e.PropertyName)
-            {                
+            {
                 case nameof(vm.Length):
                     Length = vm.Length;
                     RaisePropertyChanged(nameof(Length));
@@ -140,38 +170,96 @@ namespace CoreSampleAnnotation.AnnotationPlane
         }
     }
 
-    public class ClassificationLayerTextPresentingVM : ClassificationLayerPresentingVM
+    public abstract class ClassificationLayerTextPresentingVM : ClassificationLayerPresentingVM
     {
-        public Func<LayerClassVM, string> TextExtractor { get; set; }
+        /// <summary>
+        /// Text digest, representing current state of choice
+        /// </summary>
         public string Text
         {
             get
             {
-                if (target != null)
-                    if (target.CurrentClass != null)
-                        return TextExtractor(target.CurrentClass);
-                    else
-                        return null;
-                else
-                    return null;
+                return TextFormatter();
             }
         }
 
-        public ClassificationLayerTextPresentingVM(ClassificationLayerVM target):base(target) {
-            target.PropertyChanged += Target_PropertyChanged;
+        /// <summary>
+        /// How to extract piece of text from Class VM?
+        /// </summary>
+        public Func<LayerClassVM, string> TextExtractor { get; set; }
+
+        /// <summary>
+        /// How to format Text (depends on internal structure of derived classes)
+        /// </summary>
+        protected abstract Func<string> TextFormatter { get; }
+
+        public ClassificationLayerTextPresentingVM(ClassificationLayerVM target) : base(target) {
+        }
+    }
+
+    public class SingleClassificationLayerTextPresentingVM : ClassificationLayerTextPresentingVM {
+        private SingleClassificationLayerVM specificTarget;        
+
+        protected override Func<string> TextFormatter
+        {
+            get {
+                if (specificTarget != null)
+                    if (specificTarget.CurrentClass != null)
+                        return () => TextExtractor(specificTarget.CurrentClass);
+                    else
+                        return () => null;
+                else
+                    return () => null;
+            }
         }
 
         private void Target_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
-            ClassificationLayerVM vm = sender as ClassificationLayerVM;
+            SingleClassificationLayerVM vm = sender as SingleClassificationLayerVM;
             switch (e.PropertyName)
             {
-                case nameof(vm.CurrentClass):                    
+                case nameof(vm.CurrentClass):
                     RaisePropertyChanged(nameof(Text));
                     break;
             }
         }
 
+        public SingleClassificationLayerTextPresentingVM(SingleClassificationLayerVM target) : base(target) {
+            specificTarget = target;
+            target.PropertyChanged += Target_PropertyChanged;
+        }
+    }    
+
+    public class MultiClassificationLayerTextPresentingVM : ClassificationLayerTextPresentingVM {
+        private MultiClassificationLayerVM specificTarget;
+
+        public MultiClassificationLayerTextPresentingVM(MultiClassificationLayerVM target) : base(target) {
+            specificTarget = target;
+            target.PropertyChanged += Target_PropertyChanged;
+        }
+
+        protected override Func<string> TextFormatter {
+            get {
+                if (specificTarget != null)
+                    if (specificTarget.CurrentClasses != null)
+                        return () => string.Join(", ",specificTarget.CurrentClasses.Select(c => TextExtractor(c)).ToArray());
+                    else
+                        return () => null;
+                else
+                    return () => null;
+            }
+        }
+
+        private void Target_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            MultiClassificationLayerVM vm = sender as MultiClassificationLayerVM;
+            switch (e.PropertyName)
+            {
+                case nameof(vm.CurrentClasses):
+                    RaisePropertyChanged(nameof(Text));
+                    break;
+            }
+        }
     }
 
     public class LayerClassVM : ViewModel

@@ -10,7 +10,7 @@ namespace CoreSampleAnnotation.AnnotationPlane
     [Serializable]
     public class LayerPropertyValue {
         public string Remarks { get; set; }
-        public string Value { get; set; }
+        public string[] Value { get; set; }
     }
 
     [Serializable]

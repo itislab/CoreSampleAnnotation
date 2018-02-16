@@ -23,6 +23,7 @@ namespace CoreSampleAnnotation.Persistence
     public class FolderLayersTemplateSource : ILayersTemplateSource, ISerializable
     {
         private const string NamesFile = "Names.csv";
+        private const string MulticlassFile = "Multiclass";
         private string path;
 
         /// <summary>
@@ -38,6 +39,7 @@ namespace CoreSampleAnnotation.Persistence
             string propID = Path.GetFileName(path).ToLowerInvariant();
             propID = propID.ToLowerInvariant();
             string namesFileFullPath = Path.Combine(path, NamesFile);
+            string muticlassFileFullPath = Path.Combine(path, MulticlassFile);
 
             Dictionary<string, Class> loadedClasses = new Dictionary<string, Class>();
 
@@ -61,7 +63,8 @@ namespace CoreSampleAnnotation.Persistence
                 {
                     ID = propID,
                     Classes = loadedClasses.Select(p => p.Value).ToArray(),
-                    Name = propID
+                    Name = propID,
+                    IsMulticlass = System.IO.File.Exists(muticlassFileFullPath)
                 };
             }
             else
@@ -79,7 +82,7 @@ namespace CoreSampleAnnotation.Persistence
                         loadedProperties.Add(LoadPropertyTemplate(folder));
                     }
                     catch (Exception ex) {
-                        MessageBox.Show(string.Format("Ошибка чтения шаблона свойства (путь {0}):{1}", folder, ex.ToString()), "Не удалост загрузить шаблон свойства слоя", MessageBoxButton.OK, MessageBoxImage.Warning);
+                        MessageBox.Show(string.Format("Ошибка чтения шаблона свойства слоя керна. Свойство не загружено! (путь {0}):{1}", folder, ex.ToString()), "Не удалось загрузить шаблон свойства слоя", MessageBoxButton.OK, MessageBoxImage.Warning);
                     }
                 }
                 return loadedProperties.ToArray();

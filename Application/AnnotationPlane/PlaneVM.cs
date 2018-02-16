@@ -278,7 +278,20 @@ namespace CoreSampleAnnotation.AnnotationPlane
             {
                 FrameworkElement fe = sender as FrameworkElement;
                 LayerClassVM lc = (LayerClassVM)fe.DataContext;
-                classificationVM.LayerVM.CurrentClass = lc;
+                if (classificationVM.LayerVM is SingleClassificationLayerVM)
+                {
+                    SingleClassificationLayerVM sclVM = (SingleClassificationLayerVM)classificationVM.LayerVM;
+                    sclVM.CurrentClass = lc;
+                }
+                else if (classificationVM.LayerVM is MultiClassificationLayerVM) {
+                    MultiClassificationLayerVM mclVM = (MultiClassificationLayerVM)classificationVM.LayerVM;
+                    HashSet<LayerClassVM> curClasses = new HashSet<LayerClassVM>(mclVM.CurrentClasses);
+                    if (curClasses.Contains(lc))
+                        curClasses.Remove(lc);
+                    else
+                        curClasses.Add(lc);
+                    mclVM.CurrentClasses = curClasses;
+                }
             });
 
             classificationVM.IsVisible = false;
@@ -301,16 +314,46 @@ namespace CoreSampleAnnotation.AnnotationPlane
                 LayeredColumnVM columnVM = new LayeredColumnVM(property.ID);
                 for (int i = 0; i < layersCount; i++)
                 {
-                    ClassificationLayerVM layerVM = new ClassificationLayerVM();
+                    ClassificationLayerVM layerVM;
+                    if (property.IsMulticlass)
+                    {
+                        layerVM = new MultiClassificationLayerVM();
+                    }
+                    else {
+                        layerVM = new SingleClassificationLayerVM();
+                    }
                     layerVM.PossibleClasses = availableClasses[property.ID];
                     ColumnValues column = annotation.Columns.FirstOrDefault(c => c.PropID == property.ID);
                     if (column != null) //setting choice                        
                     {
-                        FullClassID fullID = new FullClassID(column.PropID, column.LayerValues[i].Value);
-                        if (classVMs.ContainsKey(fullID))
+                        if (column.LayerValues[i].Value != null)
                         {
-                            layerVM.CurrentClass = classVMs[fullID];
+                            foreach (string classID in column.LayerValues[i].Value)
+                            {
+                                FullClassID fullID = new FullClassID(column.PropID, classID);
+                                if (classVMs.ContainsKey(fullID))
+                                {
+                                    if (property.IsMulticlass)
+                                    {
+                                        MultiClassificationLayerVM mclVM = (MultiClassificationLayerVM)layerVM;
+                                        List<LayerClassVM> classes = new List<LayerClassVM>();
+                                        if (mclVM.CurrentClasses != null)
+                                            classes = new List<LayerClassVM>(mclVM.CurrentClasses);                                        
+                                        classes.Add(classVMs[fullID]);
+                                        mclVM.CurrentClasses = classes;
+                                    }
+                                    else
+                                    {
+                                        SingleClassificationLayerVM sclVM = (SingleClassificationLayerVM)layerVM;
+                                        sclVM.CurrentClass = classVMs[fullID];
+                                    }
+
+                                }
+                                if (!property.IsMulticlass)
+                                    break;
+                            }
                         }
+ 
                     }                    
                     layerVM.Length = LayerSyncController.LengthToWPF(boundaries[i + 1] - boundaries[i]);
                     columnVM.Layers.Add(layerVM);
@@ -391,7 +434,13 @@ namespace CoreSampleAnnotation.AnnotationPlane
                         LayeredPresentationColumnVM colVM = new LayeredPresentationColumnVM(
                             colDef.SelectedCentreTextProp.TexturalString,
                             propColumnVM,
-                            lVM => new ClassificationLayerTextPresentingVM((ClassificationLayerVM)lVM) { TextExtractor = centreTextExtractor });
+                            lVM => {
+                                if (lVM is SingleClassificationLayerVM)
+                                    return new SingleClassificationLayerTextPresentingVM((SingleClassificationLayerVM)lVM) { TextExtractor = centreTextExtractor };
+                                else if (lVM is MultiClassificationLayerVM)
+                                    return new MultiClassificationLayerTextPresentingVM((MultiClassificationLayerVM)lVM) { TextExtractor = centreTextExtractor };
+                                else throw new InvalidOperationException("Unexpected VM type");
+                            } );
 
                         colVM.ColumnHeight = colHeight;
 
@@ -422,10 +471,26 @@ namespace CoreSampleAnnotation.AnnotationPlane
                 {
                     ClassificationLayerVM clVM = layer as ClassificationLayerVM;
                     LayerPropertyValue v = new LayerPropertyValue();
-                    if (clVM.CurrentClass != null)
+                    if (clVM is SingleClassificationLayerVM)
                     {
-                        v.Value = clVM.CurrentClass.ID;
+                        SingleClassificationLayerVM sclVM = (SingleClassificationLayerVM)clVM;
+                        if (sclVM.CurrentClass != null)
+                        {
+                            v.Value = new string[] { sclVM.CurrentClass.ID };
+                        }
                     }
+                    else if (clVM is MultiClassificationLayerVM)
+                    {
+                        MultiClassificationLayerVM mclVM = (MultiClassificationLayerVM)clVM;
+                        {
+                            if (mclVM.CurrentClasses != null)
+                            {
+                                v.Value = mclVM.CurrentClasses.Select(c => c.ID).ToArray();
+                            }
+                        }
+                    }
+                    else throw new InvalidOperationException("Unexpected VM type");
+                    
                     values.Add(v);
                 }
                 return new ColumnValues() { PropID = col.Heading, LayerValues = values.ToArray() };

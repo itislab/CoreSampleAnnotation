@@ -32,8 +32,9 @@
                         <Border Margin="10" Padding="5" MouseLeftButtonDown="Border_MouseLeftButtonDown" Width="150">
                             <Border.Background>
                                 <MultiBinding Converter="{StaticResource bgColConv}" >
-                                    <Binding RelativeSource="{RelativeSource AncestorType=ItemsControl}" Path="DataContext.LayerVM.CurrentClass"/>
                                     <Binding Path="."/>
+                                    <Binding RelativeSource="{RelativeSource AncestorType=ItemsControl}" Path="DataContext.LayerVM.CurrentClass"/>
+                                    <Binding RelativeSource="{RelativeSource AncestorType=ItemsControl}" Path="DataContext.LayerVM.CurrentClasses"/>
                                 </MultiBinding>
                             </Border.Background>
                         <Grid >
@@ -44,16 +45,18 @@
                                 <TextBlock Margin="10" Text="{Binding Acronym}" Grid.Row="0" HorizontalAlignment="Center" TextAlignment="Justify" VerticalAlignment="Center">
                                     <TextBlock.Foreground>
                                         <MultiBinding Converter="{StaticResource ftColConv}" >
-                                            <Binding RelativeSource="{RelativeSource AncestorType=ItemsControl}" Path="DataContext.LayerVM.CurrentClass"/>
                                             <Binding Path="."/>
+                                            <Binding RelativeSource="{RelativeSource AncestorType=ItemsControl}" Path="DataContext.LayerVM.CurrentClass"/>
+                                            <Binding RelativeSource="{RelativeSource AncestorType=ItemsControl}" Path="DataContext.LayerVM.CurrentClasses"/>
                                         </MultiBinding>
                                     </TextBlock.Foreground>
                                 </TextBlock>
                                 <TextBlock Margin="10" Text="{Binding Description}" TextWrapping="Wrap" Grid.Row="1" HorizontalAlignment="Center"  TextAlignment="Justify" VerticalAlignment="Center">
                                     <TextBlock.Foreground>
                                         <MultiBinding Converter="{StaticResource ftColConv}" >
-                                            <Binding RelativeSource="{RelativeSource AncestorType=ItemsControl}" Path="DataContext.LayerVM.CurrentClass"/>
                                             <Binding Path="."/>
+                                            <Binding RelativeSource="{RelativeSource AncestorType=ItemsControl}" Path="DataContext.LayerVM.CurrentClass"/>
+                                            <Binding RelativeSource="{RelativeSource AncestorType=ItemsControl}" Path="DataContext.LayerVM.CurrentClasses"/>
                                         </MultiBinding>
                                     </TextBlock.Foreground>
                                 </TextBlock>

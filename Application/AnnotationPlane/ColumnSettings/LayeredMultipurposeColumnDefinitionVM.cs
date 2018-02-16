@@ -37,7 +37,7 @@ namespace CoreSampleAnnotation.AnnotationPlane.ColumnSettings
                         throw new NotImplementedException();
                 }
 
-                return string.Format("{0} свойства \"{1}\"",enumText, PropertyName);
+                return string.Format("\"{0}\": {1}", PropertyName, enumText);
             }
         }
     }

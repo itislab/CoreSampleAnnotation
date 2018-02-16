@@ -54,12 +54,24 @@ namespace CoreSampleAnnotation.AnnotationPlane
     {
         public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
         {
-            if ((values != null) && (values.Length == 2))
+            if ((values != null) && (values.Length == 3))
             {
-                LayerClassVM selected = values[0] as LayerClassVM;
-                LayerClassVM current = values[1] as LayerClassVM;
+                LayerClassVM current = values[0] as LayerClassVM;
 
-                if (selected == current)
+                bool isSelected = false;
+
+                if (values[1] is LayerClassVM) //selected class
+                {
+                    if (current == values[1])
+                        isSelected = true;
+                }
+                else if (values[2] is IEnumerable<LayerClassVM>)
+                {
+                    if (((IEnumerable<LayerClassVM>)values[2]).Contains(current))
+                        isSelected = true;
+                }
+
+                if (isSelected)
                     return new SolidColorBrush(Color.FromRgb(255,61,0));
                 else
                     return new SolidColorBrush(Color.FromRgb(93,64,55));
@@ -77,12 +89,24 @@ namespace CoreSampleAnnotation.AnnotationPlane
     {
         public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
         {
-            if ((values != null) && (values.Length == 2))
-            {
-                LayerClassVM selected = values[0] as LayerClassVM;
-                LayerClassVM current = values[1] as LayerClassVM;
+            if ((values != null) && (values.Length == 3))
+            {                
+                LayerClassVM current = values[0] as LayerClassVM;
 
-                if (selected == current)
+                bool isSelected = false;
+
+                if (values[1] is LayerClassVM) //selected class
+                {
+                    if (current == values[1])
+                        isSelected = true;
+                }
+                else if (values[2] is IEnumerable<LayerClassVM>)
+                {                    
+                    if (((IEnumerable<LayerClassVM>)values[2]).Contains(current))
+                        isSelected = true;
+                }
+
+                if (isSelected)
                     return new SolidColorBrush(Color.FromRgb(0,0,0));
                 else
                     return new SolidColorBrush(Color.FromRgb(255,255,255));
