@@ -20,7 +20,7 @@
                 <media:GearsIcon />
             </Button>
             <Button Style="{StaticResource MetroButton}" Command="{Binding SaveImageCommand}" Height="50">
-                snapshot
+                <media:ApertureIcon />
             </Button>
         </StackPanel>
         <local:ClassificationView x:Name="ClassificationView" Grid.Row="1" HorizontalAlignment="Center" VerticalAlignment="Center" Padding="30" DataContext="{Binding classificationVM}">

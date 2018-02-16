@@ -1,14 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
 
 namespace CoreSampleAnnotation.AnnotationPlane.ColumnSettings
 {
-    public class ColumnSettingsVM : ViewModel
+    [Serializable]
+    public class ColumnSettingsVM : ViewModel, ISerializable
     {
+        private ILayersTemplateSource layersTemplateSource;
         private ColumnDefinitionVM[] columnDefinitions;
         public ColumnDefinitionVM[] ColumnDefinitions
         {
@@ -37,6 +40,17 @@ namespace CoreSampleAnnotation.AnnotationPlane.ColumnSettings
         public ICommand AddPhotoCommand { get; private set; }
         public ICommand AddLayerLengthCommand { get; private set; }
         public ICommand AddLayerPropCommand { get; private set; }
+
+        private ICommand activateAnnotationPlaneCommand;
+        public ICommand ActivateAnnotationPlaneCommand {
+            get { return activateAnnotationPlaneCommand; }
+            set {
+                if (activateAnnotationPlaneCommand != value) {
+                    activateAnnotationPlaneCommand = value;
+                    RaisePropertyChanged(nameof(ActivateAnnotationPlaneCommand));
+                }
+            }
+        }
 
         private DelegateCommand MoveColumnLeft;
         private DelegateCommand MoveColumnRight;
@@ -68,12 +82,22 @@ namespace CoreSampleAnnotation.AnnotationPlane.ColumnSettings
 
             column.MoveLeft = MoveColumnLeft;
             column.MoveRight = MoveColumnRight;
+            MoveColumnLeft.RaiseCanExecuteChanged();
+            MoveColumnRight.RaiseCanExecuteChanged();
+        }        
+
+        public ColumnSettingsVM(ILayersTemplateSource layersTemplateSource)
+        {
+            this.layersTemplateSource = layersTemplateSource;
+            ColumnDefinitions = new ColumnDefinitionVM[0];
+            Initialize();
+
+            //default column set
+            AddDepthCommand.Execute(null);
+            AddPhotoCommand.Execute(null);
         }
 
-        public ColumnSettingsVM(Template.Property[] template)
-        {
-            ColumnDefinitions = new ColumnDefinitionVM[0];
-
+        protected virtual void Initialize() {
             AddDepthCommand = new DelegateCommand(() =>
             {
                 List<ColumnDefinitionVM> result = new List<ColumnDefinitionVM>(ColumnDefinitions);
@@ -104,7 +128,7 @@ namespace CoreSampleAnnotation.AnnotationPlane.ColumnSettings
             AddLayerPropCommand = new DelegateCommand(() =>
             {
                 List<ColumnDefinitionVM> result = new List<ColumnDefinitionVM>(ColumnDefinitions);
-                ColumnDefinitionVM column = new LayeredTextColumnDefinitionVM(template);
+                ColumnDefinitionVM column = new LayeredTextColumnDefinitionVM(layersTemplateSource);
                 InitializeColumn(column);
                 result.Add(column);
                 ColumnDefinitions = result.ToArray();
@@ -164,6 +188,22 @@ namespace CoreSampleAnnotation.AnnotationPlane.ColumnSettings
                     return false;
             });
         }
+
+        #region Serialization
+        protected ColumnSettingsVM(SerializationInfo info, StreamingContext context) {
+            layersTemplateSource = (ILayersTemplateSource)info.GetValue("LayersTemplateSource", typeof(ILayersTemplateSource));
+            columnDefinitions = (ColumnDefinitionVM[])info.GetValue("Columns",typeof(ColumnDefinitionVM[]));            
+            Initialize();
+            foreach (var col in columnDefinitions)
+                InitializeColumn(col);
+        }
+
+        public void GetObjectData(SerializationInfo info, StreamingContext context)
+        {
+            info.AddValue("LayersTemplateSource", layersTemplateSource);
+            info.AddValue("Columns", OrderedColumnDefinitions);            
+        }
+        #endregion
 
     }
 }

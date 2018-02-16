@@ -1,0 +1,186 @@
+﻿<UserControl x:Class="CoreSampleAnnotation.Media.TableIcon"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:CoreSampleAnnotation.Media"
+             mc:Ignorable="d" 
+             d:DesignHeight="300" d:DesignWidth="300">
+    <Viewbox xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" Stretch="Uniform">
+        <Canvas Name="svg4555" Canvas.Left="0" Canvas.Top="0" Width="100" Height="100">
+            <Canvas.RenderTransform>
+                <TranslateTransform X="0" Y="0"/>
+            </Canvas.RenderTransform>
+            <Canvas.Resources/>
+            <!--Unknown tag: metadata-->
+            <!--Unknown tag: sodipodi:namedview-->
+            <Canvas Name="g4553">
+                <Path xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" Name="path4487" Fill="{StaticResource ColorTextOnPrimary}">
+                    <Path.Data>
+                        <PathGeometry Figures="M92.087 85.3913a1.91314 1.91314 0 0 0-1.913 1.913v2.86957H87.30435a1.913 1.913 0 1 0 0 3.82609H92.087A1.91314 1.91314 0 0 0 94 92.087V87.30435A1.91314 1.91314 0 0 0 92.087 85.3913Z" FillRule="NonZero"/>
+                    </Path.Data>
+                </Path>
+                <Path xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" Name="path4489" Fill="{StaticResource ColorTextOnPrimary}">
+                    <Path.Data>
+                        <PathGeometry Figures="M73.85 94h6.11557a1.913 1.913 0 1 0 0-3.82609H73.85A1.913 1.913 0 0 0 73.85 94Z" FillRule="NonZero"/>
+                    </Path.Data>
+                </Path>
+                <Path xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" Name="path4491" Fill="{StaticResource ColorTextOnPrimary}">
+                    <Path.Data>
+                        <PathGeometry Figures="M60.3961 94h6.11557a1.913 1.913 0 0 0 0-3.82609H60.3961a1.913 1.913 0 0 0 0 3.82609Z" FillRule="NonZero"/>
+                    </Path.Data>
+                </Path>
+                <Path xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" Name="path4493" Fill="{StaticResource ColorTextOnPrimary}">
+                    <Path.Data>
+                        <PathGeometry Figures="M33.48832 94H39.6039a1.913 1.913 0 0 0 0-3.82609H33.48832a1.913 1.913 0 0 0 0 3.82609Z" FillRule="NonZero"/>
+                    </Path.Data>
+                </Path>
+                <Path xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" Name="path4495" Fill="{StaticResource ColorTextOnPrimary}">
+                    <Path.Data>
+                        <PathGeometry Figures="M46.94221 94h6.11557a1.913 1.913 0 1 0 0-3.82609H51.913V87.30435a1.913 1.913 0 1 0-3.82609 0v2.86957H46.94221a1.913 1.913 0 1 0 0 3.82609Z" FillRule="NonZero"/>
+                    </Path.Data>
+                </Path>
+                <Path xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" Name="path4497" Fill="{StaticResource ColorTextOnPrimary}">
+                    <Path.Data>
+                        <PathGeometry Figures="M26.14954 90.17391H20.03443a1.913 1.913 0 0 0 0 3.82609h6.11511a1.913 1.913 0 1 0 0-3.82609Z" FillRule="NonZero"/>
+                    </Path.Data>
+                </Path>
+                <Path xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" Name="path4499" Fill="{StaticResource ColorTextOnPrimary}">
+                    <Path.Data>
+                        <PathGeometry Figures="M7.913 94h4.78261a1.913 1.913 0 1 0 0-3.82609H9.82609V87.30435a1.913 1.913 0 1 0-3.82609 0V92.087A1.91314 1.91314 0 0 0 7.913 94Z" FillRule="NonZero"/>
+                    </Path.Data>
+                </Path>
+                <Path xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" Name="path4501" Fill="{StaticResource ColorTextOnPrimary}">
+                    <Path.Data>
+                        <PathGeometry Figures="M7.913 81.87908a1.91314 1.91314 0 0 0 1.913-1.913V73.85046a1.913 1.913 0 1 0-3.82609 0V79.966A1.91314 1.91314 0 0 0 7.913 81.87908Z" FillRule="NonZero"/>
+                    </Path.Data>
+                </Path>
+                <Path xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" Name="path4503" Fill="{StaticResource ColorTextOnPrimary}">
+                    <Path.Data>
+                        <PathGeometry Figures="M7.913 68.42519a1.91314 1.91314 0 0 0 1.913-1.913V60.39657a1.913 1.913 0 0 0-3.82609 0v6.11557A1.91314 1.91314 0 0 0 7.913 68.42519Z" FillRule="NonZero"/>
+                    </Path.Data>
+                </Path>
+                <Path xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" Name="path4505" Fill="{StaticResource ColorTextOnPrimary}">
+                    <Path.Data>
+                        <PathGeometry Figures="M7.913 54.97036a1.91314 1.91314 0 0 0 1.913-1.913V51.913h2.86957a1.913 1.913 0 1 0 0-3.82609H9.82609V46.94175a1.913 1.913 0 0 0-3.82609 0v6.11557A1.91314 1.91314 0 0 0 7.913 54.97036Z" FillRule="NonZero"/>
+                    </Path.Data>
+                </Path>
+                <Path xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" Name="path4507" Fill="{StaticResource ColorTextOnPrimary}">
+                    <Path.Data>
+                        <PathGeometry Figures="M7.913 41.51647a1.91314 1.91314 0 0 0 1.913-1.913V33.48786a1.913 1.913 0 1 0-3.82609 0v6.11557A1.91314 1.91314 0 0 0 7.913 41.51647Z" FillRule="NonZero"/>
+                    </Path.Data>
+                </Path>
+                <Path xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" Name="path4509" Fill="{StaticResource ColorTextOnPrimary}">
+                    <Path.Data>
+                        <PathGeometry Figures="M7.913 28.06258a1.91314 1.91314 0 0 0 1.913-1.913V20.034A1.913 1.913 0 1 0 6 20.034v6.11557A1.91314 1.91314 0 0 0 7.913 28.06258Z" FillRule="NonZero"/>
+                    </Path.Data>
+                </Path>
+                <Path xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" Name="path4511" Fill="{StaticResource ColorTextOnPrimary}">
+                    <Path.Data>
+                        <PathGeometry Figures="M7.913 14.6087a1.91314 1.91314 0 0 0 1.913-1.913V9.82609h2.86957a1.913 1.913 0 1 0 0-3.82609H7.913A1.91314 1.91314 0 0 0 6 7.913v4.78261A1.91314 1.91314 0 0 0 7.913 14.6087Z" FillRule="NonZero"/>
+                    </Path.Data>
+                </Path>
+                <Path xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" Name="path4513" Fill="{StaticResource ColorTextOnPrimary}">
+                    <Path.Data>
+                        <PathGeometry Figures="M33.48832 9.82609H39.6039A1.913 1.913 0 1 0 39.6039 6H33.48832a1.913 1.913 0 1 0 0 3.82609Z" FillRule="NonZero"/>
+                    </Path.Data>
+                </Path>
+                <Path xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" Name="path4515" Fill="{StaticResource ColorTextOnPrimary}">
+                    <Path.Data>
+                        <PathGeometry Figures="M26.15 6H20.03443a1.913 1.913 0 1 0 0 3.82609H26.15A1.913 1.913 0 1 0 26.15 6Z" FillRule="NonZero"/>
+                    </Path.Data>
+                </Path>
+                <Path xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" Name="path4517" Fill="{StaticResource ColorTextOnPrimary}">
+                    <Path.Data>
+                        <PathGeometry Figures="M60.3961 9.82609h6.11557a1.913 1.913 0 1 0 0-3.82609H60.3961a1.913 1.913 0 1 0 0 3.82609Z" FillRule="NonZero"/>
+                    </Path.Data>
+                </Path>
+                <Path xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" Name="path4519" Fill="{StaticResource ColorTextOnPrimary}">
+                    <Path.Data>
+                        <PathGeometry Figures="M73.85046 9.82609h6.11511a1.913 1.913 0 1 0 0-3.82609H73.85046a1.913 1.913 0 1 0 0 3.82609Z" FillRule="NonZero"/>
+                    </Path.Data>
+                </Path>
+                <Path xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" Name="path4521" Fill="{StaticResource ColorTextOnPrimary}">
+                    <Path.Data>
+                        <PathGeometry Figures="M92.087 6H87.30435a1.913 1.913 0 1 0 0 3.82609h2.86957v2.86957a1.913 1.913 0 1 0 3.82609 0V7.913A1.91314 1.91314 0 0 0 92.087 6Z" FillRule="NonZero"/>
+                    </Path.Data>
+                </Path>
+                <Path xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" Name="path4523" Fill="{StaticResource ColorTextOnPrimary}">
+                    <Path.Data>
+                        <PathGeometry Figures="M92.087 31.57481a1.91314 1.91314 0 0 0-1.913 1.913v6.11557a1.913 1.913 0 0 0 3.82609 0V33.48786A1.91314 1.91314 0 0 0 92.087 31.57481Z" FillRule="NonZero"/>
+                    </Path.Data>
+                </Path>
+                <Path xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" Name="path4525" Fill="{StaticResource ColorTextOnPrimary}">
+                    <Path.Data>
+                        <PathGeometry Figures="M92.087 18.12092a1.91314 1.91314 0 0 0-1.913 1.913v6.11557a1.913 1.913 0 1 0 3.82609 0V20.034A1.91314 1.91314 0 0 0 92.087 18.12092Z" FillRule="NonZero"/>
+                    </Path.Data>
+                </Path>
+                <Path xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" Name="path4527" Fill="{StaticResource ColorTextOnPrimary}">
+                    <Path.Data>
+                        <PathGeometry Figures="M92.087 71.93742a1.91314 1.91314 0 0 0-1.913 1.913V79.966A1.913 1.913 0 1 0 94 79.966V73.85046A1.91314 1.91314 0 0 0 92.087 71.93742Z" FillRule="NonZero"/>
+                    </Path.Data>
+                </Path>
+                <Path xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" Name="path4529" Fill="{StaticResource ColorTextOnPrimary}">
+                    <Path.Data>
+                        <PathGeometry Figures="M92.087 58.48353a1.91314 1.91314 0 0 0-1.913 1.913v6.11557a1.913 1.913 0 0 0 3.82609 0V60.39657A1.91314 1.91314 0 0 0 92.087 58.48353Z" FillRule="NonZero"/>
+                    </Path.Data>
+                </Path>
+                <Path xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" Name="path4531" Fill="{StaticResource ColorTextOnPrimary}">
+                    <Path.Data>
+                        <PathGeometry Figures="M92.087 45.02964a1.91314 1.91314 0 0 0-1.913 1.913V48.087H87.30435a1.913 1.913 0 1 0 0 3.82609h2.86957v1.14521a1.913 1.913 0 0 0 3.82609 0V46.94268A1.91314 1.91314 0 0 0 92.087 45.02964Z" FillRule="NonZero"/>
+                    </Path.Data>
+                </Path>
+                <Path xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" Name="path4533" Fill="{StaticResource ColorTextOnPrimary}">
+                    <Path.Data>
+                        <PathGeometry Figures="M51.913 9.82609h1.14474a1.913 1.913 0 1 0 0-3.82609H46.94221a1.913 1.913 0 1 0 0 3.82609H48.087v2.86957a1.913 1.913 0 1 0 3.82609 0Z" FillRule="NonZero"/>
+                    </Path.Data>
+                </Path>
+                <Path xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" Name="path4535" Fill="{StaticResource ColorTextOnPrimary}">
+                    <Path.Data>
+                        <PathGeometry Figures="M51.913 20.034a1.913 1.913 0 1 0-3.82609 0v6.11557a1.913 1.913 0 1 0 3.82609 0Z" FillRule="NonZero"/>
+                    </Path.Data>
+                </Path>
+                <Path xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" Name="path4537" Fill="{StaticResource ColorTextOnPrimary}">
+                    <Path.Data>
+                        <PathGeometry Figures="M50 31.57481a1.91314 1.91314 0 0 0-1.913 1.913v6.11557a1.913 1.913 0 0 0 3.82609 0V33.48786A1.91314 1.91314 0 0 0 50 31.57481Z" FillRule="NonZero"/>
+                    </Path.Data>
+                </Path>
+                <Path xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" Name="path4539" Fill="{StaticResource ColorTextOnPrimary}">
+                    <Path.Data>
+                        <PathGeometry Figures="M50 71.93742a1.91314 1.91314 0 0 0-1.913 1.913V79.966a1.913 1.913 0 1 0 3.82609 0V73.85046A1.91314 1.91314 0 0 0 50 71.93742Z" FillRule="NonZero"/>
+                    </Path.Data>
+                </Path>
+                <Path xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" Name="path4541" Fill="{StaticResource ColorTextOnPrimary}">
+                    <Path.Data>
+                        <PathGeometry Figures="M51.913 60.39657a1.913 1.913 0 0 0-3.82609 0v6.11557a1.913 1.913 0 0 0 3.82609 0Z" FillRule="NonZero"/>
+                    </Path.Data>
+                </Path>
+                <Path xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" Name="path4543" Fill="{StaticResource ColorTextOnPrimary}">
+                    <Path.Data>
+                        <PathGeometry Figures="M73.85 51.913h6.11557a1.913 1.913 0 1 0 0-3.82609H73.85a1.913 1.913 0 0 0 0 3.82609Z" FillRule="NonZero"/>
+                    </Path.Data>
+                </Path>
+                <Path xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" Name="path4545" Fill="{StaticResource ColorTextOnPrimary}">
+                    <Path.Data>
+                        <PathGeometry Figures="M60.3961 51.913h6.11557a1.913 1.913 0 0 0 0-3.82609H60.3961a1.913 1.913 0 0 0 0 3.82609Z" FillRule="NonZero"/>
+                    </Path.Data>
+                </Path>
+                <Path xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" Name="path4547" Fill="{StaticResource ColorTextOnPrimary}">
+                    <Path.Data>
+                        <PathGeometry Figures="M26.14954 48.087H20.03443a1.913 1.913 0 0 0 0 3.82609h6.11511a1.913 1.913 0 1 0 0-3.82609Z" FillRule="NonZero"/>
+                    </Path.Data>
+                </Path>
+                <Path xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" Name="path4549" Fill="{StaticResource ColorTextOnPrimary}">
+                    <Path.Data>
+                        <PathGeometry Figures="M46.94221 51.913H48.087v1.14521a1.913 1.913 0 0 0 3.82609 0V51.913h1.14474a1.913 1.913 0 1 0 0-3.82609H51.913V46.94268a1.913 1.913 0 1 0-3.82609 0V48.087H46.94221a1.913 1.913 0 1 0 0 3.82609Z" FillRule="NonZero"/>
+                    </Path.Data>
+                </Path>
+                <Path xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" Name="path4551" Fill="{StaticResource ColorTextOnPrimary}">
+                    <Path.Data>
+                        <PathGeometry Figures="M33.48832 51.913H39.6039a1.913 1.913 0 0 0 0-3.82609H33.48832a1.913 1.913 0 0 0 0 3.82609Z" FillRule="NonZero"/>
+                    </Path.Data>
+                </Path>
+            </Canvas>
+        </Canvas>
+    </Viewbox>
+</UserControl>

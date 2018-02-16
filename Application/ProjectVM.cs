@@ -84,15 +84,14 @@ namespace CoreSampleAnnotation
             }
         }
 
-        public void Initialize() {            
-            planeColumnSettingsVM = new ColumnSettingsVM(LayersTemplateSource.Template);
-            planeColumnSettingsVM.AddDepthCommand.Execute(null);
-            planeColumnSettingsVM.AddPhotoCommand.Execute(null);
+        public void Initialize() {
+            if(planeColumnSettingsVM == null)
+                planeColumnSettingsVM = new ColumnSettingsVM(LayersTemplateSource);            
         }
 
         public ProjectVM(IImageStorage imageStorage,ILayersTemplateSource layersTamplateSource) {            
             boreIntervalsVM = new BoreIntervalsVM(imageStorage);
-            this.layersTemplateSource = layersTamplateSource;
+            this.layersTemplateSource = layersTamplateSource;            
             Initialize();
         }
 
@@ -103,6 +102,7 @@ namespace CoreSampleAnnotation
             boreIntervalsVM = (BoreIntervalsVM)info.GetValue("Intervals", typeof(BoreIntervalsVM));
             PlaneVM = (AnnotationPlane.PlaneVM)info.GetValue("Annotation", typeof(AnnotationPlane.PlaneVM));
             layersTemplateSource = (ILayersTemplateSource)info.GetValue("LayersTemplateSource",typeof(ILayersTemplateSource));
+            planeColumnSettingsVM = (ColumnSettingsVM)info.GetValue("ColumnsSettings", typeof(ColumnSettingsVM));
             Initialize();
         }
 
@@ -112,6 +112,7 @@ namespace CoreSampleAnnotation
             info.AddValue("Intervals", BoreIntervalsVM);
             info.AddValue("Annotation",PlaneVM);
             info.AddValue("LayersTemplateSource", LayersTemplateSource);
+            info.AddValue("ColumnsSettings", PlaneColumnSettingsVM);
         }
         #endregion
     }

@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--This file is NOT compatible with Silverlight-->
+<Viewbox xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" Stretch="Uniform">
+  <Canvas Name="svg4501" Canvas.Left="0" Canvas.Top="0" Width="90" Height="112.5">
+    <Canvas.RenderTransform>
+      <TranslateTransform X="0" Y="0"/>
+    </Canvas.RenderTransform>
+    <Canvas.Resources/>
+    <!--Unknown tag: metadata-->
+    <!--Unknown tag: sodipodi:namedview-->
+    <Path xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" Name="path4485" Fill="#000000">
+      <Path.Data>
+        <PathGeometry Figures="M64.211 42.71l13.828-24.433C70.248 8.656 58.346 2.5 45 2.5c-1.125 0-2.235 0.057-3.337 0.143L64.211 42.71z" FillRule="NonZero"/>
+      </Path.Data>
+    </Path>
+    <Path xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" Name="path4487" Fill="#000000">
+      <Path.Data>
+        <PathGeometry Figures="M52.7 26.875L39.21 2.903C24.729 4.877 12.572 14.136 6.555 26.875H52.7z" FillRule="NonZero"/>
+      </Path.Data>
+    </Path>
+    <Path xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" Name="path4489" Fill="#000000">
+      <Path.Data>
+        <PathGeometry Figures="M56.543 60.859h27.888C86.404 55.957 87.5 50.608 87.5 45c0-9.242-2.959-17.787-7.968-24.76L56.543 60.859z" FillRule="NonZero"/>
+      </Path.Data>
+    </Path>
+    <Path xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" Name="path4491" Fill="#000000">
+      <Path.Data>
+        <PathGeometry Figures="M33.45 29.141H5.571C3.597 34.042 2.5 39.392 2.5 45c0 9.19 2.927 17.693 7.887 24.646L33.45 29.141z" FillRule="NonZero"/>
+      </Path.Data>
+    </Path>
+    <Path xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" Name="path4493" Fill="#000000">
+      <Path.Data>
+        <PathGeometry Figures="M37.35 63.125L50.9 87.083c14.433-2.006 26.544-11.252 32.546-23.958H37.35z" FillRule="NonZero"/>
+      </Path.Data>
+    </Path>
+    <Path xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" Name="path4495" Fill="#000000">
+      <Path.Data>
+        <PathGeometry Figures="M25.757 47.231L11.875 71.614C19.665 81.298 31.605 87.5 45 87.5c1.163 0 2.31-0.06 3.449-0.151L25.757 47.231z" FillRule="NonZero"/>
+      </Path.Data>
+    </Path>
+    <TextBlock xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" FontSize="5" FontWeight="Bold" FontFamily="Helvetica Neue, Helvetica, Arial-Unicode, Arial, Sans-serif" Foreground="#FF000000" Canvas.Left="0" Canvas.Top="100" Name="text4497">Created by José Manuel de Laá</TextBlock>
+    <TextBlock xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" FontSize="5" FontWeight="Bold" FontFamily="Helvetica Neue, Helvetica, Arial-Unicode, Arial, Sans-serif" Foreground="#FF000000" Canvas.Left="0" Canvas.Top="105" Name="text4499">from the Noun Project</TextBlock>
+  </Canvas>
+</Viewbox>

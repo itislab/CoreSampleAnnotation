@@ -13,14 +13,14 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace CoreSampleAnnotation.AnnotationPlane.ColumnSettings
+namespace CoreSampleAnnotation.Media
 {
     /// <summary>
-    /// Interaction logic for LayeredMultipurposeColumnDefinitionView.xaml
+    /// Interaction logic for TableIcon.xaml
     /// </summary>
-    public partial class LayeredMultipurposeColumnDefinitionView : UserControl
+    public partial class TableIcon : UserControl
     {
-        public LayeredMultipurposeColumnDefinitionView()
+        public TableIcon()
         {
             InitializeComponent();
         }

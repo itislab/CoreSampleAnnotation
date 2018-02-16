@@ -4,6 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:CoreSampleAnnotation.AnnotationPlane.ColumnSettings"
+             xmlns:media="clr-namespace:CoreSampleAnnotation.Media"
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="800">
     <UserControl.Resources>
@@ -12,10 +13,12 @@
         </DataTemplate>
     </UserControl.Resources>
     <Grid>
+        <Button Style="{StaticResource MetroButton}" Width="50" Height="50" VerticalAlignment="Center" HorizontalAlignment="Right" Command="{Binding ActivateAnnotationPlaneCommand}">
+            <media:TableIcon></media:TableIcon></Button>
         <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
             <ItemsControl ItemsSource="{Binding OrderedColumnDefinitions}" Grid.Row="0" VerticalAlignment="Top"  Grid.IsSharedSizeScope="True">
         </ItemsControl>
-        <StackPanel Grid.Row="1" Orientation="Horizontal" VerticalAlignment="Center">
+        <StackPanel Grid.Row="1" Orientation="Horizontal" VerticalAlignment="Center" Margin="0,30,0,0">
             <TextBlock VerticalAlignment="Center" FontSize="20">Добавить колонку:</TextBlock>
             <Button Style="{StaticResource MetroButton}" Command="{Binding AddDepthCommand}">шкала глубин</Button>
             <Button Style="{StaticResource MetroButton}" Command="{Binding AddPhotoCommand}">фото</Button>

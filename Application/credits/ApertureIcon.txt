@@ -1,0 +1,2 @@
+﻿<TextBlock xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" FontSize="5" FontWeight="Bold" FontFamily="Helvetica Neue, Helvetica, Arial-Unicode, Arial, Sans-serif" Foreground="#FF000000" Canvas.Left="0" Canvas.Top="100" Name="text4497">Created by José Manuel de Laá</TextBlock>
+            <TextBlock xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" FontSize="5" FontWeight="Bold" FontFamily="Helvetica Neue, Helvetica, Arial-Unicode, Arial, Sans-serif" Foreground="#FF000000" Canvas.Left="0" Canvas.Top="105" Name="text4499">from the Noun Project</TextBlock>

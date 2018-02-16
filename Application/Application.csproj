@@ -125,10 +125,7 @@
     <Compile Include="AnnotationPlane\ColumnSettings\DepthColumnDefinitionView.xaml.cs">
       <DependentUpon>DepthColumnDefinitionView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="AnnotationPlane\ColumnSettings\LayeredMultipurposeColumnDefinitionView.xaml.cs">
-      <DependentUpon>LayeredMultipurposeColumnDefinitionView.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="AnnotationPlane\ColumnSettings\LayeredMultipurposeColumnDefinitionVM.cs" />
+    <Compile Include="AnnotationPlane\ColumnSettings\LayeredTextColumnDefinitionVM.cs" />
     <Compile Include="AnnotationPlane\ColumnSettings\LayerLengthColumnDefinitionView.xaml.cs">
       <DependentUpon>LayerLengthColumnDefinitionView.xaml</DependentUpon>
     </Compile>
@@ -181,6 +178,9 @@
     <Compile Include="Media\AddNewPhoto.xaml.cs">
       <DependentUpon>AddNewPhoto.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Media\ApertureIcon.xaml.cs">
+      <DependentUpon>ApertureIcon.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Media\Arrow_In_circle.xaml.cs">
       <DependentUpon>Arrow_In_circle.xaml</DependentUpon>
     </Compile>
@@ -198,6 +198,9 @@
     </Compile>
     <Compile Include="Media\SaveIcon.xaml.cs">
       <DependentUpon>SaveIcon.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Media\TableIcon.xaml.cs">
+      <DependentUpon>TableIcon.xaml</DependentUpon>
     </Compile>
     <Compile Include="Persistence\FolderImageStorage.cs" />
     <Compile Include="Persistence\FolderLayersTemplateSource.cs" />
@@ -257,10 +260,6 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="AnnotationPlane\ColumnSettings\DepthColumnDefinitionView.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="AnnotationPlane\ColumnSettings\LayeredMultipurposeColumnDefinitionView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -328,6 +327,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Media\ApertureIcon.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Media\Arrow_In_circle.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -349,6 +352,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Media\SaveIcon.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Media\TableIcon.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -438,6 +445,12 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="credits\gears_icon.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="credits\table_icon.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="credits\ApertureIcon.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

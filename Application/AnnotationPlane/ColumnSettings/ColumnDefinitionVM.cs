@@ -1,13 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
 
 namespace CoreSampleAnnotation.AnnotationPlane.ColumnSettings
 {
-    public class ColumnDefinitionVM : ViewModel
+    [Serializable]
+    public class ColumnDefinitionVM : ViewModel, ISerializable
     {
         private ICommand moveLeft;
         public ICommand MoveLeft
@@ -92,6 +94,19 @@ namespace CoreSampleAnnotation.AnnotationPlane.ColumnSettings
                     RaisePropertyChanged(nameof(ColumnOrder));
                 }
             }
-        }        
+        }
+        public ColumnDefinitionVM() { }
+
+        #region Serialization
+
+        protected ColumnDefinitionVM(SerializationInfo info, StreamingContext context) {
+            columnOrder = info.GetInt32("ColumnOrder");
+        }
+
+        public virtual void GetObjectData(SerializationInfo info, StreamingContext context)
+        {
+            info.AddValue("ColumnOrder", ColumnOrder);
+        }
+        #endregion
     }
 }

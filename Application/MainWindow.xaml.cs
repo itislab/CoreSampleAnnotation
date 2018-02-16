@@ -87,6 +87,8 @@ namespace CoreSampleAnnotation
                 vm.ActiveSectionVM = vm.CurrentProjectVM.PlaneVM;
             });
 
+            vm.CurrentProjectVM.PlaneColumnSettingsVM.ActivateAnnotationPlaneCommand = menuVM.ActivateAnnotationPlaneCommand;
+
             menuVM.ActivateReportGenerationCommand = new DelegateCommand(obj => { }, obj => false);
             menuVM.ActivateTemplateEditorCommand = new DelegateCommand(obj => { }, obj => false);
         }
