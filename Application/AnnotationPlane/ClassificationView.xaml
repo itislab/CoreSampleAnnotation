@@ -42,7 +42,7 @@
                                 <RowDefinition />
                                 <RowDefinition />
                             </Grid.RowDefinitions>
-                                <TextBlock Margin="10" Text="{Binding Acronym}" Grid.Row="0" HorizontalAlignment="Center" TextAlignment="Justify" VerticalAlignment="Center">
+                                <TextBlock Margin="10" Text="{Binding VisibleShortTextID}" Grid.Row="0" HorizontalAlignment="Center" TextAlignment="Justify" VerticalAlignment="Center">
                                     <TextBlock.Foreground>
                                         <MultiBinding Converter="{StaticResource ftColConv}" >
                                             <Binding Path="."/>
@@ -51,7 +51,7 @@
                                         </MultiBinding>
                                     </TextBlock.Foreground>
                                 </TextBlock>
-                                <TextBlock Margin="10" Text="{Binding Description}" TextWrapping="Wrap" Grid.Row="1" HorizontalAlignment="Center"  TextAlignment="Justify" VerticalAlignment="Center">
+                                <TextBlock Margin="10" Text="{Binding VisibleLongTextID}" TextWrapping="Wrap" Grid.Row="1" HorizontalAlignment="Center"  TextAlignment="Justify" VerticalAlignment="Center">
                                     <TextBlock.Foreground>
                                         <MultiBinding Converter="{StaticResource ftColConv}" >
                                             <Binding Path="."/>

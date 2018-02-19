@@ -136,7 +136,10 @@ namespace CoreSampleAnnotation.AnnotationPlane
         {
             MultiClassificationLayerVM result = new MultiClassificationLayerVM();
             result.PossibleClasses = new ObservableCollection<LayerClassVM>(PossibleClasses);
-            result.CurrentClasses = new List<LayerClassVM>(CurrentClasses);
+            if (CurrentClasses == null)
+                result.CurrentClasses = new List<LayerClassVM>();
+            else
+                result.CurrentClasses = new List<LayerClassVM>(CurrentClasses);
             return result;
         }
     }
@@ -310,6 +313,28 @@ namespace CoreSampleAnnotation.AnnotationPlane
                     shortName = value;
                     RaisePropertyChanged(nameof(ShortName));
                 }
+            }
+        }
+
+        public string VisibleShortTextID {
+            get {
+                if (string.IsNullOrEmpty(acronym))
+                {
+                    return ID;
+                }
+                else
+                    return Acronym;       
+            }
+        }
+
+        public string VisibleLongTextID {
+            get {
+                if (string.IsNullOrEmpty(Description))
+                {
+                    return ShortName;
+                }
+                else
+                    return Description;
             }
         }
 

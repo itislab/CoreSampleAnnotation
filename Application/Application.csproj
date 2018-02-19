@@ -435,9 +435,6 @@
     <Resource Include="credits\rotate-icon.txt" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Media\cross_marker_blue.svg" />
-  </ItemGroup>
-  <ItemGroup>
     <Resource Include="Media\checkerboard.jpg" />
   </ItemGroup>
   <ItemGroup>

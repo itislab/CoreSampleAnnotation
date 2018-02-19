@@ -93,17 +93,17 @@ namespace CoreSampleAnnotation.AnnotationPlane.ColumnSettings
                 bool foundShortName = false;
                 foreach (Class c in p.Classes)
                 {
-                    if (!foundDescription && c.Description != null)
+                    if (!foundDescription && !(string.IsNullOrEmpty(c.Description)))
                     {
                         textVariants.Add(new Variant(p.ID, p.Name, Presentation.Description));
                         foundDescription = true;
                     }
-                    if (!foundAcronym && c.Acronym != null)
+                    if (!foundAcronym && !(string.IsNullOrEmpty(c.Acronym)))
                     {
                         textVariants.Add(new Variant(p.ID, p.Name, Presentation.Acronym));
                         foundAcronym = true;
                     }
-                    if (!foundShortName && c.ShortName != null)
+                    if (!foundShortName && !(string.IsNullOrEmpty(c.ShortName)))
                     {
                         textVariants.Add(new Variant(p.ID, p.Name, Presentation.ShortName));
                         foundShortName = true;

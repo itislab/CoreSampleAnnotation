@@ -284,8 +284,12 @@ namespace CoreSampleAnnotation.AnnotationPlane
                     sclVM.CurrentClass = lc;
                 }
                 else if (classificationVM.LayerVM is MultiClassificationLayerVM) {
-                    MultiClassificationLayerVM mclVM = (MultiClassificationLayerVM)classificationVM.LayerVM;
-                    HashSet<LayerClassVM> curClasses = new HashSet<LayerClassVM>(mclVM.CurrentClasses);
+                    MultiClassificationLayerVM mclVM = (MultiClassificationLayerVM)classificationVM.LayerVM;                    
+                        HashSet<LayerClassVM> curClasses;
+                    if (mclVM.CurrentClasses == null)
+                        curClasses = new HashSet<LayerClassVM>();
+                    else
+                        curClasses = new HashSet<LayerClassVM>(mclVM.CurrentClasses);
                     if (curClasses.Contains(lc))
                         curClasses.Remove(lc);
                     else
