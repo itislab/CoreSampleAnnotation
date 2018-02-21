@@ -29,6 +29,8 @@ namespace CoreSampleAnnotation.AnnotationPlane.LayerSyncronization
         double[] GetLayerHeights();
     }
 
+    public enum FreeSpaceAccepter { UpperLayer, LowerLayer};
+
     /// <summary>
     /// Performs syncronious operations on a group of layered columns
     /// </summary>
@@ -151,6 +153,48 @@ namespace CoreSampleAnnotation.AnnotationPlane.LayerSyncronization
         }
 
         /// <summary>
+        /// Removes the layer
+        /// </summary>
+        /// <param name="idx">Which layer to remove</param>
+        /// <param name="freeSpaceAccepter">Where to attach the freed space</param>
+        public void RemoveLayer(int idx, FreeSpaceAccepter freeSpaceAccepter) {
+            AssertLayerIdx(idx);
+            if (idx == 0 && freeSpaceAccepter == FreeSpaceAccepter.UpperLayer)
+                throw new ArgumentException("There is no upper layer to attach free space");
+            if (idx >= depthBoundaries.Length - 2 && freeSpaceAccepter == FreeSpaceAccepter.LowerLayer)
+                throw new ArgumentException("There is no lower layer to attach free space");
+
+            double freedSpace = GetLayerWPFHeight(idx);
+            int spaceAcceptorIdx;            
+            switch (freeSpaceAccepter)
+            {
+                case FreeSpaceAccepter.UpperLayer:
+                    spaceAcceptorIdx = idx - 1;
+                    break;
+                case FreeSpaceAccepter.LowerLayer:
+                    spaceAcceptorIdx = idx + 1;
+                    break;
+                default: throw new NotImplementedException();
+            }
+            double spaceAcceptorOldHeight = GetLayerWPFHeight(spaceAcceptorIdx);
+            double spaceAcceptorNewHeight = spaceAcceptorOldHeight + freedSpace;
+            foreach (var column in columns) {
+                column.SetLayerHeight(spaceAcceptorIdx, spaceAcceptorNewHeight);
+                column.RemoveLayer(idx);
+            }
+
+            int boundaryIdxToRemove;
+            switch (freeSpaceAccepter) {
+                case FreeSpaceAccepter.UpperLayer:
+                    boundaryIdxToRemove = idx; break;
+                case FreeSpaceAccepter.LowerLayer:
+                    boundaryIdxToRemove = idx + 1;break;
+                default: throw new NotImplementedException();
+            }
+            depthBoundaries = depthBoundaries.Take(boundaryIdxToRemove).Concat(depthBoundaries.Skip(boundaryIdxToRemove + 1)).ToArray();
+        }
+
+        /// <summary>
         /// Sets the layer idx Height to newHight, compensting the change by the hight of the lext layer (so total column height is unchanged)
         /// </summary>
         /// <param name="idx">the layer to set the new height</param>
@@ -177,11 +221,11 @@ namespace CoreSampleAnnotation.AnnotationPlane.LayerSyncronization
             depthBoundaries[idx + 1] = depthBoundaries[idx + 1] - WpfToLength(nextLayerAddition);
         }
 
-        public void UnregisterLayer(ILayersColumn column) {
+        public void UnregisterColumn(ILayersColumn column) {
             columns.Remove(column);
         }
 
-        public void RegisterLayer(ILayersColumn column) {
+        public void RegisterColumn(ILayersColumn column) {
             double[] layerHeights = column.GetLayerHeights();
             if (depthBoundaries == null)
             {

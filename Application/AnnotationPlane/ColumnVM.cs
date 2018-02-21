@@ -149,10 +149,12 @@ namespace CoreSampleAnnotation.AnnotationPlane
     /// <summary>
     /// Wraps LayeredColumnVM, presenting each LayerVM as adapter wrapped
     /// </summary>
-    public class LayeredPresentationColumnVM : ColumnVM {
+    public class LayeredPresentationColumnVM : ColumnVM
+    {
         private LayeredColumnVM target;
         private Func<LayerVM, LayerVM> adapter;
-        public LayeredPresentationColumnVM(string heading, LayeredColumnVM target, Func<LayerVM,LayerVM> adapter) : base(heading) {
+        public LayeredPresentationColumnVM(string heading, LayeredColumnVM target, Func<LayerVM, LayerVM> adapter) : base(heading)
+        {
             this.target = target;
             this.adapter = adapter;
             target.Layers.CollectionChanged += Layers_CollectionChanged;
@@ -163,7 +165,8 @@ namespace CoreSampleAnnotation.AnnotationPlane
 
         private void Target_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
-            switch (e.PropertyName) {
+            switch (e.PropertyName)
+            {
                 case nameof(target.LowerBound):
                     LowerBound = target.LowerBound;
                     break;
@@ -178,16 +181,23 @@ namespace CoreSampleAnnotation.AnnotationPlane
 
         private void Layers_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
         {
-            switch (e.Action) {
+            switch (e.Action)
+            {
                 case System.Collections.Specialized.NotifyCollectionChangedAction.Add:
-                    for (int i =0; i<e.NewItems.Count;i++) {
+                    for (int i = 0; i < e.NewItems.Count; i++)
+                    {
                         LayerVM addedVM = (LayerVM)e.NewItems[i];
                         LayerVM craftedVM = adapter(addedVM);
                         if (e.NewItems.Count == 0)
                             Layers.Add(craftedVM);
                         else
-                            Layers.Insert(e.NewStartingIndex+i, craftedVM);
+                            Layers.Insert(e.NewStartingIndex + i, craftedVM);
                     }
+                    break;
+                case System.Collections.Specialized.NotifyCollectionChangedAction.Remove:
+                    if (e.OldItems.Count != 1)
+                        throw new InvalidOperationException();
+                    Layers.RemoveAt(e.OldStartingIndex);
                     break;
                 default:
                     throw new NotImplementedException();
@@ -201,7 +211,7 @@ namespace CoreSampleAnnotation.AnnotationPlane
             get
             {
                 return layers;
-            }           
+            }
         }
     }
 
@@ -215,8 +225,10 @@ namespace CoreSampleAnnotation.AnnotationPlane
         /// <summary>
         /// the wpf width of the widest image among <seealso cref="ImageRegions"/>
         /// </summary>
-        public double MaxImageWidth {
-            get {
+        public double MaxImageWidth
+        {
+            get
+            {
                 if (ImageRegions != null)
                 {
                     var regions = ImageRegions.ToArray();
@@ -268,7 +280,8 @@ namespace CoreSampleAnnotation.AnnotationPlane
         private void Region_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
             Intervals.PhotoRegion region = sender as Intervals.PhotoRegion;
-            switch (e.PropertyName) {
+            switch (e.PropertyName)
+            {
                 case nameof(region.WpfWidth):
                     RaisePropertyChanged(nameof(MaxImageWidth));
                     break;
@@ -285,14 +298,16 @@ namespace CoreSampleAnnotation.AnnotationPlane
         {
             this.PropertyChanged += LayerRealSizeColumnVM_PropertyChanged;
             Layers.CollectionChanged += Layers_CollectionChanged;
-            foreach (LayerVM vm in Layers) {
+            foreach (LayerVM vm in Layers)
+            {
                 vm.PropertyChanged += LayerVm_PropertyChanged;
             }
         }
 
         private void LayerVm_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
-            if (e.PropertyName == nameof(LayerVM.Length)) {
+            if (e.PropertyName == nameof(LayerVM.Length))
+            {
                 UpdateRealLength();
             }
         }
@@ -301,11 +316,13 @@ namespace CoreSampleAnnotation.AnnotationPlane
         {
             if (e.OldItems != null)
             {
-                foreach (LayerVM vm in e.OldItems) {
+                foreach (LayerVM vm in e.OldItems)
+                {
                     vm.PropertyChanged -= LayerVm_PropertyChanged;
                 }
             }
-            if (e.NewItems != null) {
+            if (e.NewItems != null)
+            {
                 foreach (LayerVM vm in e.NewItems)
                 {
                     vm.PropertyChanged += LayerVm_PropertyChanged;

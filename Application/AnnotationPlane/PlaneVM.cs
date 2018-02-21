@@ -13,7 +13,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 
 namespace CoreSampleAnnotation.AnnotationPlane
-{    
+{
     struct FullClassID
     {
         public readonly string PropID;
@@ -66,10 +66,12 @@ namespace CoreSampleAnnotation.AnnotationPlane
         /// <summary>
         /// Coordinates dragging elements are calculated related to this element
         /// </summary>
-        public FrameworkElement DragReferenceElem {
+        public FrameworkElement DragReferenceElem
+        {
             get { return dragReferenceElem; }
-            set {
-                if(dragReferenceElem != value)
+            set
+            {
+                if (dragReferenceElem != value)
                 {
                     dragReferenceElem = value;
                     RaisePropertyChanged(nameof(DragReferenceElem));
@@ -111,7 +113,7 @@ namespace CoreSampleAnnotation.AnnotationPlane
         private void RegisterForLayerSync(LayeredColumnVM column)
         {
             LayerSyncronization.ILayersColumn adaptedColumn = new SyncronizerColumnAdapter(column);
-            LayerSyncController.RegisterLayer(adaptedColumn);
+            LayerSyncController.RegisterColumn(adaptedColumn);
         }
 
         private void MassColumnRemove()
@@ -275,17 +277,54 @@ namespace CoreSampleAnnotation.AnnotationPlane
             AnnoGridVM = new AnnotationGridVM();
             classificationVM = new ClassificationVM();
 
-            ElementDropped = new DelegateCommand(obj => {
+            ElementDropped = new DelegateCommand(obj =>
+            {
                 ElemDroppedEventArgs edea = obj as ElemDroppedEventArgs;
                 LayerBoundary boundary = edea.DroppedElement.Tag as LayerBoundary;
-                System.Diagnostics.Debug.WriteLine("dropped boundary {0} with offset {1} in {2} column",boundary.ID,edea.WpfTopOffset, edea.ColumnIdx);
+                System.Diagnostics.Debug.WriteLine("dropped boundary {0} with offset {1} in {2} column", boundary.ID, edea.WpfTopOffset, edea.ColumnIdx);
                 //TODO: update rank
                 int boundIdx = Array.FindIndex(layerBoundaryEditorVM.Boundaries, b => b.ID == boundary.ID);
                 double prevTop = layerSyncController.GetLayerWPFTop(boundIdx);
                 double prevBottom = layerSyncController.GetLayerWPFBottom(boundIdx);
-                System.Diagnostics.Debug.WriteLine("Changing layer {0} bottom from {1} to {2}",boundIdx,prevBottom,edea.WpfTopOffset);
-                double newHeight = edea.WpfTopOffset - prevTop;
-                layerSyncController.MoveBoundary(boundIdx, newHeight);
+                double nextBottom = layerSyncController.GetLayerWPFBottom(boundIdx + 1);
+                double newBottom = edea.WpfTopOffset;
+                if (newBottom <= prevTop)
+                {
+                    var res = MessageBox.Show(
+                        string.Format("Удалить границу слоев на глубине {0:#.##}м заполнив путое место информацией из слоя снизу?", layerSyncController.WpfToDepth(boundary.Level)),
+                        "Удаление слоя", MessageBoxButton.OKCancel, MessageBoxImage.Question);
+                    switch (res) {
+                        case MessageBoxResult.OK:
+                            LayerSyncController.RemoveLayer(boundIdx, LayerSyncronization.FreeSpaceAccepter.LowerLayer);
+                            break;
+                        case MessageBoxResult.Cancel:
+                            layerBoundaryEditorVM.Boundaries = layerBoundaryEditorVM.Boundaries.ToArray(); // this recreates all views, after the boundary label dragging
+                            break;
+                        default: throw new NotImplementedException();
+                    }
+
+                }
+                else if (newBottom >= nextBottom)
+                {
+                    var res = MessageBox.Show(
+                    string.Format("Удалить границу слоев на глубине {0:#.##}м заполнив путое место информацией из слоя сверху?", layerSyncController.WpfToDepth(boundary.Level)),
+                    "Удаление слоя", MessageBoxButton.OKCancel, MessageBoxImage.Question);
+                    switch (res)
+                    {
+                        case MessageBoxResult.OK:
+                            LayerSyncController.RemoveLayer(boundIdx+1, LayerSyncronization.FreeSpaceAccepter.UpperLayer);
+                            break;
+                        case MessageBoxResult.Cancel:
+                            layerBoundaryEditorVM.Boundaries = layerBoundaryEditorVM.Boundaries.ToArray(); // this recreates all views, after the boundary label dragging
+                            break;
+                        default: throw new NotImplementedException();
+                    }
+                }
+                else {
+                    System.Diagnostics.Debug.WriteLine("Changing layer {0} bottom from {1} to {2}", boundIdx, prevBottom, edea.WpfTopOffset);
+                    double newHeight = edea.WpfTopOffset - prevTop;
+                    layerSyncController.MoveBoundary(boundIdx, newHeight);
+                }
             });
 
             PointSelected = new DelegateCommand(obj =>
@@ -330,9 +369,10 @@ namespace CoreSampleAnnotation.AnnotationPlane
                     SingleClassificationLayerVM sclVM = (SingleClassificationLayerVM)classificationVM.LayerVM;
                     sclVM.CurrentClass = lc;
                 }
-                else if (classificationVM.LayerVM is MultiClassificationLayerVM) {
-                    MultiClassificationLayerVM mclVM = (MultiClassificationLayerVM)classificationVM.LayerVM;                    
-                        HashSet<LayerClassVM> curClasses;
+                else if (classificationVM.LayerVM is MultiClassificationLayerVM)
+                {
+                    MultiClassificationLayerVM mclVM = (MultiClassificationLayerVM)classificationVM.LayerVM;
+                    HashSet<LayerClassVM> curClasses;
                     if (mclVM.CurrentClasses == null)
                         curClasses = new HashSet<LayerClassVM>();
                     else
@@ -358,9 +398,11 @@ namespace CoreSampleAnnotation.AnnotationPlane
             ColScaleController.LowerDepth = lowerDepth;
             LayerSyncController.LowerDepth = lowerDepth;
 
-            layerBoundaryEditorVM.DragStart = new DelegateCommand(args => {                
-                if (DragReferenceElem != null) {
-                    LayerBoundaries.DragStartEventArgs dsea = args as LayerBoundaries.DragStartEventArgs;                    
+            layerBoundaryEditorVM.DragStart = new DelegateCommand(args =>
+            {
+                if (DragReferenceElem != null)
+                {
+                    LayerBoundaries.DragStartEventArgs dsea = args as LayerBoundaries.DragStartEventArgs;
                     Point startDragCoord = dsea.MouseEvent.GetPosition(DragReferenceElem);
                     Point localDragOffset = dsea.MouseEvent.GetPosition(dsea.FrameworkElement);
                     Point dragItemLocation = startDragCoord - new Vector(localDragOffset.X, localDragOffset.Y);
@@ -369,7 +411,7 @@ namespace CoreSampleAnnotation.AnnotationPlane
                     dsea.FrameworkElement.Tag = dsea.FrameworkElement.DataContext; // storing original data context in tag befor the element is moved out of the UI tree
                     AnnoGridVM.DraggedItem = dsea.FrameworkElement;
                 }
-                    
+
             });
 
             double colHeight = LayerSyncController.DepthToWPF(lowerDepth) - LayerSyncController.DepthToWPF(upperDepth);
@@ -384,7 +426,8 @@ namespace CoreSampleAnnotation.AnnotationPlane
                     {
                         layerVM = new MultiClassificationLayerVM();
                     }
-                    else {
+                    else
+                    {
                         layerVM = new SingleClassificationLayerVM();
                     }
                     layerVM.PossibleClasses = availableClasses[property.ID];
@@ -403,7 +446,7 @@ namespace CoreSampleAnnotation.AnnotationPlane
                                         MultiClassificationLayerVM mclVM = (MultiClassificationLayerVM)layerVM;
                                         List<LayerClassVM> classes = new List<LayerClassVM>();
                                         if (mclVM.CurrentClasses != null)
-                                            classes = new List<LayerClassVM>(mclVM.CurrentClasses);                                        
+                                            classes = new List<LayerClassVM>(mclVM.CurrentClasses);
                                         classes.Add(classVMs[fullID]);
                                         mclVM.CurrentClasses = classes;
                                     }
@@ -418,8 +461,8 @@ namespace CoreSampleAnnotation.AnnotationPlane
                                     break;
                             }
                         }
- 
-                    }                    
+
+                    }
                     layerVM.Length = LayerSyncController.LengthToWPF(boundaries[i + 1] - boundaries[i]);
                     columnVM.Layers.Add(layerVM);
                 }
@@ -467,18 +510,18 @@ namespace CoreSampleAnnotation.AnnotationPlane
                     RegisterForLayerSync(colVM);
                 }
                 else if (columnDefinition is PhotoColumnDefinitionVM)
-                {                    
+                {
                     ImageColumnVM imColVM = new ImageColumnVM("Фото керна");
-                    BoundaryEditorColumnVM beVM = new BoundaryEditorColumnVM(imColVM,layerBoundaryEditorVM);                    
+                    BoundaryEditorColumnVM beVM = new BoundaryEditorColumnVM(imColVM, layerBoundaryEditorVM);
 
                     var syncAdapter = new SyncronizerBoundaryAdapter(layerBoundaryEditorVM);
 
                     imColVM.ColumnHeight = colHeight;
                     imColVM.ImageRegions = photos;
-                    AnnoGridVM.Columns.Add(beVM);                    
+                    AnnoGridVM.Columns.Add(beVM);
                     RegisterForScaleSync(imColVM, true);
 
-                    LayerSyncController.RegisterLayer(syncAdapter);
+                    LayerSyncController.RegisterColumn(syncAdapter);
                     ColScaleController.AttachToColumn(syncAdapter);
                 }
                 else if (columnDefinition is LayeredTextColumnDefinitionVM)
@@ -506,13 +549,14 @@ namespace CoreSampleAnnotation.AnnotationPlane
                         LayeredPresentationColumnVM colVM = new LayeredPresentationColumnVM(
                             colDef.SelectedCentreTextProp.TexturalString,
                             propColumnVM,
-                            lVM => {
+                            lVM =>
+                            {
                                 if (lVM is SingleClassificationLayerVM)
                                     return new SingleClassificationLayerTextPresentingVM((SingleClassificationLayerVM)lVM) { TextExtractor = centreTextExtractor };
                                 else if (lVM is MultiClassificationLayerVM)
                                     return new MultiClassificationLayerTextPresentingVM((MultiClassificationLayerVM)lVM) { TextExtractor = centreTextExtractor };
                                 else throw new InvalidOperationException("Unexpected VM type");
-                            } );
+                            });
 
                         colVM.ColumnHeight = colHeight;
 
@@ -525,9 +569,10 @@ namespace CoreSampleAnnotation.AnnotationPlane
 
         #region Persistence
 
-        protected PlaneVM(SerializationInfo info, StreamingContext context) {
+        protected PlaneVM(SerializationInfo info, StreamingContext context)
+        {
             LayersAnnotation layersAnnotation = (LayersAnnotation)info.GetValue("LayersAnnotation", typeof(LayersAnnotation));
-            layersTemplateSource = (ILayersTemplateSource)info.GetValue("LayersTemplate",typeof(ILayersTemplateSource));
+            layersTemplateSource = (ILayersTemplateSource)info.GetValue("LayersTemplate", typeof(ILayersTemplateSource));
             layerBoundaryEditorVM = new LayerBoundaryEditorVM();
             Initialize(layersAnnotation);
         }
@@ -563,14 +608,14 @@ namespace CoreSampleAnnotation.AnnotationPlane
                         }
                     }
                     else throw new InvalidOperationException("Unexpected VM type");
-                    
+
                     values.Add(v);
                 }
                 return new ColumnValues() { PropID = col.Heading, LayerValues = values.ToArray() };
             }).ToArray();
 
             info.AddValue("LayersAnnotation", layersAnnotation);
-            info.AddValue("LayersTemplate",layersTemplateSource);
+            info.AddValue("LayersTemplate", layersTemplateSource);
         }
 
         #endregion
