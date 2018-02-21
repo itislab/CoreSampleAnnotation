@@ -285,10 +285,32 @@ namespace CoreSampleAnnotation.AnnotationPlane
         {
             this.PropertyChanged += LayerRealSizeColumnVM_PropertyChanged;
             Layers.CollectionChanged += Layers_CollectionChanged;
+            foreach (LayerVM vm in Layers) {
+                vm.PropertyChanged += LayerVm_PropertyChanged;
+            }
+        }
+
+        private void LayerVm_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == nameof(LayerVM.Length)) {
+                UpdateRealLength();
+            }
         }
 
         private void Layers_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
         {
+            if (e.OldItems != null)
+            {
+                foreach (LayerVM vm in e.OldItems) {
+                    vm.PropertyChanged -= LayerVm_PropertyChanged;
+                }
+            }
+            if (e.NewItems != null) {
+                foreach (LayerVM vm in e.NewItems)
+                {
+                    vm.PropertyChanged += LayerVm_PropertyChanged;
+                }
+            }
             UpdateRealLength();
         }
 
