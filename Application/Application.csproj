@@ -103,6 +103,10 @@
     <Compile Include="AnnotationPlane\ColumnSettings\LayeredTextColumnDefinitionView.xaml.cs">
       <DependentUpon>LayeredTextColumnDefinitionView.xaml</DependentUpon>
     </Compile>
+    <Compile Include="AnnotationPlane\LayerBoundaries\LayerLabel.xaml.cs">
+      <DependentUpon>LayerLabel.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="AnnotationPlane\LayerBoundaries\LayerBoundaryEditorVM.cs" />
     <Compile Include="AnnotationPlane\LayersAnnotation.cs" />
     <Compile Include="AnnotationPlane\AnnotationGrid.xaml.cs">
       <DependentUpon>AnnotationGrid.xaml</DependentUpon>
@@ -157,6 +161,7 @@
     <Compile Include="AnnotationPlane\PlaneHalpers.cs" />
     <Compile Include="AnnotationPlane\PlaneVM.cs" />
     <Compile Include="AnnotationPlane\RegionImage.cs" />
+    <Compile Include="AnnotationPlane\SyncronizerBoundaryAdapter.cs" />
     <Compile Include="AnnotationPlane\syncronizerColumnAdapter.cs" />
     <Compile Include="AnnotationPlane\SyncronizerScaleAdapter.cs" />
     <Compile Include="AnnotationPlane\Template\Class.cs" />
@@ -286,6 +291,10 @@
     <Page Include="AnnotationPlane\ImageColumnView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="AnnotationPlane\LayerBoundaries\LayerLabel.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="AnnotationPlane\LayerDepthPropertyView.xaml">
       <Generator>MSBuild:Compile</Generator>

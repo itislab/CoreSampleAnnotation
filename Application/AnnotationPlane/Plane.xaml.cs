@@ -24,10 +24,27 @@ namespace CoreSampleAnnotation.AnnotationPlane
         {
             InitializeComponent();                                              
             
-            this.AnnoGrod.PointSelected += Plane_PointSelected;                                   
+            this.AnnoGrod.PointSelected += Plane_PointSelected;
+            this.AnnoGrod.ElementDropped += AnnoGrod_ElementDropped;
+
+            DataContextChanged += Plane_DataContextChanged;
         }
 
+        private void AnnoGrod_ElementDropped(object sender, ElemDroppedEventArgs e)
+        {
+            if (ElementDropped != null)
+            {
+                ElementDropped.Execute(e);
+            }
+        }
 
+        private void Plane_DataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
+        {
+            PlaneVM mv = e.NewValue as PlaneVM;
+            if (mv != null) {
+                mv.DragReferenceElem = AnnoGrod.LowerGrid;
+            }
+        }
 
         public ICommand PointSelected
         {
@@ -38,6 +55,18 @@ namespace CoreSampleAnnotation.AnnotationPlane
         // Using a DependencyProperty as the backing store for PointSelected.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty PointSelectedProperty =
             DependencyProperty.Register("PointSelected", typeof(ICommand), typeof(Plane), new PropertyMetadata(null));
+
+
+
+        public ICommand ElementDropped
+        {
+            get { return (ICommand)GetValue(ElementDroppedProperty); }
+            set { SetValue(ElementDroppedProperty, value); }
+        }
+
+        // Using a DependencyProperty as the backing store for ElementDropped.  This enables animation, styling, binding, etc...
+        public static readonly DependencyProperty ElementDroppedProperty =
+            DependencyProperty.Register("ElementDropped", typeof(ICommand), typeof(Plane), new PropertyMetadata(null));
 
 
 

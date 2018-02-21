@@ -1,4 +1,5 @@
 ﻿using CoreSampleAnnotation.AnnotationPlane.ColumnSettings;
+using CoreSampleAnnotation.AnnotationPlane.LayerBoundaries;
 using CoreSampleAnnotation.AnnotationPlane.Template;
 using System;
 using System.Collections.Generic;
@@ -57,6 +58,22 @@ namespace CoreSampleAnnotation.AnnotationPlane
             get
             {
                 return layerProps;
+            }
+        }
+
+        private LayerBoundaryEditorVM layerBoundaryEditorVM;
+        private FrameworkElement dragReferenceElem;
+        /// <summary>
+        /// Coordinates dragging elements are calculated related to this element
+        /// </summary>
+        public FrameworkElement DragReferenceElem {
+            get { return dragReferenceElem; }
+            set {
+                if(dragReferenceElem != value)
+                {
+                    dragReferenceElem = value;
+                    RaisePropertyChanged(nameof(DragReferenceElem));
+                }
             }
         }
 
@@ -129,6 +146,23 @@ namespace CoreSampleAnnotation.AnnotationPlane
 
         public ICommand PointSelected { private set; get; }
 
+        private ICommand elementDropped;
+        public ICommand ElementDropped
+        {
+            get
+            {
+                return elementDropped;
+            }
+            set
+            {
+                if (elementDropped != value)
+                {
+                    elementDropped = value;
+                    RaisePropertyChanged(nameof(ElementDropped));
+                }
+            }
+        }
+
         private ICommand activateSettingsCommand;
         public ICommand ActivateSettingsCommand
         {
@@ -167,7 +201,7 @@ namespace CoreSampleAnnotation.AnnotationPlane
         public PlaneVM(LayersAnnotation annotation, ILayersTemplateSource layersTemplateSource)
         {
             this.layersTemplateSource = layersTemplateSource;
-
+            this.layerBoundaryEditorVM = new LayerBoundaryEditorVM();
             Initialize(annotation);
         }
 
@@ -241,6 +275,19 @@ namespace CoreSampleAnnotation.AnnotationPlane
             AnnoGridVM = new AnnotationGridVM();
             classificationVM = new ClassificationVM();
 
+            ElementDropped = new DelegateCommand(obj => {
+                ElemDroppedEventArgs edea = obj as ElemDroppedEventArgs;
+                LayerBoundary boundary = edea.DroppedElement.Tag as LayerBoundary;
+                System.Diagnostics.Debug.WriteLine("dropped boundary {0} with offset {1} in {2} column",boundary.ID,edea.WpfTopOffset, edea.ColumnIdx);
+                //TODO: update rank
+                int boundIdx = Array.FindIndex(layerBoundaryEditorVM.Boundaries, b => b.ID == boundary.ID);
+                double prevTop = layerSyncController.GetLayerWPFTop(boundIdx);
+                double prevBottom = layerSyncController.GetLayerWPFBottom(boundIdx);
+                System.Diagnostics.Debug.WriteLine("Changing layer {0} bottom from {1} to {2}",boundIdx,prevBottom,edea.WpfTopOffset);
+                double newHeight = edea.WpfTopOffset - prevTop;
+                layerSyncController.MoveBoundary(boundIdx, newHeight);
+            });
+
             PointSelected = new DelegateCommand(obj =>
             {
                 PointSelectedEventArgs psea = obj as PointSelectedEventArgs;
@@ -309,7 +356,21 @@ namespace CoreSampleAnnotation.AnnotationPlane
             ColScaleController.UpperDepth = upperDepth;
             LayerSyncController.UpperDepth = upperDepth;
             ColScaleController.LowerDepth = lowerDepth;
-            LayerSyncController.LowerDepth = lowerDepth;            
+            LayerSyncController.LowerDepth = lowerDepth;
+
+            layerBoundaryEditorVM.DragStart = new DelegateCommand(args => {                
+                if (DragReferenceElem != null) {
+                    LayerBoundaries.DragStartEventArgs dsea = args as LayerBoundaries.DragStartEventArgs;                    
+                    Point startDragCoord = dsea.MouseEvent.GetPosition(DragReferenceElem);
+                    Point localDragOffset = dsea.MouseEvent.GetPosition(dsea.FrameworkElement);
+                    Point dragItemLocation = startDragCoord - new Vector(localDragOffset.X, localDragOffset.Y);
+                    AnnoGridVM.LocalDraggedItemOffset = localDragOffset;
+                    AnnoGridVM.DragItemLocation = dragItemLocation;
+                    dsea.FrameworkElement.Tag = dsea.FrameworkElement.DataContext; // storing original data context in tag befor the element is moved out of the UI tree
+                    AnnoGridVM.DraggedItem = dsea.FrameworkElement;
+                }
+                    
+            });
 
             double colHeight = LayerSyncController.DepthToWPF(lowerDepth) - LayerSyncController.DepthToWPF(upperDepth);
 
@@ -406,12 +467,19 @@ namespace CoreSampleAnnotation.AnnotationPlane
                     RegisterForLayerSync(colVM);
                 }
                 else if (columnDefinition is PhotoColumnDefinitionVM)
-                {
+                {                    
                     ImageColumnVM imColVM = new ImageColumnVM("Фото керна");
+                    BoundaryEditorColumnVM beVM = new BoundaryEditorColumnVM(imColVM,layerBoundaryEditorVM);                    
+
+                    var syncAdapter = new SyncronizerBoundaryAdapter(layerBoundaryEditorVM);
+
                     imColVM.ColumnHeight = colHeight;
                     imColVM.ImageRegions = photos;
-                    AnnoGridVM.Columns.Add(imColVM);
+                    AnnoGridVM.Columns.Add(beVM);                    
                     RegisterForScaleSync(imColVM, true);
+
+                    LayerSyncController.RegisterLayer(syncAdapter);
+                    ColScaleController.AttachToColumn(syncAdapter);
                 }
                 else if (columnDefinition is LayeredTextColumnDefinitionVM)
                 {
@@ -460,6 +528,7 @@ namespace CoreSampleAnnotation.AnnotationPlane
         protected PlaneVM(SerializationInfo info, StreamingContext context) {
             LayersAnnotation layersAnnotation = (LayersAnnotation)info.GetValue("LayersAnnotation", typeof(LayersAnnotation));
             layersTemplateSource = (ILayersTemplateSource)info.GetValue("LayersTemplate",typeof(ILayersTemplateSource));
+            layerBoundaryEditorVM = new LayerBoundaryEditorVM();
             Initialize(layersAnnotation);
         }
 

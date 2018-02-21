@@ -6,6 +6,9 @@
              xmlns:local="clr-namespace:CoreSampleAnnotation.AnnotationPlane"
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300">
+    <UserControl.Resources>
+        <local:NullToCollapsedConverter x:Key="nullToCollapsed" />
+    </UserControl.Resources>
     <Grid Grid.IsSharedSizeScope="True">
         <Grid.RowDefinitions>
             <RowDefinition Height="auto"/>
@@ -13,16 +16,25 @@
         </Grid.RowDefinitions>
         <Border Grid.Row="0" BorderThickness="0" BorderBrush="Black">
             <Grid Name="HeadersGrid" >
-            <Grid.RowDefinitions>
+                <Grid.RowDefinitions>
                     <RowDefinition Height="auto"/>
                 </Grid.RowDefinitions>
-        </Grid>
+            </Grid>
         </Border>
         <ScrollViewer VerticalAlignment="Top" Grid.Row="1" Name="GridScroll">
             <Border BorderBrush="Black" BorderThickness="0">
-                <Grid Name="ColumnsGrid" IsManipulationEnabled="True"></Grid>
+                <Grid Name="LowerGrid">
+                    <Grid Name="ColumnsGrid" IsManipulationEnabled="True"></Grid>
+                    <Canvas Name="DraggingCanvas">
+                        <ContentControl
+                            Visibility="{Binding DraggedItem, Converter={StaticResource nullToCollapsed}}"
+                            Content="{Binding DraggedItem}"
+                            Canvas.Left="{Binding DraggedItemLeft, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type local:AnnotationGrid}}}"
+                            Canvas.Top="{Binding DraggedItemTop, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type local:AnnotationGrid}}}"/>
+                    </Canvas>
+                </Grid>
             </Border>
         </ScrollViewer>
     </Grid>
-    
+
 </UserControl>

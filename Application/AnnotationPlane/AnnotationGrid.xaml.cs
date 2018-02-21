@@ -22,6 +22,8 @@ namespace CoreSampleAnnotation.AnnotationPlane
     /// </summary>
     public partial class AnnotationGrid : UserControl
     {
+        private bool isMouseCaptured = false;
+
         public AnnotationGrid()
         {
             InitializeComponent();
@@ -38,7 +40,61 @@ namespace CoreSampleAnnotation.AnnotationPlane
             b2.Source = this;
             b2.Mode = BindingMode.TwoWay;
             SetBinding(AnnotationGrid.InternalScaleFactorProperty, b2);
+            
+            LowerGrid.PreviewMouseMove += ColumnsGrid_PreviewMouseMove;
+            LowerGrid.PreviewMouseUp += ColumnsGrid_PreviewMouseUp;
         }
+
+        private void ColumnsGrid_PreviewMouseUp(object sender, MouseButtonEventArgs e)
+        {
+            AnnotationGridVM agVM = DataContext as AnnotationGridVM;
+            if (agVM != null)
+            {
+                if (agVM.DraggedItem != null)
+                {
+                    Point localOffset = agVM.LocalDraggedItemOffset;
+                    Point curLocation = e.GetPosition(ColumnsGrid);
+                    Point droppedLocation = new Point(curLocation.X - localOffset.X, curLocation.Y - localOffset.Y);                    
+                    if (isMouseCaptured)
+                    {
+                        //ReleaseMouseCapture();
+                        System.Diagnostics.Trace.WriteLine("Mouse release");
+                        isMouseCaptured = false;
+                    }                    
+
+                    int col = -1;
+                    foreach (UIElement elem in ColumnsGrid.Children) {
+                        if (VisualTreeHelper.HitTest(elem, droppedLocation) != null) {
+                            col = Grid.GetColumn(elem);
+                        }
+                    }
+
+                    ElementDropped?.Invoke(this, new ElemDroppedEventArgs(agVM.DraggedItem, col, droppedLocation.Y));
+
+                    agVM.DraggedItem = null;
+                }
+            }
+        }
+
+        private void ColumnsGrid_PreviewMouseMove(object sender, MouseEventArgs e)
+        {
+            AnnotationGridVM agVM = DataContext as AnnotationGridVM;
+            if (agVM != null) {
+                if (agVM.DraggedItem != null) {
+                    Point localOffset = agVM.LocalDraggedItemOffset;
+                    Point curLocation = e.GetPosition(LowerGrid);
+                    DraggedItemLeft = curLocation.X - localOffset.X;
+                    DraggedItemTop = curLocation.Y - localOffset.Y;
+                    System.Diagnostics.Trace.WriteLine(string.Format("Elem moved to {0}:{1}", DraggedItemLeft, DraggedItemTop));
+                    if (!isMouseCaptured) {
+                        //CaptureMouse();
+                        System.Diagnostics.Trace.WriteLine("Mouse captured");
+                        isMouseCaptured = true;
+                    }
+                    e.Handled = true;
+                }
+            }
+        }       
 
         private void ColumnsGrid_ManipulationDelta(object sender, ManipulationDeltaEventArgs e)
         {
@@ -72,6 +128,33 @@ namespace CoreSampleAnnotation.AnnotationPlane
             GridScroll.ScrollToVerticalOffset(endOffsetInWPF);            
             e.Handled = true;
         }
+
+
+
+        public double DraggedItemLeft
+        {
+            get { return (double)GetValue(DraggedItemLeftProperty); }
+            set { SetValue(DraggedItemLeftProperty, value); }
+        }
+
+        // Using a DependencyProperty as the backing store for DraggedItemLeft.  This enables animation, styling, binding, etc...
+        public static readonly DependencyProperty DraggedItemLeftProperty =
+            DependencyProperty.Register("DraggedItemLeft", typeof(double), typeof(AnnotationGrid), new PropertyMetadata(0.0));
+
+
+
+
+        public double DraggedItemTop
+        {
+            get { return (double)GetValue(DraggedItemTopProperty); }
+            set { SetValue(DraggedItemTopProperty, value); }
+        }
+
+        // Using a DependencyProperty as the backing store for DraggedItemTop.  This enables animation, styling, binding, etc...
+        public static readonly DependencyProperty DraggedItemTopProperty =
+            DependencyProperty.Register("DraggedItemTop", typeof(double), typeof(AnnotationGrid), new PropertyMetadata(0.0));
+
+
 
         #region long hold related
         private Point touchPoint;
@@ -202,6 +285,8 @@ namespace CoreSampleAnnotation.AnnotationPlane
         #endregion
         public event EventHandler<PointSelectedEventArgs> PointSelected = null;
 
+        public event EventHandler<ElemDroppedEventArgs> ElementDropped = null;
+
         public object BoundDataContext
         {
             get { return (object)GetValue(BoundDataContextProperty); }
@@ -316,6 +401,32 @@ namespace CoreSampleAnnotation.AnnotationPlane
         {
             this.wpfTopOffset = wpfTopOffset;
             this.columnIdx = columnIdx;
+        }
+    }
+
+    public class ElemDroppedEventArgs : PointSelectedEventArgs
+    {        
+        public FrameworkElement DroppedElement { get; private set; }
+
+        public ElemDroppedEventArgs(FrameworkElement fe, int columnIdx, double wpfTopOffset) : base(columnIdx, wpfTopOffset)
+        {
+            DroppedElement = fe;
+        }
+    }
+
+    public class NullToCollapsedConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (value != null)
+                return Visibility.Visible;
+            else
+                return Visibility.Collapsed;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
         }
     }
 }

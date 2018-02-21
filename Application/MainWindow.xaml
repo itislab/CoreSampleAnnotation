@@ -14,7 +14,7 @@
             <local:ProjectMenuView DataContext="{Binding}"/>
         </DataTemplate>
         <DataTemplate DataType="{x:Type plane:PlaneVM}">
-            <plane:Plane PointSelected="{Binding PointSelected}"/>
+            <plane:Plane PointSelected="{Binding PointSelected}" ElementDropped="{Binding ElementDropped}"/>
         </DataTemplate>
         <DataTemplate DataType="{x:Type local:ViewModel}">
             <TextBlock>Нет View для данного типа VM</TextBlock>

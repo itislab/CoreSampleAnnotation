@@ -127,6 +127,56 @@ namespace CoreSampleAnnotation.AnnotationPlane.LayerSyncronization
             return idx;
         }
 
+        private void AssertLayerIdx(int idx) {
+            if (idx < 0)
+                throw new ArgumentException("layer index is negative");
+            if (idx >= depthBoundaries.Length - 1)
+                throw new ArgumentException("layer index is out of bounds");
+        }
+
+        public double GetLayerWPFHeight(int idx) {
+            AssertLayerIdx(idx);
+            return LengthToWPF(depthBoundaries[idx + 1] - depthBoundaries[idx]);
+        }
+
+        public double GetLayerWPFTop(int idx) {
+            AssertLayerIdx(idx);
+            return DepthToWPF(depthBoundaries[idx]);
+        }
+
+        public double GetLayerWPFBottom(int idx)
+        {
+            AssertLayerIdx(idx);
+            return DepthToWPF(depthBoundaries[idx+1]);
+        }
+
+        /// <summary>
+        /// Sets the layer idx Height to newHight, compensting the change by the hight of the lext layer (so total column height is unchanged)
+        /// </summary>
+        /// <param name="idx">the layer to set the new height</param>
+        /// <param name="newHeight">the new hight to set (in WPF units)</param>
+        public void MoveBoundary(int idx, double newHeight) {
+            if (idx >= depthBoundaries.Length - 2)
+                throw new InvalidOperationException("can not move boundary of the lat layer");
+            if (newHeight <= 0.0)
+                throw new ArgumentException("height can't be negative");
+            double[] wpfDepthBoundaries = depthBoundaries.Select(b => DepthToWPF(b)).ToArray();
+            double oldHeight = wpfDepthBoundaries[idx + 1] - wpfDepthBoundaries[idx];
+            double nextLayerHeigth = wpfDepthBoundaries[idx + 2] - wpfDepthBoundaries[idx + 1];
+            double nextLayerAddition = oldHeight - newHeight;
+            if (nextLayerAddition < 0.0) {
+                //the layer grows. Checking that it does not overgrow the next layer                
+                if (newHeight - oldHeight >= nextLayerHeigth)
+                    throw new InvalidOperationException("the layer overgrowth the next layer");                
+            }
+            foreach (var column in columns)
+            {
+                column.SetLayerHeight(idx, newHeight);                
+                column.SetLayerHeight(idx + 1, nextLayerHeigth + nextLayerAddition);
+            }
+            depthBoundaries[idx + 1] = depthBoundaries[idx + 1] - WpfToLength(nextLayerAddition);
+        }
+
         public void UnregisterLayer(ILayersColumn column) {
             columns.Remove(column);
         }
