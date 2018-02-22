@@ -12,6 +12,9 @@ namespace CoreSampleAnnotation.AnnotationPlane.LayerBoundaries
     /// </summary>
     public class LayerBoundary {
     
+        /// <summary>
+        /// In WPF units
+        /// </summary>
         public double Level { get; private set; }
     
         public ICommand DragStarted { get; set; }
@@ -123,6 +126,38 @@ namespace CoreSampleAnnotation.AnnotationPlane.LayerBoundaries
             List<LayerBoundary> newVal = new List<LayerBoundary>(boundaries.Where(b => b.ID != boundaryID));
             newVal.Add(new LayerBoundary(toUpdate.Level, rank));
             Boundaries = newVal.ToArray();
+        }
+
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="idx">internal (inter layer) boundary index</param>
+        public void RemoveBoundary(int idx) {
+            Boundaries = Boundaries.Take(idx).Concat(Boundaries.Skip(idx + 1)).ToArray();
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="idx">internal (inter layer) boundary index</param>
+        /// <param name="level"></param>
+        public void MoveBoundary(int idx, double level) {
+            var copy = Boundaries.ToArray();
+            copy[idx] = new LayerBoundary(level,copy[idx].Rank);
+            Boundaries = copy;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="idx">internal (inter layer) boundary index used to access new created elem</param>
+        /// <param name="rank"></param>
+        /// <param name="level"></param>
+        public void AddBoundary(int rank, double level) {
+            List<LayerBoundary> l = new List<LayerBoundary>(Boundaries);
+            l.Add(new LayerBoundary(level,rank));
+            Boundaries = l.ToArray();
         }
     }
 

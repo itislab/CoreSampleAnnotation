@@ -78,6 +78,47 @@ namespace CoreSampleAnnotation.AnnotationPlane
                 }
             }
         }
+        
+        /// <param name="layerIdx">index of inner (between layers) boundaries</param>
+        private void RemoveLayerBoundary(int layerIdx, LayerSyncronization.FreeSpaceAccepter freeSpaceAccepter)
+        {
+            layerBoundaryEditorVM.RemoveBoundary(layerIdx);
+            //if (layerIdx == 0)
+            //{
+            //    layerSyncController.RemoveLayer(0, LayerSyncronization.FreeSpaceAccepter.LowerLayer);
+                
+            //}
+            //else if (layerIdx == layerBoundaryEditorVM.Boundaries.Length - 1)
+            //{
+            //    LayerSyncController.RemoveLayer(layerIdx + 1, LayerSyncronization.FreeSpaceAccepter.UpperLayer);
+            //    //layerBoundaryEditorVM.RemoveBoundary(layerIdx);
+            //}
+            //else
+                switch (freeSpaceAccepter)
+                {
+                    case LayerSyncronization.FreeSpaceAccepter.LowerLayer:
+                        LayerSyncController.RemoveLayer(layerIdx, freeSpaceAccepter); break;
+                    case LayerSyncronization.FreeSpaceAccepter.UpperLayer:
+                        LayerSyncController.RemoveLayer(layerIdx+1, freeSpaceAccepter); break;
+                    default: throw new NotImplementedException();
+                }
+                
+        }
+
+        /// <param name="layerIdx">index of inner (between layers) boundaries</param>
+        /// <param name="level">in WPF units</param>
+        private void MoveLayerBoundary(int layerIdx, double level) {
+            layerBoundaryEditorVM.MoveBoundary(layerIdx, level);
+            double up = 0.0;
+            if (layerIdx > 0)
+                up = LayerSyncController.GetLayerWPFTop(layerIdx);
+            LayerSyncController.MoveBoundary(layerIdx, level - up);
+        }
+
+        private void AddBoundary(double level) {
+            layerBoundaryEditorVM.AddBoundary(0,level);
+            LayerSyncController.SplitLayer(level);
+        }
 
         private List<ColumnVM> scaleSyncedCols = new List<ColumnVM>();
         public List<ColumnVM> ScaleSyncedCols
@@ -281,8 +322,7 @@ namespace CoreSampleAnnotation.AnnotationPlane
             {
                 ElemDroppedEventArgs edea = obj as ElemDroppedEventArgs;
                 LayerBoundary boundary = edea.DroppedElement.Tag as LayerBoundary;
-                System.Diagnostics.Debug.WriteLine("dropped boundary {0} with offset {1} in {2} column", boundary.ID, edea.WpfTopOffset, edea.ColumnIdx);
-                //TODO: update rank
+                System.Diagnostics.Debug.WriteLine("dropped boundary {0} with offset {1} in {2} column", boundary.ID, edea.WpfTopOffset, edea.ColumnIdx);                
                 int boundIdx = Array.FindIndex(layerBoundaryEditorVM.Boundaries, b => b.ID == boundary.ID);
                 double prevTop = layerSyncController.GetLayerWPFTop(boundIdx);
                 double prevBottom = layerSyncController.GetLayerWPFBottom(boundIdx);
@@ -295,7 +335,7 @@ namespace CoreSampleAnnotation.AnnotationPlane
                         "Удаление слоя", MessageBoxButton.OKCancel, MessageBoxImage.Question);
                     switch (res) {
                         case MessageBoxResult.OK:
-                            LayerSyncController.RemoveLayer(boundIdx, LayerSyncronization.FreeSpaceAccepter.LowerLayer);
+                            RemoveLayerBoundary(boundIdx, LayerSyncronization.FreeSpaceAccepter.LowerLayer);
                             break;
                         case MessageBoxResult.Cancel:
                             layerBoundaryEditorVM.Boundaries = layerBoundaryEditorVM.Boundaries.ToArray(); // this recreates all views, after the boundary label dragging
@@ -312,7 +352,7 @@ namespace CoreSampleAnnotation.AnnotationPlane
                     switch (res)
                     {
                         case MessageBoxResult.OK:
-                            LayerSyncController.RemoveLayer(boundIdx+1, LayerSyncronization.FreeSpaceAccepter.UpperLayer);
+                            RemoveLayerBoundary(boundIdx, LayerSyncronization.FreeSpaceAccepter.UpperLayer);
                             break;
                         case MessageBoxResult.Cancel:
                             layerBoundaryEditorVM.Boundaries = layerBoundaryEditorVM.Boundaries.ToArray(); // this recreates all views, after the boundary label dragging
@@ -336,8 +376,7 @@ namespace CoreSampleAnnotation.AnnotationPlane
                         }
                     }
                     System.Diagnostics.Debug.WriteLine("Changing layer {0} bottom from {1} to {2}", boundIdx, prevBottom, edea.WpfTopOffset);
-                    double newHeight = edea.WpfTopOffset - prevTop;
-                    layerSyncController.MoveBoundary(boundIdx, newHeight);
+                    MoveLayerBoundary(boundIdx, edea.WpfTopOffset);                    
                 }
             });
 
@@ -352,7 +391,7 @@ namespace CoreSampleAnnotation.AnnotationPlane
                 if (newLayerTypes.Contains(relatedVmType))
                 {
                     System.Diagnostics.Debug.WriteLine("Layer split requested");
-                    layerSyncController.SplitLayer(psea.WpfTopOffset);
+                    AddBoundary(psea.WpfTopOffset);
                 }
                 else if (typeof(LayeredPresentationColumnVM) == relatedVmType)
                 {
@@ -490,7 +529,7 @@ namespace CoreSampleAnnotation.AnnotationPlane
 
             var syncAdapter = new SyncronizerBoundaryAdapter(layerBoundaryEditorVM);
 
-            LayerSyncController.RegisterColumn(syncAdapter);
+//            LayerSyncController.RegisterColumn(syncAdapter);
             ColScaleController.AttachToColumn(syncAdapter);
         }
 

@@ -73,12 +73,15 @@ namespace CoreSampleAnnotation.AnnotationPlane
             }
             else {
                 double up;
+                                
                 if (targetIdx == 0)
                     up = 0.0;
                 else
-                    up = boundariesVM.Boundaries[targetIdx].Level; ;
-                LayerBoundary newVM = new LayerBoundary(up, 0);                
-                res.Insert(targetIdx, newVM);
+                {
+                    up = boundariesVM.Boundaries[targetIdx].Level;                    
+                }
+                LayerBoundary newVM = new LayerBoundary(up,0);                
+                res.Insert(targetIdx, newVM);                
             }
             boundariesVM.Boundaries = res.ToArray();
         }
