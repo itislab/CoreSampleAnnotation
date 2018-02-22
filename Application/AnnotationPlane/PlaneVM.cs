@@ -82,18 +82,7 @@ namespace CoreSampleAnnotation.AnnotationPlane
         /// <param name="layerIdx">index of inner (between layers) boundaries</param>
         private void RemoveLayerBoundary(int layerIdx, LayerSyncronization.FreeSpaceAccepter freeSpaceAccepter)
         {
-            layerBoundaryEditorVM.RemoveBoundary(layerIdx);
-            //if (layerIdx == 0)
-            //{
-            //    layerSyncController.RemoveLayer(0, LayerSyncronization.FreeSpaceAccepter.LowerLayer);
-                
-            //}
-            //else if (layerIdx == layerBoundaryEditorVM.Boundaries.Length - 1)
-            //{
-            //    LayerSyncController.RemoveLayer(layerIdx + 1, LayerSyncronization.FreeSpaceAccepter.UpperLayer);
-            //    //layerBoundaryEditorVM.RemoveBoundary(layerIdx);
-            //}
-            //else
+            layerBoundaryEditorVM.RemoveBoundary(layerIdx);            
                 switch (freeSpaceAccepter)
                 {
                     case LayerSyncronization.FreeSpaceAccepter.LowerLayer:
@@ -368,7 +357,7 @@ namespace CoreSampleAnnotation.AnnotationPlane
                         BoundaryEditorColumnVM becVM = AnnoGridVM.Columns[colIdx] as BoundaryEditorColumnVM;
                         if (becVM != null) {
                             //this is boundary editor column. Setting rank according to the column
-                            RankFilteringBoundaryCollection rfbc = becVM.BoundariesVM as RankFilteringBoundaryCollection;
+                            RankMatchingBoundaryCollection rfbc = becVM.BoundariesVM as RankMatchingBoundaryCollection;
                             if (rfbc != null) {
                                 //this column is attached to rank filtering VM
                                 layerBoundaryEditorVM.ChangeRank(boundary.ID, rfbc.Rank);
@@ -621,9 +610,12 @@ namespace CoreSampleAnnotation.AnnotationPlane
                     int rank = colDef.SelectedIndex;
                     string heading = string.Format("Границы между {0}",colDef.Selected.ToLowerInvariant());
                     BlankColumnVM blankColumnVM = new BlankColumnVM(heading);
-                    RankFilteringBoundaryCollection filter = new RankFilteringBoundaryCollection(layerBoundaryEditorVM, rank);
+                    RankMoreOrEqualBoundaryCollection filter = new RankMoreOrEqualBoundaryCollection(layerBoundaryEditorVM, rank);
+                    RankMatchingBoundaryCollection filter2 = new RankMatchingBoundaryCollection(layerBoundaryEditorVM, rank);
 
-                    BoundaryEditorColumnVM beVM = new BoundaryEditorColumnVM(blankColumnVM, filter);
+                    BoundaryLineColumnVM blVM = new BoundaryLineColumnVM(blankColumnVM, filter);
+                    BoundaryEditorColumnVM beVM = new BoundaryEditorColumnVM(blVM, filter2);
+                    
 
                     blankColumnVM.ColumnHeight = colHeight;
                     blankColumnVM.ColumnWidth = 100;

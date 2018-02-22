@@ -111,12 +111,13 @@
       <DependentUpon>BlankColumnView.xaml</DependentUpon>
     </Compile>
     <Compile Include="AnnotationPlane\Columns\BlankColumnVM.cs" />
+    <Compile Include="AnnotationPlane\LayerBoundaries\BoundaryLineColumnVM.cs" />
     <Compile Include="AnnotationPlane\LayerBoundaries\ILayerBoundariesVM.cs" />
     <Compile Include="AnnotationPlane\LayerBoundaries\LayerLabel.xaml.cs">
       <DependentUpon>LayerLabel.xaml</DependentUpon>
     </Compile>
     <Compile Include="AnnotationPlane\LayerBoundaries\LayerBoundaryEditorVM.cs" />
-    <Compile Include="AnnotationPlane\LayerBoundaries\RankFilteringBoundaryCollection.cs" />
+    <Compile Include="AnnotationPlane\LayerBoundaries\RankMatchingBoundaryCollection.cs" />
     <Compile Include="AnnotationPlane\LayersAnnotation.cs" />
     <Compile Include="AnnotationPlane\AnnotationGrid.xaml.cs">
       <DependentUpon>AnnotationGrid.xaml</DependentUpon>
