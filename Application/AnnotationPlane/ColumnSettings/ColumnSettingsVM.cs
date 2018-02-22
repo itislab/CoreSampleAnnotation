@@ -12,6 +12,7 @@ namespace CoreSampleAnnotation.AnnotationPlane.ColumnSettings
     public class ColumnSettingsVM : ViewModel, ISerializable
     {
         private ILayersTemplateSource layersTemplateSource;
+        private ILayerRankNamesSource layerRankNameSource;
         private ColumnDefinitionVM[] columnDefinitions;
         public ColumnDefinitionVM[] ColumnDefinitions
         {
@@ -40,6 +41,7 @@ namespace CoreSampleAnnotation.AnnotationPlane.ColumnSettings
         public ICommand AddPhotoCommand { get; private set; }
         public ICommand AddLayerLengthCommand { get; private set; }
         public ICommand AddLayerPropCommand { get; private set; }
+        public ICommand AddLayerBoundsCommand { get; private set; }
 
         private ICommand activateAnnotationPlaneCommand;
         public ICommand ActivateAnnotationPlaneCommand {
@@ -86,9 +88,10 @@ namespace CoreSampleAnnotation.AnnotationPlane.ColumnSettings
             MoveColumnRight.RaiseCanExecuteChanged();
         }        
 
-        public ColumnSettingsVM(ILayersTemplateSource layersTemplateSource)
+        public ColumnSettingsVM(ILayersTemplateSource layersTemplateSource, ILayerRankNamesSource layerRankNameSource)
         {
             this.layersTemplateSource = layersTemplateSource;
+            this.layerRankNameSource = layerRankNameSource;
             ColumnDefinitions = new ColumnDefinitionVM[0];
             Initialize();
 
@@ -187,11 +190,20 @@ namespace CoreSampleAnnotation.AnnotationPlane.ColumnSettings
                 else
                     return false;
             });
+
+            AddLayerBoundsCommand = new DelegateCommand(() => {
+                List<ColumnDefinitionVM> result = new List<ColumnDefinitionVM>(ColumnDefinitions);
+                ColumnDefinitionVM column = new LayerEditColumnDefinitionVM(layerRankNameSource.GetInstrumentalMultipleNames);
+                InitializeColumn(column);
+                result.Add(column);
+                ColumnDefinitions = result.ToArray();
+            });
         }
 
         #region Serialization
         protected ColumnSettingsVM(SerializationInfo info, StreamingContext context) {
             layersTemplateSource = (ILayersTemplateSource)info.GetValue("LayersTemplateSource", typeof(ILayersTemplateSource));
+            layerRankNameSource = new Persistence.StaticLayerRankNamesSource();
             columnDefinitions = (ColumnDefinitionVM[])info.GetValue("Columns",typeof(ColumnDefinitionVM[]));            
             Initialize();
             foreach (var col in columnDefinitions)

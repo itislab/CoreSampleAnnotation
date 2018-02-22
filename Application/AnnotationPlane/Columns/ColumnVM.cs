@@ -223,7 +223,7 @@ namespace CoreSampleAnnotation.AnnotationPlane
         }
 
         /// <summary>
-        /// the wpf width of the widest image among <seealso cref="ImageRegions"/>
+        /// The wpf width of the widest image among <seealso cref="ImageRegions"/>
         /// </summary>
         public double MaxImageWidth
         {

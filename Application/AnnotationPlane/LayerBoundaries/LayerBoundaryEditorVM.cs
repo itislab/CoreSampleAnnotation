@@ -39,9 +39,35 @@ namespace CoreSampleAnnotation.AnnotationPlane.LayerBoundaries
         }
     }
 
-    public class LayerBoundaryEditorVM : ViewModel
+    public class LayerBoundaryEditorVM : ViewModel, ILayerBoundariesVM
     {
         private LayerBoundary[] boundaries;
+
+        /// <summary>
+        /// Puts the ascending numeration of Number field in the objects with the same Rank field value
+        /// </summary>
+        /// <param name="boundaries"></param>
+        /// <returns></returns>
+        private static LayerBoundary[] RecalcBoundaryNumbers(LayerBoundary[] boundaries) {
+            int minRank = boundaries.Select(b => b.Rank).Min();
+            int maxRank = boundaries.Select(b => b.Rank).Max();
+            int[] numbers = Enumerable.Repeat(2,maxRank-minRank+1).ToArray();
+
+            int N = boundaries.Length;
+
+            LayerBoundary[] result = new LayerBoundary[N];
+
+            
+            for (int i = 0; i < N; i++)
+            {
+                LayerBoundary lb = boundaries[i];
+                int idx = lb.Rank - minRank;
+                lb.Number = numbers[idx]++;
+                result[i] = lb;
+            }
+
+            return result;
+        }
 
         public LayerBoundary[] Boundaries {
             get {
@@ -55,7 +81,7 @@ namespace CoreSampleAnnotation.AnnotationPlane.LayerBoundaries
                             vm.DragStarted = null;
                         }
                     }
-                    boundaries = value;
+                    boundaries = RecalcBoundaryNumbers(value.OrderBy(b => b.Level).ToArray());
                     if (value != null) {
                         foreach (LayerBoundary vm in value) {
                             vm.DragStarted = dragStart;
@@ -103,12 +129,13 @@ namespace CoreSampleAnnotation.AnnotationPlane.LayerBoundaries
 
     public class BoundaryEditorColumnVM: ColumnVM {
 
-        public BoundaryEditorColumnVM(ColumnVM targetColumn, LayerBoundaryEditorVM editorVM) :base(targetColumn.Heading) {
+        public BoundaryEditorColumnVM(ColumnVM targetColumn, ILayerBoundariesVM boundariesVM) :base(targetColumn.Heading) {
             ColumnVM = targetColumn;
-            BoundaryEditorVM = editorVM;
+            BoundariesVM = boundariesVM;            
         }
+               
 
-        public LayerBoundaryEditorVM BoundaryEditorVM { get; private set; }
+        public ILayerBoundariesVM BoundariesVM { get; private set; }
         public ColumnVM ColumnVM { get; private set; }
     }
 }

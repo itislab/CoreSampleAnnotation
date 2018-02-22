@@ -21,6 +21,9 @@
         <DataTemplate DataType="{x:Type local:LayerLengthColumnDefinitionVM}">
             <local:LayerLengthColumnDefinitionView />
         </DataTemplate>
+        <DataTemplate DataType="{x:Type local:LayerEditColumnDefinitionVM}">
+            <local:LayerEditColumnDefinitionView />
+        </DataTemplate>
         <core:VisibilityHiddenConverter x:Key="visibilityHiddenConverter" />
     </UserControl.Resources>
     <Grid>

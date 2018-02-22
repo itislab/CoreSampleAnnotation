@@ -41,11 +41,22 @@ namespace CoreSampleAnnotation.AnnotationPlane
             b2.Mode = BindingMode.TwoWay;
             SetBinding(AnnotationGrid.InternalScaleFactorProperty, b2);
             
-            LowerGrid.PreviewMouseMove += ColumnsGrid_PreviewMouseMove;
-            LowerGrid.PreviewMouseUp += ColumnsGrid_PreviewMouseUp;
+            LowerGrid.PreviewMouseMove += LowerGrid_PreviewMouseMove;
+            LowerGrid.PreviewMouseUp += LowerGrid_PreviewMouseUp;
         }
 
-        private void ColumnsGrid_PreviewMouseUp(object sender, MouseButtonEventArgs e)
+        private bool IsInVisualTree(DependencyObject elem, DependencyObject parent) {
+            DependencyObject cur = elem;
+            do
+            {
+                if (cur == parent)
+                    return true;
+                cur = VisualTreeHelper.GetParent(cur);                
+            } while (cur != null);
+            return false;
+        }
+
+        private void LowerGrid_PreviewMouseUp(object sender, MouseButtonEventArgs e)
         {
             AnnotationGridVM agVM = DataContext as AnnotationGridVM;
             if (agVM != null)
@@ -53,8 +64,10 @@ namespace CoreSampleAnnotation.AnnotationPlane
                 if (agVM.DraggedItem != null)
                 {
                     Point localOffset = agVM.LocalDraggedItemOffset;
-                    Point curLocation = e.GetPosition(ColumnsGrid);
-                    Point droppedLocation = new Point(curLocation.X - localOffset.X, curLocation.Y - localOffset.Y);                    
+                    Point curLocation = e.GetPosition(ColumnsGrid);                    
+                    Point droppedLocation = new Point(
+                        curLocation.X - localOffset.X + agVM.DraggedItem.ActualWidth/2, //X coord is the location of the centre of the dragged element
+                        curLocation.Y - localOffset.Y); //Y coord is a top of the dragged element
                     if (isMouseCaptured)
                     {
                         //ReleaseMouseCapture();
@@ -63,11 +76,16 @@ namespace CoreSampleAnnotation.AnnotationPlane
                     }                    
 
                     int col = -1;
-                    foreach (UIElement elem in ColumnsGrid.Children) {
-                        if (VisualTreeHelper.HitTest(elem, droppedLocation) != null) {
-                            col = Grid.GetColumn(elem);
-                        }
+                    var htResult = VisualTreeHelper.HitTest(ColumnsGrid, droppedLocation);
+                    if (htResult != null)
+                    {
+                        foreach (UIElement elem in ColumnsGrid.Children)
+                        {
+                            if(IsInVisualTree(htResult.VisualHit,elem))
+                                col = Grid.GetColumn(elem);
+                        }                        
                     }
+                    
 
                     ElementDropped?.Invoke(this, new ElemDroppedEventArgs(agVM.DraggedItem, col, droppedLocation.Y));
 
@@ -76,7 +94,7 @@ namespace CoreSampleAnnotation.AnnotationPlane
             }
         }
 
-        private void ColumnsGrid_PreviewMouseMove(object sender, MouseEventArgs e)
+        private void LowerGrid_PreviewMouseMove(object sender, MouseEventArgs e)
         {
             AnnotationGridVM agVM = DataContext as AnnotationGridVM;
             if (agVM != null) {

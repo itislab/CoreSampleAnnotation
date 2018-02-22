@@ -16,6 +16,18 @@ namespace CoreSampleAnnotation
     {
         private string boreName = string.Empty;
 
+        private ILayerRankNamesSource layerRankNameSource;
+        public ILayerRankNamesSource LayerRankNameSource {
+            get
+            { return layerRankNameSource; }
+            set {
+                if (layerRankNameSource != value) {
+                    layerRankNameSource = value;
+                    RaisePropertyChanged(nameof(LayerRankNameSource));
+                }
+            }
+        }
+
         /// <summary>
         /// The name og the bore hole from where the core samples are extracted
         /// </summary>
@@ -85,8 +97,9 @@ namespace CoreSampleAnnotation
         }
 
         public void Initialize() {
+            layerRankNameSource = new Persistence.StaticLayerRankNamesSource();
             if(planeColumnSettingsVM == null)
-                planeColumnSettingsVM = new ColumnSettingsVM(LayersTemplateSource);            
+                planeColumnSettingsVM = new ColumnSettingsVM(LayersTemplateSource,LayerRankNameSource);            
         }
 
         public ProjectVM(IImageStorage imageStorage,ILayersTemplateSource layersTamplateSource) {            

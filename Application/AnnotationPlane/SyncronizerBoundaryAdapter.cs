@@ -111,7 +111,7 @@ namespace CoreSampleAnnotation.AnnotationPlane
             else
             {
                 LayerBoundary[] res = lbVMs.ToArray();
-                res[layerIdx] = new LayerBoundary(height + up, 0);
+                res[layerIdx] = new LayerBoundary(height + up, res[layerIdx].Rank);
                 boundariesVM.Boundaries = res;
             }
         }

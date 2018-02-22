@@ -100,13 +100,23 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="AnnotationPlane\ColumnSettings\LayerEditColumnDefinitionView.xaml.cs">
+      <DependentUpon>LayerEditColumnDefinitionView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="AnnotationPlane\ColumnSettings\LayerEditColumnDefinitionVM.cs" />
     <Compile Include="AnnotationPlane\ColumnSettings\LayeredTextColumnDefinitionView.xaml.cs">
       <DependentUpon>LayeredTextColumnDefinitionView.xaml</DependentUpon>
     </Compile>
+    <Compile Include="AnnotationPlane\Columns\BlankColumnView.xaml.cs">
+      <DependentUpon>BlankColumnView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="AnnotationPlane\Columns\BlankColumnVM.cs" />
+    <Compile Include="AnnotationPlane\LayerBoundaries\ILayerBoundariesVM.cs" />
     <Compile Include="AnnotationPlane\LayerBoundaries\LayerLabel.xaml.cs">
       <DependentUpon>LayerLabel.xaml</DependentUpon>
     </Compile>
     <Compile Include="AnnotationPlane\LayerBoundaries\LayerBoundaryEditorVM.cs" />
+    <Compile Include="AnnotationPlane\LayerBoundaries\RankFilteringBoundaryCollection.cs" />
     <Compile Include="AnnotationPlane\LayersAnnotation.cs" />
     <Compile Include="AnnotationPlane\AnnotationGrid.xaml.cs">
       <DependentUpon>AnnotationGrid.xaml</DependentUpon>
@@ -136,14 +146,14 @@
     <Compile Include="AnnotationPlane\ColumnSettings\PhotoColumnDefinitionView.xaml.cs">
       <DependentUpon>PhotoColumnDefinitionView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="AnnotationPlane\ColumnView.xaml.cs">
+    <Compile Include="AnnotationPlane\Columns\ColumnView.xaml.cs">
       <DependentUpon>ColumnView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="AnnotationPlane\ColumnVM.cs" />
-    <Compile Include="AnnotationPlane\DepthAxisView.xaml.cs">
+    <Compile Include="AnnotationPlane\Columns\ColumnVM.cs" />
+    <Compile Include="AnnotationPlane\Columns\DepthAxisView.xaml.cs">
       <DependentUpon>DepthAxisView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="AnnotationPlane\ImageColumnView.xaml.cs" />
+    <Compile Include="AnnotationPlane\Columns\ImageColumnView.xaml.cs" />
     <Compile Include="AnnotationPlane\LayerDepthPropertyView.xaml.cs">
       <DependentUpon>LayerDepthPropertyView.xaml</DependentUpon>
     </Compile>
@@ -167,6 +177,7 @@
     <Compile Include="AnnotationPlane\Template\Class.cs" />
     <Compile Include="AnnotationPlane\Template\InputField.cs" />
     <Compile Include="AnnotationPlane\Template\Property.cs" />
+    <Compile Include="ILayerRankNamesSource.cs" />
     <Compile Include="ILayersTemplateSource.cs" />
     <Compile Include="Intervals\BoreIntervalsView.xaml.cs">
       <DependentUpon>BoreIntervalsView.xaml</DependentUpon>
@@ -213,6 +224,7 @@
     <Compile Include="Persistence\HardcodedLayerTemplate.cs" />
     <Compile Include="Persistence\JsonNetInterfaceBinder.cs" />
     <Compile Include="Persistence\PathUtils.cs" />
+    <Compile Include="Persistence\StaticLayerRankNamesSource.cs" />
     <Compile Include="PhotoMarkup\AnnotatedPolygon.xaml.cs">
       <DependentUpon>AnnotatedPolygon.xaml</DependentUpon>
     </Compile>
@@ -268,6 +280,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="AnnotationPlane\ColumnSettings\LayerEditColumnDefinitionView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="AnnotationPlane\ColumnSettings\LayeredTextColumnDefinitionView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -280,15 +296,19 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="AnnotationPlane\ColumnView.xaml">
+    <Page Include="AnnotationPlane\Columns\BlankColumnView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="AnnotationPlane\Columns\ColumnView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="AnnotationPlane\DepthAxisView.xaml">
+    <Page Include="AnnotationPlane\Columns\DepthAxisView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="AnnotationPlane\ImageColumnView.xaml">
+    <Page Include="AnnotationPlane\Columns\ImageColumnView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>

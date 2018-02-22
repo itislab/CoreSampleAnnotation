@@ -6,7 +6,8 @@
              xmlns:local="clr-namespace:CoreSampleAnnotation.AnnotationPlane.LayerBoundaries"
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300">
-    <Grid>
-        <Rectangle Width="80" Height="40" Fill="Red" Name="Rect" Opacity="0.5"/>
+    <Grid Width="100" Height="40">
+        <Rectangle HorizontalAlignment="Stretch" Height="40" Fill="Red" Name="Rect" Opacity="0.5"/>
+        <TextBlock VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="16" Text="{Binding Number, FallbackValue=NA}"></TextBlock>
     </Grid>
 </UserControl>

@@ -27,10 +27,13 @@
         <DataTemplate DataType="{x:Type bounds:LayerBoundary}">
             <bounds:LayerLabel/>
         </DataTemplate>
+        <DataTemplate DataType="{x:Type local:BlankColumnVM}">
+            <local:BlankColumnView />
+        </DataTemplate>
         <DataTemplate DataType="{x:Type bounds:BoundaryEditorColumnVM}">
             <Grid>
                 <ContentPresenter Content="{Binding ColumnVM}" ClipToBounds="True"/>
-                <ItemsControl ItemsSource="{Binding BoundaryEditorVM.Boundaries}">
+                <ItemsControl ItemsSource="{Binding BoundariesVM.Boundaries}">
                     <ItemsControl.ItemsPanel>
                         <ItemsPanelTemplate>
                             <Canvas />

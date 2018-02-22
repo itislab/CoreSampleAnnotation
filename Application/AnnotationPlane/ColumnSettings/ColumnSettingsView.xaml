@@ -23,6 +23,7 @@
             <Button Style="{StaticResource MetroButton}" Command="{Binding AddDepthCommand}">шкала глубин</Button>
             <Button Style="{StaticResource MetroButton}" Command="{Binding AddPhotoCommand}">фото</Button>
             <Button Style="{StaticResource MetroButton}" Command="{Binding AddLayerLengthCommand}">мощность слоя</Button>
+            <Button Style="{StaticResource MetroButton}" Command="{Binding AddLayerBoundsCommand}">Границы слоев</Button>
             <Button Style="{StaticResource MetroButton}" Command="{Binding AddLayerPropCommand}">свойство слоя</Button>
         </StackPanel>
         </StackPanel>

@@ -275,7 +275,7 @@ namespace CoreSampleAnnotation.AnnotationPlane
 
 
             AnnoGridVM = new AnnotationGridVM();
-            classificationVM = new ClassificationVM();
+            classificationVM = new ClassificationVM();                       
 
             ElementDropped = new DelegateCommand(obj =>
             {
@@ -321,6 +321,20 @@ namespace CoreSampleAnnotation.AnnotationPlane
                     }
                 }
                 else {
+                    //dealing with rank change
+                    int colIdx = edea.ColumnIdx;
+                    if (colIdx != -1) {
+                        //drop is in one of the column
+                        BoundaryEditorColumnVM becVM = AnnoGridVM.Columns[colIdx] as BoundaryEditorColumnVM;
+                        if (becVM != null) {
+                            //this is boundary editor column. Setting rank according to the column
+                            RankFilteringBoundaryCollection rfbc = becVM.BoundariesVM as RankFilteringBoundaryCollection;
+                            if (rfbc != null) {
+                                //this column is attached to rank filtering VM
+                                layerBoundaryEditorVM.ChangeRank(boundary.ID, rfbc.Rank);
+                            }
+                        }
+                    }
                     System.Diagnostics.Debug.WriteLine("Changing layer {0} bottom from {1} to {2}", boundIdx, prevBottom, edea.WpfTopOffset);
                     double newHeight = edea.WpfTopOffset - prevTop;
                     layerSyncController.MoveBoundary(boundIdx, newHeight);
@@ -473,6 +487,11 @@ namespace CoreSampleAnnotation.AnnotationPlane
                 RegisterForScaleSync(columnVM, false);
                 LayerProps.Add(columnVM);
             }
+
+            var syncAdapter = new SyncronizerBoundaryAdapter(layerBoundaryEditorVM);
+
+            LayerSyncController.RegisterColumn(syncAdapter);
+            ColScaleController.AttachToColumn(syncAdapter);
         }
 
         public void SetPresentationColumns(ColumnSettingsVM columnDefinitions, Intervals.PhotoRegion[] photos)
@@ -512,17 +531,12 @@ namespace CoreSampleAnnotation.AnnotationPlane
                 else if (columnDefinition is PhotoColumnDefinitionVM)
                 {
                     ImageColumnVM imColVM = new ImageColumnVM("Фото керна");
-                    BoundaryEditorColumnVM beVM = new BoundaryEditorColumnVM(imColVM, layerBoundaryEditorVM);
-
-                    var syncAdapter = new SyncronizerBoundaryAdapter(layerBoundaryEditorVM);
-
+                    //BoundaryEditorColumnVM beVM = new BoundaryEditorColumnVM(imColVM, layerBoundaryEditorVM);
+                    
                     imColVM.ColumnHeight = colHeight;
                     imColVM.ImageRegions = photos;
-                    AnnoGridVM.Columns.Add(beVM);
+                    AnnoGridVM.Columns.Add(imColVM);
                     RegisterForScaleSync(imColVM, true);
-
-                    LayerSyncController.RegisterColumn(syncAdapter);
-                    ColScaleController.AttachToColumn(syncAdapter);
                 }
                 else if (columnDefinition is LayeredTextColumnDefinitionVM)
                 {
@@ -562,6 +576,20 @@ namespace CoreSampleAnnotation.AnnotationPlane
 
                         AnnoGridVM.Columns.Add(colVM);
                     }
+                }
+                else if (columnDefinition is LayerEditColumnDefinitionVM) {
+                    LayerEditColumnDefinitionVM colDef = (LayerEditColumnDefinitionVM)columnDefinition;
+                    int rank = colDef.SelectedIndex;
+                    string heading = string.Format("Границы между {0}",colDef.Selected.ToLowerInvariant());
+                    BlankColumnVM blankColumnVM = new BlankColumnVM(heading);
+                    RankFilteringBoundaryCollection filter = new RankFilteringBoundaryCollection(layerBoundaryEditorVM, rank);
+
+                    BoundaryEditorColumnVM beVM = new BoundaryEditorColumnVM(blankColumnVM, filter);
+
+                    blankColumnVM.ColumnHeight = colHeight;
+                    blankColumnVM.ColumnWidth = 100;
+                    AnnoGridVM.Columns.Add(beVM);
+                    RegisterForScaleSync(blankColumnVM, true);
                 }
                 else throw new NotSupportedException("Незнакомое определение колонки");
             }
