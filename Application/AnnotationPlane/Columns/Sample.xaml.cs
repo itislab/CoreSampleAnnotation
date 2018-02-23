@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CoreSampleAnnotation.AnnotationPlane.LayerBoundaries;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -13,28 +14,25 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace CoreSampleAnnotation.AnnotationPlane.LayerBoundaries
+namespace CoreSampleAnnotation.AnnotationPlane.Columns
 {
-    public class DragStartEventArgs : EventArgs {
-        public MouseEventArgs MouseEvent { get; set; }
-        public FrameworkElement FrameworkElement { get; set; }
-    }
-
     /// <summary>
-    /// Interaction logic for LayerLabel.xaml
+    /// Interaction logic for Sample.xaml
     /// </summary>
-    public partial class LayerLabel : UserControl
+    public partial class Sample : UserControl
     {
-        public LayerLabel()
+        public Sample()
         {
             InitializeComponent();
-            this.PreviewMouseDown += Rect_PreviewMouseDown;
-        }        
+            PreviewMouseDown += Sample_PreviewMouseDown;
+        }
 
-        private void Rect_PreviewMouseDown(object sender, MouseButtonEventArgs e)
-        {            
-            LayerBoundary vm = DataContext as LayerBoundary;
-            if (vm != null) {
+        private void Sample_PreviewMouseDown(object sender, MouseButtonEventArgs e)
+        {
+            System.Diagnostics.Trace.WriteLine("label clicked");
+            SampleVM vm = DataContext as SampleVM;
+            if (vm != null)
+            {
                 if (vm.DragStarted != null)
                 {
                     DragStartEventArgs dsea = new DragStartEventArgs();
@@ -43,6 +41,6 @@ namespace CoreSampleAnnotation.AnnotationPlane.LayerBoundaries
                     vm.DragStarted.Execute(dsea);
                 }
             }
-        }
+        }        
     }
 }

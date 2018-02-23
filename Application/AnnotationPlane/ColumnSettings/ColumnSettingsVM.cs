@@ -42,6 +42,7 @@ namespace CoreSampleAnnotation.AnnotationPlane.ColumnSettings
         public ICommand AddLayerLengthCommand { get; private set; }
         public ICommand AddLayerPropCommand { get; private set; }
         public ICommand AddLayerBoundsCommand { get; private set; }
+        public ICommand AddLayerSamplesCommand { get; private set; }
 
         private ICommand activateAnnotationPlaneCommand;
         public ICommand ActivateAnnotationPlaneCommand {
@@ -100,15 +101,13 @@ namespace CoreSampleAnnotation.AnnotationPlane.ColumnSettings
             var ranks = layerRankNameSource.InstrumentalMultipleNames.Reverse().ToArray();
             foreach (string rank in ranks)
             {
-
                 LayerEditColumnDefinitionVM column = new LayerEditColumnDefinitionVM(layerRankNameSource);
                 column.Selected = rank;
-                InitializeColumn(column);
                 result.Add(column);
-
+                ColumnDefinitions = result.ToArray(); // As InitializeColumn uses ColumnDefinitions
+                InitializeColumn(column);                
             }
-            ColumnDefinitions = result.ToArray();
-      
+            
             AddDepthCommand.Execute(null);
             AddPhotoCommand.Execute(null);            
         }
@@ -145,6 +144,22 @@ namespace CoreSampleAnnotation.AnnotationPlane.ColumnSettings
             {
                 List<ColumnDefinitionVM> result = new List<ColumnDefinitionVM>(ColumnDefinitions);
                 ColumnDefinitionVM column = new LayeredTextColumnDefinitionVM(layersTemplateSource);
+                InitializeColumn(column);
+                result.Add(column);
+                ColumnDefinitions = result.ToArray();
+            });
+
+            AddLayerBoundsCommand = new DelegateCommand(() => {
+                List<ColumnDefinitionVM> result = new List<ColumnDefinitionVM>(ColumnDefinitions);
+                ColumnDefinitionVM column = new LayerEditColumnDefinitionVM(layerRankNameSource);
+                InitializeColumn(column);
+                result.Add(column);
+                ColumnDefinitions = result.ToArray();
+            });
+
+            AddLayerSamplesCommand = new DelegateCommand(() => {
+                List<ColumnDefinitionVM> result = new List<ColumnDefinitionVM>(ColumnDefinitions);
+                ColumnDefinitionVM column = new LayerSamplesDefinitionVM();
                 InitializeColumn(column);
                 result.Add(column);
                 ColumnDefinitions = result.ToArray();
@@ -204,13 +219,7 @@ namespace CoreSampleAnnotation.AnnotationPlane.ColumnSettings
                     return false;
             });
 
-            AddLayerBoundsCommand = new DelegateCommand(() => {
-                List<ColumnDefinitionVM> result = new List<ColumnDefinitionVM>(ColumnDefinitions);
-                ColumnDefinitionVM column = new LayerEditColumnDefinitionVM(layerRankNameSource);
-                InitializeColumn(column);
-                result.Add(column);
-                ColumnDefinitions = result.ToArray();
-            });
+           
         }
 
         #region Serialization

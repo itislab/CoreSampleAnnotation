@@ -24,6 +24,9 @@
         <DataTemplate DataType="{x:Type local:LayerEditColumnDefinitionVM}">
             <local:LayerEditColumnDefinitionView />
         </DataTemplate>
+        <DataTemplate DataType="{x:Type local:LayerSamplesDefinitionVM}">
+            <TextBlock VerticalAlignment="Center" FontSize="20">Колонка с образцами</TextBlock>
+        </DataTemplate>
         <core:VisibilityHiddenConverter x:Key="visibilityHiddenConverter" />
     </UserControl.Resources>
     <Grid>

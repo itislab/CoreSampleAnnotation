@@ -16,6 +16,14 @@ namespace CoreSampleAnnotation.AnnotationPlane.ColumnSettings
     }
 
     [Serializable]
+    public class LayerSamplesDefinitionVM : ColumnDefinitionVM, ISerializable
+    {
+        public LayerSamplesDefinitionVM() { }
+
+        protected LayerSamplesDefinitionVM(SerializationInfo info, StreamingContext context):base(info,context) { }
+    }
+
+    [Serializable]
     public class LayerLengthColumnDefinitionVM : ColumnDefinitionVM, ISerializable
     {
         public LayerLengthColumnDefinitionVM() { }

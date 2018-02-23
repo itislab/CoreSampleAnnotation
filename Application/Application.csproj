@@ -111,6 +111,10 @@
       <DependentUpon>BlankColumnView.xaml</DependentUpon>
     </Compile>
     <Compile Include="AnnotationPlane\Columns\BlankColumnVM.cs" />
+    <Compile Include="AnnotationPlane\Columns\Sample.xaml.cs">
+      <DependentUpon>Sample.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="AnnotationPlane\Columns\SamplesColumnVM.cs" />
     <Compile Include="AnnotationPlane\LayerBoundaries\BoundaryLineColumnVM.cs" />
     <Compile Include="AnnotationPlane\LayerBoundaries\ILayerBoundariesVM.cs" />
     <Compile Include="AnnotationPlane\LayerBoundaries\LayerLabel.xaml.cs">
@@ -313,6 +317,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
+    <Page Include="AnnotationPlane\Columns\Sample.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="AnnotationPlane\LayerBoundaries\LayerLabel.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -479,6 +487,7 @@
   <ItemGroup>
     <Resource Include="credits\ApertureIcon.txt" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

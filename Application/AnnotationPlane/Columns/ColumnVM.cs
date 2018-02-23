@@ -94,7 +94,17 @@ namespace CoreSampleAnnotation.AnnotationPlane
             this.heading = heading;
         }
 
+        protected double WPFtoRealDepth(double wpfDepth) {
+            double scaleFactor = (lowerBound - upperBound) / ColumnHeight;
+            return wpfDepth * scaleFactor + upperBound;
+        }
 
+        /// <param name="depth">in meters</param>
+        /// <returns></returns>
+        protected double RealDepthToWPF(double depth) {
+            double scaleFactor = (lowerBound - upperBound) / ColumnHeight;
+            return (depth - upperBound) / scaleFactor;
+        }
     }
 
     public class DepthAxisColumnVM : ColumnVM

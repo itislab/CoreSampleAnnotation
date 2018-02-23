@@ -78,25 +78,26 @@ namespace CoreSampleAnnotation.AnnotationPlane
                 }
             }
         }
-        
+
         /// <param name="layerIdx">index of inner (between layers) boundaries</param>
         private void RemoveLayerBoundary(int layerIdx, LayerSyncronization.FreeSpaceAccepter freeSpaceAccepter)
         {
-            layerBoundaryEditorVM.RemoveBoundary(layerIdx);            
-                switch (freeSpaceAccepter)
-                {
-                    case LayerSyncronization.FreeSpaceAccepter.LowerLayer:
-                        LayerSyncController.RemoveLayer(layerIdx, freeSpaceAccepter); break;
-                    case LayerSyncronization.FreeSpaceAccepter.UpperLayer:
-                        LayerSyncController.RemoveLayer(layerIdx+1, freeSpaceAccepter); break;
-                    default: throw new NotImplementedException();
-                }
-                
+            layerBoundaryEditorVM.RemoveBoundary(layerIdx);
+            switch (freeSpaceAccepter)
+            {
+                case LayerSyncronization.FreeSpaceAccepter.LowerLayer:
+                    LayerSyncController.RemoveLayer(layerIdx, freeSpaceAccepter); break;
+                case LayerSyncronization.FreeSpaceAccepter.UpperLayer:
+                    LayerSyncController.RemoveLayer(layerIdx + 1, freeSpaceAccepter); break;
+                default: throw new NotImplementedException();
+            }
+
         }
 
         /// <param name="layerIdx">index of inner (between layers) boundaries</param>
         /// <param name="level">in WPF units</param>
-        private void MoveLayerBoundary(int layerIdx, double level) {
+        private void MoveLayerBoundary(int layerIdx, double level)
+        {
             layerBoundaryEditorVM.MoveBoundary(layerIdx, level);
             double up = 0.0;
             if (layerIdx > 0)
@@ -104,8 +105,9 @@ namespace CoreSampleAnnotation.AnnotationPlane
             LayerSyncController.MoveBoundary(layerIdx, level - up);
         }
 
-        private void AddBoundary(double level) {
-            layerBoundaryEditorVM.AddBoundary(0,level);
+        private void AddBoundary(double level)
+        {
+            layerBoundaryEditorVM.AddBoundary(0, level);
             LayerSyncController.SplitLayer(level);
         }
 
@@ -123,6 +125,8 @@ namespace CoreSampleAnnotation.AnnotationPlane
 
         private Dictionary<FullClassID, LayerClassVM> classVMs = new Dictionary<FullClassID, LayerClassVM>();
         private readonly Dictionary<string, IEnumerable<LayerClassVM>> availableClasses = new Dictionary<string, IEnumerable<LayerClassVM>>();
+
+        private SamplesColumnVM samplesColumnVM;
 
         /// <summary>
         /// 
@@ -234,6 +238,7 @@ namespace CoreSampleAnnotation.AnnotationPlane
         {
             this.layersTemplateSource = layersTemplateSource;
             this.layerBoundaryEditorVM = new LayerBoundaryEditorVM();
+            samplesColumnVM = new SamplesColumnVM();
             Initialize(annotation);
         }
 
@@ -305,68 +310,104 @@ namespace CoreSampleAnnotation.AnnotationPlane
 
 
             AnnoGridVM = new AnnotationGridVM();
-            classificationVM = new ClassificationVM();                       
+            classificationVM = new ClassificationVM();
+
 
             ElementDropped = new DelegateCommand(obj =>
             {
                 ElemDroppedEventArgs edea = obj as ElemDroppedEventArgs;
                 LayerBoundary boundary = edea.DroppedElement.Tag as LayerBoundary;
-                System.Diagnostics.Debug.WriteLine("dropped boundary {0} with offset {1} in {2} column", boundary.ID, edea.WpfTopOffset, edea.ColumnIdx);                
-                int boundIdx = Array.FindIndex(layerBoundaryEditorVM.Boundaries, b => b.ID == boundary.ID);
-                double prevTop = layerSyncController.GetLayerWPFTop(boundIdx);
-                double prevBottom = layerSyncController.GetLayerWPFBottom(boundIdx);
-                double nextBottom = layerSyncController.GetLayerWPFBottom(boundIdx + 1);
-                double newBottom = edea.WpfTopOffset;
-                if (newBottom <= prevTop)
+                SampleVM sample = edea.DroppedElement.Tag as SampleVM;
+                if (boundary != null)
                 {
-                    var res = MessageBox.Show(
-                        string.Format("Удалить границу слоев на глубине {0:#.##}м заполнив путое место информацией из слоя снизу?", layerSyncController.WpfToDepth(boundary.Level)),
-                        "Удаление слоя", MessageBoxButton.OKCancel, MessageBoxImage.Question);
-                    switch (res) {
-                        case MessageBoxResult.OK:
-                            RemoveLayerBoundary(boundIdx, LayerSyncronization.FreeSpaceAccepter.LowerLayer);
-                            break;
-                        case MessageBoxResult.Cancel:
-                            layerBoundaryEditorVM.Boundaries = layerBoundaryEditorVM.Boundaries.ToArray(); // this recreates all views, after the boundary label dragging
-                            break;
-                        default: throw new NotImplementedException();
-                    }
-
-                }
-                else if (newBottom >= nextBottom)
-                {
-                    var res = MessageBox.Show(
-                    string.Format("Удалить границу слоев на глубине {0:#.##}м заполнив путое место информацией из слоя сверху?", layerSyncController.WpfToDepth(boundary.Level)),
-                    "Удаление слоя", MessageBoxButton.OKCancel, MessageBoxImage.Question);
-                    switch (res)
+                    System.Diagnostics.Debug.WriteLine("dropped boundary {0} with offset {1} in {2} column", boundary.ID, edea.WpfTopOffset, edea.ColumnIdx);
+                    int boundIdx = Array.FindIndex(layerBoundaryEditorVM.Boundaries, b => b.ID == boundary.ID);
+                    double prevTop = layerSyncController.GetLayerWPFTop(boundIdx);
+                    double prevBottom = layerSyncController.GetLayerWPFBottom(boundIdx);
+                    double nextBottom = layerSyncController.GetLayerWPFBottom(boundIdx + 1);
+                    double newBottom = edea.WpfTopOffset;
+                    if (newBottom <= prevTop)
                     {
-                        case MessageBoxResult.OK:
-                            RemoveLayerBoundary(boundIdx, LayerSyncronization.FreeSpaceAccepter.UpperLayer);
-                            break;
-                        case MessageBoxResult.Cancel:
-                            layerBoundaryEditorVM.Boundaries = layerBoundaryEditorVM.Boundaries.ToArray(); // this recreates all views, after the boundary label dragging
-                            break;
-                        default: throw new NotImplementedException();
+                        var res = MessageBox.Show(
+                            string.Format("Удалить границу слоев на глубине {0:#.##}м заполнив путое место информацией из слоя снизу?", layerSyncController.WpfToDepth(boundary.Level)),
+                            "Удаление слоя", MessageBoxButton.OKCancel, MessageBoxImage.Question);
+                        switch (res)
+                        {
+                            case MessageBoxResult.OK:
+                                RemoveLayerBoundary(boundIdx, LayerSyncronization.FreeSpaceAccepter.LowerLayer);
+                                break;
+                            case MessageBoxResult.Cancel:
+                                layerBoundaryEditorVM.Boundaries = layerBoundaryEditorVM.Boundaries.ToArray(); // this recreates all views, after the boundary label dragging
+                                break;
+                            default: throw new NotImplementedException();
+                        }
+
                     }
-                }
-                else {
-                    //dealing with rank change
-                    int colIdx = edea.ColumnIdx;
-                    if (colIdx != -1) {
-                        //drop is in one of the column
-                        BoundaryEditorColumnVM becVM = AnnoGridVM.Columns[colIdx] as BoundaryEditorColumnVM;
-                        if (becVM != null) {
-                            //this is boundary editor column. Setting rank according to the column
-                            RankMatchingBoundaryCollection rfbc = becVM.BoundariesVM as RankMatchingBoundaryCollection;
-                            if (rfbc != null) {
-                                //this column is attached to rank filtering VM
-                                layerBoundaryEditorVM.ChangeRank(boundary.ID, rfbc.Rank);
-                            }
+                    else if (newBottom >= nextBottom)
+                    {
+                        var res = MessageBox.Show(
+                        string.Format("Удалить границу слоев на глубине {0:#.##}м заполнив путое место информацией из слоя сверху?", layerSyncController.WpfToDepth(boundary.Level)),
+                        "Удаление слоя", MessageBoxButton.OKCancel, MessageBoxImage.Question);
+                        switch (res)
+                        {
+                            case MessageBoxResult.OK:
+                                RemoveLayerBoundary(boundIdx, LayerSyncronization.FreeSpaceAccepter.UpperLayer);
+                                break;
+                            case MessageBoxResult.Cancel:
+                                layerBoundaryEditorVM.Boundaries = layerBoundaryEditorVM.Boundaries.ToArray(); // this recreates all views, after the boundary label dragging
+                                break;
+                            default: throw new NotImplementedException();
                         }
                     }
-                    System.Diagnostics.Debug.WriteLine("Changing layer {0} bottom from {1} to {2}", boundIdx, prevBottom, edea.WpfTopOffset);
-                    MoveLayerBoundary(boundIdx, edea.WpfTopOffset);                    
+                    else
+                    {
+                        //dealing with rank change
+                        int colIdx = edea.ColumnIdx;
+                        if (colIdx != -1)
+                        {
+                            //drop is in one of the column
+                            BoundaryEditorColumnVM becVM = AnnoGridVM.Columns[colIdx] as BoundaryEditorColumnVM;
+                            if (becVM != null)
+                            {
+                                //this is boundary editor column. Setting rank according to the column
+                                RankMatchingBoundaryCollection rfbc = becVM.BoundariesVM as RankMatchingBoundaryCollection;
+                                if (rfbc != null)
+                                {
+                                    //this column is attached to rank filtering VM
+                                    layerBoundaryEditorVM.ChangeRank(boundary.ID, rfbc.Rank);
+                                }
+                            }
+                        }
+                        System.Diagnostics.Debug.WriteLine("Changing layer {0} bottom from {1} to {2}", boundIdx, prevBottom, edea.WpfTopOffset);
+                        MoveLayerBoundary(boundIdx, edea.WpfTopOffset);
+                    }
                 }
+                else if (sample != null)
+                {
+                    System.Diagnostics.Debug.WriteLine("dropped smaple with offset {0}", edea.WpfTopOffset);
+                    if ((edea.ColumnIdx != -1) && (AnnoGridVM.Columns[edea.ColumnIdx] is SamplesColumnVM))
+                    {
+                        double depth = layerSyncController.WpfToDepth(edea.WpfTopOffset + 50);//TODO: grap center coord of the UI from UI, not from hardcoded value of 50
+                        sample.Depth = depth;
+                        samplesColumnVM.Samples = samplesColumnVM.Samples.ToArray(); //asignment forces refresh
+                    }
+                    else {                        
+                        var res = MessageBox.Show(
+                            string.Format("Удалить образец {0} с глубины {1:#.##}м?",sample.Number, sample.Depth),
+                            "Подтверждение удаления образца",
+                            MessageBoxButton.OKCancel,MessageBoxImage.Question);
+                        switch (res) {
+                            case MessageBoxResult.OK:
+                                samplesColumnVM.Samples = samplesColumnVM.Samples.Where(s => s != sample).ToArray();
+                                break;
+                            case MessageBoxResult.Cancel:
+                                samplesColumnVM.Samples = samplesColumnVM.Samples.ToArray(); //asignment forces refresh
+                                break;
+                            default: throw new NotImplementedException();
+                        }
+                    }
+                }
+                else throw new NotImplementedException("Сброшен незнакомый объект");
             });
 
             PointSelected = new DelegateCommand(obj =>
@@ -374,7 +415,7 @@ namespace CoreSampleAnnotation.AnnotationPlane
                 PointSelectedEventArgs psea = obj as PointSelectedEventArgs;
                 System.Diagnostics.Debug.WriteLine("Selected point with offset {0} in {1} column", psea.WpfTopOffset, psea.ColumnIdx);
 
-                Type[] newLayerTypes = new Type[] { typeof(ImageColumnVM), typeof(DepthAxisColumnVM) };
+                Type[] newLayerTypes = new Type[] { typeof(ImageColumnVM), typeof(DepthAxisColumnVM), typeof(BoundaryEditorColumnVM) };
                 ColumnVM relatedVM = AnnoGridVM.Columns[psea.ColumnIdx];
                 Type relatedVmType = relatedVM.GetType();
                 if (newLayerTypes.Contains(relatedVmType))
@@ -392,6 +433,15 @@ namespace CoreSampleAnnotation.AnnotationPlane
                         classificationVM.LayerVM = clpmv.ClassificationVM;
                         classificationVM.IsVisible = true;
                     }
+                }
+                else if (typeof(SamplesColumnVM) == relatedVmType)
+                {
+                    SamplesColumnVM scVM = (SamplesColumnVM)relatedVM;
+                    double depth = layerSyncController.WpfToDepth(psea.WpfTopOffset);
+                    SampleVM sampleVM = new SampleVM(depth);
+                    List<SampleVM> l = new List<SampleVM>(scVM.Samples);
+                    l.Add(sampleVM);
+                    scVM.Samples = l.ToArray();
                 }
             });
 
@@ -444,7 +494,7 @@ namespace CoreSampleAnnotation.AnnotationPlane
             {
                 if (DragReferenceElem != null)
                 {
-                    LayerBoundaries.DragStartEventArgs dsea = args as LayerBoundaries.DragStartEventArgs;
+                    DragStartEventArgs dsea = args as LayerBoundaries.DragStartEventArgs;
                     Point startDragCoord = dsea.MouseEvent.GetPosition(DragReferenceElem);
                     Point localDragOffset = dsea.MouseEvent.GetPosition(dsea.FrameworkElement);
                     Point dragItemLocation = startDragCoord - new Vector(localDragOffset.X, localDragOffset.Y);
@@ -453,8 +503,9 @@ namespace CoreSampleAnnotation.AnnotationPlane
                     dsea.FrameworkElement.Tag = dsea.FrameworkElement.DataContext; // storing original data context in tag befor the element is moved out of the UI tree
                     AnnoGridVM.DraggedItem = dsea.FrameworkElement;
                 }
-
             });
+
+            samplesColumnVM.DragStart = layerBoundaryEditorVM.DragStart;
 
             double colHeight = LayerSyncController.DepthToWPF(lowerDepth) - LayerSyncController.DepthToWPF(upperDepth);
 
@@ -516,9 +567,12 @@ namespace CoreSampleAnnotation.AnnotationPlane
                 LayerProps.Add(columnVM);
             }
 
+            samplesColumnVM.ColumnHeight = colHeight;
+            RegisterForScaleSync(samplesColumnVM, false);
+
             var syncAdapter = new SyncronizerBoundaryAdapter(layerBoundaryEditorVM);
 
-//            LayerSyncController.RegisterColumn(syncAdapter);
+            //            LayerSyncController.RegisterColumn(syncAdapter);
             ColScaleController.AttachToColumn(syncAdapter);
         }
 
@@ -560,7 +614,7 @@ namespace CoreSampleAnnotation.AnnotationPlane
                 {
                     ImageColumnVM imColVM = new ImageColumnVM("Фото керна");
                     //BoundaryEditorColumnVM beVM = new BoundaryEditorColumnVM(imColVM, layerBoundaryEditorVM);
-                    
+
                     imColVM.ColumnHeight = colHeight;
                     imColVM.ImageRegions = photos;
                     AnnoGridVM.Columns.Add(imColVM);
@@ -605,22 +659,27 @@ namespace CoreSampleAnnotation.AnnotationPlane
                         AnnoGridVM.Columns.Add(colVM);
                     }
                 }
-                else if (columnDefinition is LayerEditColumnDefinitionVM) {
+                else if (columnDefinition is LayerEditColumnDefinitionVM)
+                {
                     LayerEditColumnDefinitionVM colDef = (LayerEditColumnDefinitionVM)columnDefinition;
                     int rank = colDef.SelectedIndex;
-                    string heading = string.Format("Границы между {0}",colDef.Selected.ToLowerInvariant());
+                    string heading = string.Format("Границы между {0}", colDef.Selected.ToLowerInvariant());
                     BlankColumnVM blankColumnVM = new BlankColumnVM(heading);
                     RankMoreOrEqualBoundaryCollection filter = new RankMoreOrEqualBoundaryCollection(layerBoundaryEditorVM, rank);
                     RankMatchingBoundaryCollection filter2 = new RankMatchingBoundaryCollection(layerBoundaryEditorVM, rank);
 
                     BoundaryLineColumnVM blVM = new BoundaryLineColumnVM(blankColumnVM, filter);
                     BoundaryEditorColumnVM beVM = new BoundaryEditorColumnVM(blVM, filter2);
-                    
+
 
                     blankColumnVM.ColumnHeight = colHeight;
                     blankColumnVM.ColumnWidth = 100;
                     AnnoGridVM.Columns.Add(beVM);
                     RegisterForScaleSync(blankColumnVM, true);
+                }
+                else if (columnDefinition is LayerSamplesDefinitionVM)
+                {
+                    AnnoGridVM.Columns.Add(samplesColumnVM);
                 }
                 else throw new NotSupportedException("Незнакомое определение колонки");
             }
@@ -632,7 +691,8 @@ namespace CoreSampleAnnotation.AnnotationPlane
         {
             LayersAnnotation layersAnnotation = (LayersAnnotation)info.GetValue("LayersAnnotation", typeof(LayersAnnotation));
             layersTemplateSource = (ILayersTemplateSource)info.GetValue("LayersTemplate", typeof(ILayersTemplateSource));
-            layerBoundaryEditorVM = (LayerBoundaryEditorVM)info.GetValue("LayerBoundaries", typeof(LayerBoundaryEditorVM));            
+            layerBoundaryEditorVM = (LayerBoundaryEditorVM)info.GetValue("LayerBoundaries", typeof(LayerBoundaryEditorVM));
+            samplesColumnVM = (SamplesColumnVM)info.GetValue("Samples",typeof(SamplesColumnVM));
             Initialize(layersAnnotation);
         }
 
@@ -672,7 +732,7 @@ namespace CoreSampleAnnotation.AnnotationPlane
                 }
                 return new ColumnValues() { PropID = col.Heading, LayerValues = values.ToArray() };
             }).ToArray();
-
+            info.AddValue("Samples",samplesColumnVM);
             info.AddValue("LayersAnnotation", layersAnnotation);
             info.AddValue("LayersTemplate", layersTemplateSource);
             info.AddValue("LayerBoundaries", layerBoundaryEditorVM);

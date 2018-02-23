@@ -5,10 +5,12 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:CoreSampleAnnotation.AnnotationPlane"
              xmlns:app="clr-namespace:CoreSampleAnnotation"
+             xmlns:columns="clr-namespace:CoreSampleAnnotation.AnnotationPlane.Columns"
              xmlns:bounds="clr-namespace:CoreSampleAnnotation.AnnotationPlane.LayerBoundaries"
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300">
     <UserControl.Resources>
+        <local:SampleOffsetConverter x:Key="sampleOffsetConverter"/>
         <DataTemplate DataType="{x:Type local:DepthAxisColumnVM}">
             <local:DepthAxisView />
         </DataTemplate>
@@ -23,6 +25,32 @@
         </DataTemplate>
         <DataTemplate DataType="{x:Type app:ViewModel}">
             <TextBlock>Column template is not set</TextBlock>
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type local:SamplesColumnVM}">
+            <ItemsControl ItemsSource="{Binding Samples}" Width="100">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <Canvas />
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemContainerStyle>
+                    <Style TargetType="ContentPresenter">
+                        <Setter Property="Canvas.Top">
+                            <Setter.Value>
+                                <MultiBinding Converter="{StaticResource sampleOffsetConverter}">
+                                    <Binding Path="Level" />
+                                    <Binding RelativeSource="{RelativeSource Self}" Path="ActualHeight"/>
+                                </MultiBinding>
+                            </Setter.Value>
+                        </Setter>
+                    </Style>
+                </ItemsControl.ItemContainerStyle>
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <columns:Sample/>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
         </DataTemplate>
         <DataTemplate DataType="{x:Type bounds:LayerBoundary}">
             <bounds:LayerLabel/>
@@ -78,7 +106,7 @@
             </Grid>
         </DataTemplate>
     </UserControl.Resources>
-    <Border Background="AliceBlue">
+    <Border Background="White">
         <ContentPresenter Content="{Binding}" ClipToBounds="True"/>
     </Border>
 </UserControl>
