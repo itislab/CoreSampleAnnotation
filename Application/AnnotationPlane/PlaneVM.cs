@@ -632,7 +632,7 @@ namespace CoreSampleAnnotation.AnnotationPlane
         {
             LayersAnnotation layersAnnotation = (LayersAnnotation)info.GetValue("LayersAnnotation", typeof(LayersAnnotation));
             layersTemplateSource = (ILayersTemplateSource)info.GetValue("LayersTemplate", typeof(ILayersTemplateSource));
-            layerBoundaryEditorVM = new LayerBoundaryEditorVM();
+            layerBoundaryEditorVM = (LayerBoundaryEditorVM)info.GetValue("LayerBoundaries", typeof(LayerBoundaryEditorVM));            
             Initialize(layersAnnotation);
         }
 
@@ -675,6 +675,7 @@ namespace CoreSampleAnnotation.AnnotationPlane
 
             info.AddValue("LayersAnnotation", layersAnnotation);
             info.AddValue("LayersTemplate", layersTemplateSource);
+            info.AddValue("LayerBoundaries", layerBoundaryEditorVM);
         }
 
         #endregion

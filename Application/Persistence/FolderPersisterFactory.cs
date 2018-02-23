@@ -13,6 +13,7 @@ namespace CoreSampleAnnotation.Persistence
     {
         readonly private string imagesDirectory = "Photos";
         readonly private string layersTemplateDirectory = "LayersTemplate";
+        readonly private string layersRankFile = "LayerRanks.csv";
 
         public bool TryCreateNew(out IProjectPersister persister)
         {
@@ -46,13 +47,16 @@ namespace CoreSampleAnnotation.Persistence
                         var imageStorage = new FolderImageStorage(System.IO.Path.Combine(path, imagesDirectory));
 
                         //coping default layer template
-                        string defaultTemplatePath = Path.Combine(System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location),"DefaultLayersTemplate");
+                        string exeLocation = Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location);
+                        string defaultTemplatePath = Path.Combine(exeLocation, "DefaultLayersTemplate");
                         PathUtils.DeepCopy(defaultTemplatePath, Path.Combine(path, layersTemplateDirectory));
                         var layersTemplate = new FolderLayersTemplateSource(Path.Combine(path, layersTemplateDirectory));
+                        File.Copy(Path.Combine(exeLocation, "DefaultLayerRanks.csv"), Path.Combine(path, layersRankFile));
+                        var layerRanks = new CsvFileLayerRankSource(Path.Combine(path, layersRankFile));
 
                         Directory.SetCurrentDirectory(path); //after this the paths in project will be relative
 
-                        persister.SaveProject(new ProjectVM(imageStorage, layersTemplate)); //new clean project is dumped to disk
+                        persister.SaveProject(new ProjectVM(imageStorage, layersTemplate, layerRanks)); //new clean project is dumped to disk
                         
                         return true;
                     default:

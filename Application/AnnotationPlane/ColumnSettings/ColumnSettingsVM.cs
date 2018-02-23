@@ -96,8 +96,21 @@ namespace CoreSampleAnnotation.AnnotationPlane.ColumnSettings
             Initialize();
 
             //default column set
+            List<ColumnDefinitionVM> result = new List<ColumnDefinitionVM>();
+            var ranks = layerRankNameSource.InstrumentalMultipleNames.Reverse().ToArray();
+            foreach (string rank in ranks)
+            {
+
+                LayerEditColumnDefinitionVM column = new LayerEditColumnDefinitionVM(layerRankNameSource);
+                column.Selected = rank;
+                InitializeColumn(column);
+                result.Add(column);
+
+            }
+            ColumnDefinitions = result.ToArray();
+      
             AddDepthCommand.Execute(null);
-            AddPhotoCommand.Execute(null);
+            AddPhotoCommand.Execute(null);            
         }
 
         protected virtual void Initialize() {
@@ -193,7 +206,7 @@ namespace CoreSampleAnnotation.AnnotationPlane.ColumnSettings
 
             AddLayerBoundsCommand = new DelegateCommand(() => {
                 List<ColumnDefinitionVM> result = new List<ColumnDefinitionVM>(ColumnDefinitions);
-                ColumnDefinitionVM column = new LayerEditColumnDefinitionVM(layerRankNameSource.GetInstrumentalMultipleNames);
+                ColumnDefinitionVM column = new LayerEditColumnDefinitionVM(layerRankNameSource);
                 InitializeColumn(column);
                 result.Add(column);
                 ColumnDefinitions = result.ToArray();
@@ -203,7 +216,7 @@ namespace CoreSampleAnnotation.AnnotationPlane.ColumnSettings
         #region Serialization
         protected ColumnSettingsVM(SerializationInfo info, StreamingContext context) {
             layersTemplateSource = (ILayersTemplateSource)info.GetValue("LayersTemplateSource", typeof(ILayersTemplateSource));
-            layerRankNameSource = new Persistence.StaticLayerRankNamesSource();
+            layerRankNameSource = (ILayerRankNamesSource)info.GetValue("LayerRankNameSource", typeof(ILayerRankNamesSource));            
             columnDefinitions = (ColumnDefinitionVM[])info.GetValue("Columns",typeof(ColumnDefinitionVM[]));            
             Initialize();
             foreach (var col in columnDefinitions)
@@ -213,6 +226,7 @@ namespace CoreSampleAnnotation.AnnotationPlane.ColumnSettings
         public void GetObjectData(SerializationInfo info, StreamingContext context)
         {
             info.AddValue("LayersTemplateSource", layersTemplateSource);
+            info.AddValue("LayerRankNameSource", layerRankNameSource);
             info.AddValue("Columns", OrderedColumnDefinitions);            
         }
         #endregion

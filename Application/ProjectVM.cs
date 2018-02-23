@@ -56,8 +56,7 @@ namespace CoreSampleAnnotation
                     RaisePropertyChanged(nameof(LayersTemplateSource));
                 }
             }
-        }
-
+        }        
 
         private BoreIntervalsVM boreIntervalsVM;
         public BoreIntervalsVM BoreIntervalsVM {
@@ -96,15 +95,15 @@ namespace CoreSampleAnnotation
             }
         }
 
-        public void Initialize() {
-            layerRankNameSource = new Persistence.StaticLayerRankNamesSource();
+        public void Initialize() {            
             if(planeColumnSettingsVM == null)
                 planeColumnSettingsVM = new ColumnSettingsVM(LayersTemplateSource,LayerRankNameSource);            
         }
 
-        public ProjectVM(IImageStorage imageStorage,ILayersTemplateSource layersTamplateSource) {            
+        public ProjectVM(IImageStorage imageStorage,ILayersTemplateSource layersTemplateSource, ILayerRankNamesSource layerRankSource) {            
             boreIntervalsVM = new BoreIntervalsVM(imageStorage);
-            this.layersTemplateSource = layersTamplateSource;            
+            this.layerRankNameSource = layerRankSource;
+            this.layersTemplateSource = layersTemplateSource;            
             Initialize();
         }
 
@@ -115,6 +114,7 @@ namespace CoreSampleAnnotation
             boreIntervalsVM = (BoreIntervalsVM)info.GetValue("Intervals", typeof(BoreIntervalsVM));
             PlaneVM = (AnnotationPlane.PlaneVM)info.GetValue("Annotation", typeof(AnnotationPlane.PlaneVM));
             layersTemplateSource = (ILayersTemplateSource)info.GetValue("LayersTemplateSource",typeof(ILayersTemplateSource));
+            layerRankNameSource = (ILayerRankNamesSource)info.GetValue("LayersRankSource", typeof(ILayerRankNamesSource));
             planeColumnSettingsVM = (ColumnSettingsVM)info.GetValue("ColumnsSettings", typeof(ColumnSettingsVM));
             Initialize();
         }
@@ -125,6 +125,7 @@ namespace CoreSampleAnnotation
             info.AddValue("Intervals", BoreIntervalsVM);
             info.AddValue("Annotation",PlaneVM);
             info.AddValue("LayersTemplateSource", LayersTemplateSource);
+            info.AddValue("LayersRankSource", LayerRankNameSource);
             info.AddValue("ColumnsSettings", PlaneColumnSettingsVM);
         }
         #endregion

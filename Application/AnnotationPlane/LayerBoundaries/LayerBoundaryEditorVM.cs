@@ -1,16 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
 
 namespace CoreSampleAnnotation.AnnotationPlane.LayerBoundaries
 {
+    [Serializable]
     /// <summary>
     /// correspond to enternal boundary (not the two side boundaris of the column)
-    /// </summary>
-    public class LayerBoundary {
+    /// </summary>    
+    public class LayerBoundary: ISerializable {
     
         /// <summary>
         /// In WPF units
@@ -40,9 +42,26 @@ namespace CoreSampleAnnotation.AnnotationPlane.LayerBoundaries
             Rank = rank;
             id = Guid.NewGuid();
         }
+
+        #region Serialization
+
+        protected LayerBoundary(SerializationInfo info, StreamingContext context) {
+            Rank = info.GetInt32("Rank");
+            Level = info.GetDouble("Level");
+            id = Guid.NewGuid();
+        }
+
+        public virtual void GetObjectData(SerializationInfo info, StreamingContext context)
+        {
+            info.AddValue("Rank", Rank);
+            info.AddValue("Level", Level);
+        }
+
+        #endregion
     }
 
-    public class LayerBoundaryEditorVM : ViewModel, ILayerBoundariesVM
+    [Serializable]
+    public class LayerBoundaryEditorVM : ViewModel, ILayerBoundariesVM, ISerializable
     {
         private LayerBoundary[] boundaries;
 
@@ -162,6 +181,19 @@ namespace CoreSampleAnnotation.AnnotationPlane.LayerBoundaries
             l.Add(new LayerBoundary(level,rank));
             Boundaries = l.ToArray();
         }
+
+        #region Serialization
+        protected LayerBoundaryEditorVM(SerializationInfo info, StreamingContext context) {
+            Boundaries = (LayerBoundary[])info.GetValue("Boundaries",typeof(LayerBoundary[]));
+
+        }
+
+        public virtual void GetObjectData(SerializationInfo info, StreamingContext context)
+        {
+            info.AddValue("Boundaries",boundaries);
+        }
+
+        #endregion
     }
 
 

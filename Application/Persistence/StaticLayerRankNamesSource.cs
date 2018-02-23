@@ -6,9 +6,10 @@ using System.Threading.Tasks;
 
 namespace CoreSampleAnnotation.Persistence
 {
+    [Obsolete("Used for early development")]
     public class StaticLayerRankNamesSource : ILayerRankNamesSource
     {
-        public string[] GetGeneritiveNames
+        public string[] GeneritiveNames
         {
             get
             {
@@ -16,7 +17,7 @@ namespace CoreSampleAnnotation.Persistence
             }
         }
 
-        public string[] GetInstrumentalMultipleNames
+        public string[] InstrumentalMultipleNames
         {
             get
             {
@@ -24,7 +25,7 @@ namespace CoreSampleAnnotation.Persistence
             }
         }
 
-        public string[] GetNominativeNames
+        public string[] NominativeNames
         {
             get
             {

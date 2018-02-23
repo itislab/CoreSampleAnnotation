@@ -8,6 +8,7 @@ using System.Windows.Media;
 
 namespace CoreSampleAnnotation.Persistence
 {
+    [Obsolete("Used for early development")]
     public class HardcodedLayerTemplate
     {
         public static HardcodedLayerTemplate Instance { get; private set; }

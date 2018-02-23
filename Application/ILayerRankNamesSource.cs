@@ -8,8 +8,8 @@ namespace CoreSampleAnnotation
 {
     public interface ILayerRankNamesSource
     {
-        string[] GetNominativeNames { get; }
-        string[] GetGeneritiveNames { get; }
-        string[] GetInstrumentalMultipleNames { get; }
+        string[] NominativeNames { get; }
+        string[] GeneritiveNames { get; }
+        string[] InstrumentalMultipleNames { get; }
     }
 }
