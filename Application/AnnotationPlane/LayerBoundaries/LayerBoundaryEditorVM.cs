@@ -65,7 +65,10 @@ namespace CoreSampleAnnotation.AnnotationPlane.LayerBoundaries
             {
                 LayerBoundary lb = boundaries[i];
                 int idx = lb.Rank - minRank;
-                lb.Number = numbers[idx]++;
+                int num = numbers[idx]++;
+                lb.Number = num;
+                for (int j = 0; j < idx; j++)                
+                    numbers[j] = 2;                
                 result[i] = lb;
             }
 
