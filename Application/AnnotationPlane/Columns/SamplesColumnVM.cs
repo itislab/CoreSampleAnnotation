@@ -56,7 +56,7 @@ namespace CoreSampleAnnotation.AnnotationPlane
             }
         }
 
-        public ICommand DragStarted { get; set; }
+        public ICommand DragStarted { get; set; }        
 
         /// <param name="depth">in meters (positive value)</param>
         public SampleVM(double depth) {

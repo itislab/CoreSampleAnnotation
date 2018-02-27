@@ -9,10 +9,7 @@ using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
+
 
 namespace CoreSampleAnnotation.AnnotationPlane.Columns
 {
@@ -23,13 +20,14 @@ namespace CoreSampleAnnotation.AnnotationPlane.Columns
     {
         public Sample()
         {
-            InitializeComponent();
-            PreviewMouseDown += Sample_PreviewMouseDown;
+            InitializeComponent();            
+            MouseDown += Sample_MouseDown;
+            TouchDown += Sample_TouchDown;
+            
         }
 
-        private void Sample_PreviewMouseDown(object sender, MouseButtonEventArgs e)
+        private void Sample_MouseDown(object sender, MouseEventArgs e)
         {
-            System.Diagnostics.Trace.WriteLine("label clicked");
             SampleVM vm = DataContext as SampleVM;
             if (vm != null)
             {
@@ -37,8 +35,26 @@ namespace CoreSampleAnnotation.AnnotationPlane.Columns
                 {
                     DragStartEventArgs dsea = new DragStartEventArgs();
                     dsea.FrameworkElement = sender as FrameworkElement;
-                    dsea.MouseEvent = e;
+                    dsea.GetEventPoint = (elem => e.GetPosition(elem));
                     vm.DragStarted.Execute(dsea);
+                    e.Handled = true;
+                }
+            }
+        }
+
+        private void Sample_TouchDown(object sender, TouchEventArgs e)
+        {
+            System.Diagnostics.Trace.WriteLine("label touched");
+            SampleVM vm = DataContext as SampleVM;
+            if (vm != null)
+            {
+                if (vm.DragStarted != null)
+                {
+                    DragStartEventArgs dsea = new DragStartEventArgs();                    
+                    dsea.FrameworkElement = sender as FrameworkElement;
+                    dsea.GetEventPoint = (elem => e.GetTouchPoint(elem).Position);
+                    vm.DragStarted.Execute(dsea);
+                    e.Handled = true;
                 }
             }
         }        

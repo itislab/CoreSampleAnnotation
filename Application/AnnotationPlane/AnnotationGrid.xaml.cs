@@ -43,6 +43,20 @@ namespace CoreSampleAnnotation.AnnotationPlane
             
             LowerGrid.PreviewMouseMove += LowerGrid_PreviewMouseMove;
             LowerGrid.PreviewMouseUp += LowerGrid_PreviewMouseUp;
+            LowerGrid.PreviewTouchMove += LowerGrid_PreviewTouchMove;
+            LowerGrid.PreviewTouchUp += LowerGrid_PreviewTouchUp;
+        }
+
+        private void LowerGrid_PreviewTouchUp(object sender, TouchEventArgs e)
+        {
+            if (HandleDragEnd(elem => e.GetTouchPoint(elem).Position))
+                e.Handled = true;
+        }
+
+        private void LowerGrid_PreviewTouchMove(object sender, TouchEventArgs e)
+        {
+            if (HandleDrag(elem => e.GetTouchPoint(elem).Position))                
+                e.Handled = true;
         }
 
         private bool IsInVisualTree(DependencyObject elem, DependencyObject parent) {
@@ -56,24 +70,23 @@ namespace CoreSampleAnnotation.AnnotationPlane
             return false;
         }
 
-        private void LowerGrid_PreviewMouseUp(object sender, MouseButtonEventArgs e)
-        {
+        private bool HandleDragEnd(Func<IInputElement,Point> eventPointExtractor) {
             AnnotationGridVM agVM = DataContext as AnnotationGridVM;
             if (agVM != null)
             {
                 if (agVM.DraggedItem != null)
                 {
                     Point localOffset = agVM.LocalDraggedItemOffset;
-                    Point curLocation = e.GetPosition(ColumnsGrid);                    
+                    Point curLocation = eventPointExtractor(ColumnsGrid);
                     Point droppedLocation = new Point(
-                        curLocation.X - localOffset.X + agVM.DraggedItem.ActualWidth/2, //X coord is the location of the centre of the dragged element
+                        curLocation.X - localOffset.X + agVM.DraggedItem.ActualWidth / 2, //X coord is the location of the centre of the dragged element
                         curLocation.Y - localOffset.Y); //Y coord is a top of the dragged element
                     if (isMouseCaptured)
                     {
                         //ReleaseMouseCapture();
                         System.Diagnostics.Trace.WriteLine("Mouse release");
                         isMouseCaptured = false;
-                    }                    
+                    }
 
                     int col = -1;
                     var htResult = VisualTreeHelper.HitTest(ColumnsGrid, droppedLocation);
@@ -81,37 +94,59 @@ namespace CoreSampleAnnotation.AnnotationPlane
                     {
                         foreach (UIElement elem in ColumnsGrid.Children)
                         {
-                            if(IsInVisualTree(htResult.VisualHit,elem))
+                            if (IsInVisualTree(htResult.VisualHit, elem))
                                 col = Grid.GetColumn(elem);
-                        }                        
+                        }
                     }
-                    
+
 
                     ElementDropped?.Invoke(this, new ElemDroppedEventArgs(agVM.DraggedItem, col, droppedLocation.Y));
 
                     agVM.DraggedItem = null;
+                    return true;
                 }
             }
+            return false;           
         }
 
-        private void LowerGrid_PreviewMouseMove(object sender, MouseEventArgs e)
+        private void LowerGrid_PreviewMouseUp(object sender, MouseButtonEventArgs e)
         {
+            if (HandleDragEnd(elem => e.GetPosition(elem)))
+                e.Handled = true;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="eventPointExtractor"></param>
+        /// <returns>whether the event is handled</returns>
+        private bool HandleDrag(Func<IInputElement, Point> eventPointExtractor) {
             AnnotationGridVM agVM = DataContext as AnnotationGridVM;
-            if (agVM != null) {
-                if (agVM.DraggedItem != null) {
+            if (agVM != null)
+            {
+                if (agVM.DraggedItem != null)
+                {
                     Point localOffset = agVM.LocalDraggedItemOffset;
-                    Point curLocation = e.GetPosition(LowerGrid);
+                    Point curLocation = eventPointExtractor(LowerGrid);
                     DraggedItemLeft = curLocation.X - localOffset.X;
                     DraggedItemTop = curLocation.Y - localOffset.Y;
                     System.Diagnostics.Trace.WriteLine(string.Format("Elem moved to {0}:{1}", DraggedItemLeft, DraggedItemTop));
-                    if (!isMouseCaptured) {
+                    if (!isMouseCaptured)
+                    {
                         //CaptureMouse();
                         System.Diagnostics.Trace.WriteLine("Mouse captured");
                         isMouseCaptured = true;
                     }
-                    e.Handled = true;
+                    return true;
                 }
             }
+            return false;
+        }
+
+        private void LowerGrid_PreviewMouseMove(object sender, MouseEventArgs e)
+        {
+            if (HandleDrag(elem => e.GetPosition(elem)))
+                e.Handled = true;
         }       
 
         private void ColumnsGrid_ManipulationDelta(object sender, ManipulationDeltaEventArgs e)
@@ -342,9 +377,9 @@ namespace CoreSampleAnnotation.AnnotationPlane
 
             //point selection related
             view.PreviewMouseRightButtonDown += View_MouseRightButtonDown;
-            view.PreviewTouchDown += View_TouchDown;
-            view.PreviewTouchMove += View_TouchMove;
-            view.PreviewTouchUp += View_TouchUp;
+            view.TouchDown += View_TouchDown;
+            view.TouchMove += View_TouchMove;
+            view.TouchUp += View_TouchUp;
             view.IsManipulationEnabled = true;
             view.TouchLeave += View_TouchLeave;
 

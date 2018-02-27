@@ -494,9 +494,9 @@ namespace CoreSampleAnnotation.AnnotationPlane
             {
                 if (DragReferenceElem != null)
                 {
-                    DragStartEventArgs dsea = args as LayerBoundaries.DragStartEventArgs;
-                    Point startDragCoord = dsea.MouseEvent.GetPosition(DragReferenceElem);
-                    Point localDragOffset = dsea.MouseEvent.GetPosition(dsea.FrameworkElement);
+                    DragStartEventArgs dsea = args as DragStartEventArgs;
+                    Point startDragCoord = dsea.GetEventPoint(DragReferenceElem);
+                    Point localDragOffset = dsea.GetEventPoint(dsea.FrameworkElement);
                     Point dragItemLocation = startDragCoord - new Vector(localDragOffset.X, localDragOffset.Y);
                     AnnoGridVM.LocalDraggedItemOffset = localDragOffset;
                     AnnoGridVM.DragItemLocation = dragItemLocation;

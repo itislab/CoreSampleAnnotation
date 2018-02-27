@@ -16,7 +16,7 @@ using System.Windows.Shapes;
 namespace CoreSampleAnnotation.AnnotationPlane.LayerBoundaries
 {
     public class DragStartEventArgs : EventArgs {
-        public MouseEventArgs MouseEvent { get; set; }
+        public Func<IInputElement,Point> GetEventPoint { get; set; }
         public FrameworkElement FrameworkElement { get; set; }
     }
 
@@ -28,10 +28,28 @@ namespace CoreSampleAnnotation.AnnotationPlane.LayerBoundaries
         public LayerLabel()
         {
             InitializeComponent();
-            this.PreviewMouseDown += Rect_PreviewMouseDown;
-        }        
+            MouseDown += LayerLabel_MouseDown;
+            TouchDown += LayerLabel_TouchDown;
 
-        private void Rect_PreviewMouseDown(object sender, MouseButtonEventArgs e)
+        }
+
+        private void LayerLabel_TouchDown(object sender, TouchEventArgs e)
+        {
+            LayerBoundary vm = DataContext as LayerBoundary;
+            if (vm != null)
+            {
+                if (vm.DragStarted != null)
+                {
+                    DragStartEventArgs dsea = new DragStartEventArgs();
+                    dsea.FrameworkElement = sender as FrameworkElement;
+                    dsea.GetEventPoint = (elem => e.GetTouchPoint(elem).Position);
+                    vm.DragStarted.Execute(dsea);
+                    e.Handled = true;
+                }
+            }
+        }
+
+        private void LayerLabel_MouseDown(object sender, MouseButtonEventArgs e)
         {            
             LayerBoundary vm = DataContext as LayerBoundary;
             if (vm != null) {
@@ -39,8 +57,9 @@ namespace CoreSampleAnnotation.AnnotationPlane.LayerBoundaries
                 {
                     DragStartEventArgs dsea = new DragStartEventArgs();
                     dsea.FrameworkElement = sender as FrameworkElement;
-                    dsea.MouseEvent = e;
+                    dsea.GetEventPoint= (elem => e.GetPosition(elem));
                     vm.DragStarted.Execute(dsea);
+                    e.Handled = true;
                 }
             }
         }
