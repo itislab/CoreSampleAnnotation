@@ -9,6 +9,7 @@ using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 
@@ -310,8 +311,7 @@ namespace CoreSampleAnnotation.AnnotationPlane
 
 
             AnnoGridVM = new AnnotationGridVM();
-            classificationVM = new ClassificationVM();
-
+            classificationVM = new ClassificationVM();            
 
             ElementDropped = new DelegateCommand(obj =>
             {

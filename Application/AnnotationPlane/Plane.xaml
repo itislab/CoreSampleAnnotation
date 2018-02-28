@@ -13,7 +13,7 @@
             <RowDefinition/>
         </Grid.RowDefinitions>
         <!--<Slider Orientation="Horizontal" Name="ScaleSlider" Minimum="10" Maximum="3000" Value="{Binding Path=ColScaleController.ScaleFactor, Mode=TwoWay}"></Slider>-->
-        <local:AnnotationGrid x:Name="AnnoGrod" Grid.Row="1" DataContext="{ Binding AnnoGridVM }" >
+        <local:AnnotationGrid x:Name="AnnoGrid" Grid.Row="1" DataContext="{ Binding AnnoGridVM }" >
         </local:AnnotationGrid>
         <StackPanel HorizontalAlignment="Right" VerticalAlignment="Center" Grid.Row="1">
             <Button Style="{StaticResource MetroButton}" Command="{Binding ActivateSettingsCommand}" Height="50">

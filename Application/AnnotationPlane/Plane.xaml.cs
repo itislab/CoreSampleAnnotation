@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -12,6 +13,8 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using System.Windows.Xps.Packaging;
+using System.Xml;
 
 namespace CoreSampleAnnotation.AnnotationPlane
 {
@@ -19,13 +22,13 @@ namespace CoreSampleAnnotation.AnnotationPlane
     /// Interaction logic for Plane.xaml
     /// </summary>
     public partial class Plane : UserControl
-    {               
+    {
         public Plane()
         {
-            InitializeComponent();                                              
-            
-            this.AnnoGrod.PointSelected += Plane_PointSelected;
-            this.AnnoGrod.ElementDropped += AnnoGrod_ElementDropped;
+            InitializeComponent();
+
+            this.AnnoGrid.PointSelected += Plane_PointSelected;
+            this.AnnoGrid.ElementDropped += AnnoGrod_ElementDropped;
 
             DataContextChanged += Plane_DataContextChanged;
         }
@@ -40,9 +43,50 @@ namespace CoreSampleAnnotation.AnnotationPlane
 
         private void Plane_DataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
         {
-            PlaneVM mv = e.NewValue as PlaneVM;
-            if (mv != null) {
-                mv.DragReferenceElem = AnnoGrod.LowerGrid;
+            PlaneVM vm = e.NewValue as PlaneVM;
+            if (vm != null)
+            {
+                vm.DragReferenceElem = AnnoGrid.LowerGrid;
+                vm.SaveImageCommand = new DelegateCommand(() =>
+                {
+                    List<Reports.SVG.ISvgRenderableColumn> columnRenderers = new List<Reports.SVG.ISvgRenderableColumn>();
+                    int idx = 0;
+                    foreach (UIElement elem in AnnoGrid.HeadersGrid.Children) {
+                        columnRenderers.Add(new Reports.SVG.ColumnPainter(elem,null,vm.AnnoGridVM.Columns[idx]));
+                        idx++;
+                    }
+                    var svg = Reports.SVG.Report.Generate(columnRenderers.ToArray());
+                    using (XmlTextWriter writer = new XmlTextWriter("result.svg", Encoding.UTF8))
+                    {
+                        svg.Write(writer);
+                    }
+
+                    /*
+                    FixedDocument fixedDoc = new FixedDocument();
+                    PageContent pageContent = new PageContent();
+                    FixedPage fixedPage = new FixedPage();
+                    fixedPage.Width = ActualWidth;
+                    fixedPage.Height = AnnoGrid.HeadersGrid.ActualHeight + AnnoGrid.ColumnsGrid.ActualHeight;
+
+                    Plane planeToPrint = new Plane();
+                    Grid.SetIsSharedSizeScope(planeToPrint, true);
+                    //planeToPrint.Width = 800;
+                    //planeToPrint.Height = 8000;
+                    planeToPrint.DataContext = vm;
+
+                    //Create first page of document
+                    fixedPage.Children.Add(planeToPrint);
+                    ((System.Windows.Markup.IAddChild)pageContent).AddChild(fixedPage);
+                    fixedDoc.Pages.Add(pageContent);
+                    //Create any other required pages here
+
+                    //save the document
+                    XpsDocument xpsd = new XpsDocument("report.xps", FileAccess.Write);
+                    System.Windows.Xps.XpsDocumentWriter xw = XpsDocument.CreateXpsDocumentWriter(xpsd);
+                    xw.Write(fixedDoc);
+                    xpsd.Close();
+                    */
+                });
             }
         }
 
@@ -72,11 +116,12 @@ namespace CoreSampleAnnotation.AnnotationPlane
 
         private void Plane_PointSelected(object sender, PointSelectedEventArgs e)
         {
-            if (PointSelected != null) {
+            if (PointSelected != null)
+            {
                 PointSelected.Execute(e);
             }
         }
 
-        
+
     }
 }

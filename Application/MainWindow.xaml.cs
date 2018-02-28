@@ -77,12 +77,7 @@ namespace CoreSampleAnnotation
                 
                 vm.CurrentProjectVM.PlaneVM.ActivateSettingsCommand = new DelegateCommand(() => {
                     vm.ActiveSectionVM = vm.CurrentProjectVM.PlaneColumnSettingsVM;
-                });
-
-                vm.CurrentProjectVM.PlaneVM.SaveImageCommand = new DelegateCommand(() =>
-                {
-
-                });
+                });                
                 
                 vm.ActiveSectionVM = vm.CurrentProjectVM.PlaneVM;
             });

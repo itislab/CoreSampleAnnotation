@@ -59,8 +59,15 @@
       <HintPath>..\App\packages\Newtonsoft.Json.10.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="ReachFramework" />
+    <Reference Include="Svg, Version=2.2.1.39233, Culture=neutral, PublicKeyToken=12a0bac221edeae2, processorArchitecture=MSIL">
+      <HintPath>..\App\packages\Svg.2.3.0\lib\net35\Svg.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Printing" />
     <Reference Include="System.Reactive.Core, Version=3.0.1000.0, Culture=neutral, PublicKeyToken=94bc3704cddfc263, processorArchitecture=MSIL">
       <HintPath>..\App\packages\System.Reactive.Core.3.1.1\lib\net45\System.Reactive.Core.dll</HintPath>
       <Private>True</Private>
@@ -256,6 +263,8 @@
     <Compile Include="ProjectMenuVM.cs" />
     <Compile Include="ProjectVM.cs" />
     <Compile Include="Persistence\FolderPersister.cs" />
+    <Compile Include="Reports\SVG\ColumnPainter.cs" />
+    <Compile Include="Reports\SVG\Report.cs" />
     <Compile Include="StartupMenu.xaml.cs">
       <DependentUpon>StartupMenu.xaml</DependentUpon>
     </Compile>
