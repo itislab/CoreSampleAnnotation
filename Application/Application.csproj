@@ -263,7 +263,10 @@
     <Compile Include="ProjectMenuVM.cs" />
     <Compile Include="ProjectVM.cs" />
     <Compile Include="Persistence\FolderPersister.cs" />
+    <Compile Include="Reports\SVG\BoundaryColumnPainter.cs" />
     <Compile Include="Reports\SVG\ColumnPainter.cs" />
+    <Compile Include="Reports\SVG\ColumnPainterFactory.cs" />
+    <Compile Include="Reports\SVG\Helpers.cs" />
     <Compile Include="Reports\SVG\Report.cs" />
     <Compile Include="StartupMenu.xaml.cs">
       <DependentUpon>StartupMenu.xaml</DependentUpon>

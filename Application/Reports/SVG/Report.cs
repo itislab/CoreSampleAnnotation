@@ -23,8 +23,7 @@ namespace CoreSampleAnnotation.Reports.SVG
     }
 
     public static class Report
-    {
-        private static SvgUnit dtos(double value) { return new SvgUnit((float)value); }
+    {        
 
         public static SvgDocument Generate(ISvgRenderableColumn[] columns) {
             //generating headers
@@ -37,10 +36,10 @@ namespace CoreSampleAnnotation.Reports.SVG
                 RenderedSvg heading = columns[i].RenderHeader();
                 SvgRectangle rect = new SvgRectangle();
                 headerHeight = heading.RenderedSize.Height;
-                rect.Width = dtos(heading.RenderedSize.Width);
-                rect.Height = dtos(heading.RenderedSize.Height);
-                rect.X = dtos(horizontalOffset);
-                rect.Y = dtos(0.0);
+                rect.Width = Helpers.dtos(heading.RenderedSize.Width);
+                rect.Height = Helpers.dtos(heading.RenderedSize.Height);
+                rect.X = Helpers.dtos(horizontalOffset);
+                rect.Y = Helpers.dtos(0.0);
                 rect.Stroke = blackPaint;
 
                 heading.SVG.Transforms.Add(new SvgTranslate((float)(horizontalOffset + heading.RenderedSize.Width*0.5), (float)heading.RenderedSize.Height*0.9f));
@@ -62,20 +61,23 @@ namespace CoreSampleAnnotation.Reports.SVG
                 RenderedSvg column = columns[i].RenderColumn();
                 SvgRectangle rect = new SvgRectangle();
                 columnHeight = column.RenderedSize.Height;
-                rect.Width = dtos(column.RenderedSize.Width);
-                rect.Height = dtos(column.RenderedSize.Height);
-                rect.X = dtos(horizontalOffset);
-                rect.Y = dtos(0.0);
+                rect.Width = Helpers.dtos(column.RenderedSize.Width);
+                rect.Height = Helpers.dtos(column.RenderedSize.Height);
+                rect.X = Helpers.dtos(horizontalOffset);
+                rect.Y = Helpers.dtos(0.0);
                 rect.Stroke = blackPaint;
 
+                column.SVG.Transforms.Add(new SvgTranslate((float)(horizontalOffset)));
+
                 columnsGroup.Children.Add(rect);
+                columnsGroup.Children.Add(column.SVG);
 
                 horizontalOffset += column.RenderedSize.Width;
             }
 
             SvgDocument result = new SvgDocument();
-            result.Width = dtos(horizontalOffset);
-            result.Height = dtos((headerHeight+columnHeight));
+            result.Width = Helpers.dtos(horizontalOffset);
+            result.Height = Helpers.dtos((headerHeight+columnHeight));
             result.Fill = new SvgColourServer(System.Drawing.Color.White);
             result.Children.Add(headerGroup);
             result.Children.Add(columnsGroup);

@@ -52,7 +52,7 @@ namespace CoreSampleAnnotation.AnnotationPlane
                     List<Reports.SVG.ISvgRenderableColumn> columnRenderers = new List<Reports.SVG.ISvgRenderableColumn>();
                     int idx = 0;
                     foreach (UIElement elem in AnnoGrid.HeadersGrid.Children) {
-                        columnRenderers.Add(new Reports.SVG.ColumnPainter(elem,AnnoGrid.ColumnsGrid.Children[idx] as ColumnView,vm.AnnoGridVM.Columns[idx]));
+                        columnRenderers.Add(Reports.SVG.ColumnPainterFactory.Create(elem,AnnoGrid.ColumnsGrid.Children[idx] as ColumnView,vm.AnnoGridVM.Columns[idx]));
                         idx++;
                     }
                     var svg = Reports.SVG.Report.Generate(columnRenderers.ToArray());

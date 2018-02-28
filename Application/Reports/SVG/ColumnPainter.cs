@@ -21,10 +21,11 @@ namespace CoreSampleAnnotation.Reports.SVG
             this.view = view;
         }
 
-        public RenderedSvg RenderColumn()
+        public virtual RenderedSvg RenderColumn()
         {
             RenderedSvg result = new RenderedSvg();
             result.RenderedSize = view.RenderSize;
+            result.SVG = new Svg.SvgGroup();
             return result;
         }
 
