@@ -23,10 +23,13 @@ namespace CoreSampleAnnotation.Reports.SVG
                 }
                 return new BoundaryColumnPainter(headerView, view, vm, lbVM);
             }
-            else if (vm is ImageColumnVM) {
+            else if (vm is ImageColumnVM)
+            {
                 return new ImageColumnPainter(headerView, view, (ImageColumnVM)vm);
             }
-            else
+            else if (vm is DepthAxisColumnVM) {
+                return new DepthColumnPainter(headerView, view, (DepthAxisColumnVM)vm);
+            } else
                 return new ColumnPainter(headerView, view, vm);
         }
     }

@@ -266,6 +266,7 @@
     <Compile Include="Reports\SVG\BoundaryColumnPainter.cs" />
     <Compile Include="Reports\SVG\ColumnPainter.cs" />
     <Compile Include="Reports\SVG\ColumnPainterFactory.cs" />
+    <Compile Include="Reports\SVG\DepthColumnPainter.cs" />
     <Compile Include="Reports\SVG\Helpers.cs" />
     <Compile Include="Reports\SVG\ImageColumnPainter.cs" />
     <Compile Include="Reports\SVG\Report.cs" />
