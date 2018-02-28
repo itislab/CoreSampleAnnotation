@@ -13,15 +13,19 @@ namespace CoreSampleAnnotation.Reports.SVG
     {
         protected readonly UIElement headerView;
         protected readonly ColumnVM vm;
+        protected readonly ColumnView view;
 
         public ColumnPainter(UIElement headerView, ColumnView view, ColumnVM vm) {
             this.headerView = headerView;
             this.vm = vm;
+            this.view = view;
         }
 
         public RenderedSvg RenderColumn()
         {
-            throw new NotImplementedException();
+            RenderedSvg result = new RenderedSvg();
+            result.RenderedSize = view.RenderSize;
+            return result;
         }
 
         public RenderedSvg RenderHeader()

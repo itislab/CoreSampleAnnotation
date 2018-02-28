@@ -29,19 +29,19 @@ namespace CoreSampleAnnotation.Reports.SVG
         public static SvgDocument Generate(ISvgRenderableColumn[] columns) {
             //generating headers
             SvgGroup headerGroup = new SvgGroup();
-            SvgPaintServer paintServer = new SvgColourServer(System.Drawing.Color.Black);            
+            SvgPaintServer blackPaint = new SvgColourServer(System.Drawing.Color.Black);            
             double horizontalOffset = 0.0;
-            double height = 0;
+            double headerHeight = 0;
             for (int i = 0; i < columns.Length; i++)
             {
                 RenderedSvg heading = columns[i].RenderHeader();
                 SvgRectangle rect = new SvgRectangle();
-                height = heading.RenderedSize.Height;
+                headerHeight = heading.RenderedSize.Height;
                 rect.Width = dtos(heading.RenderedSize.Width);
                 rect.Height = dtos(heading.RenderedSize.Height);
                 rect.X = dtos(horizontalOffset);
                 rect.Y = dtos(0.0);
-                rect.Stroke = paintServer;
+                rect.Stroke = blackPaint;
 
                 heading.SVG.Transforms.Add(new SvgTranslate((float)(horizontalOffset + heading.RenderedSize.Width*0.5), (float)heading.RenderedSize.Height*0.9f));
                 heading.SVG.Transforms.Add(new SvgRotate((float)-90.0));
@@ -52,11 +52,33 @@ namespace CoreSampleAnnotation.Reports.SVG
 
 
             }
+            //generating columns
+            SvgGroup columnsGroup = new SvgGroup();
+            double columnHeight = 0.0;
+            horizontalOffset = 0.0;
+            columnsGroup.Transforms.Add(new SvgTranslate(0.0f, (float)headerHeight));
+            for (int i = 0; i < columns.Length; i++)
+            {
+                RenderedSvg column = columns[i].RenderColumn();
+                SvgRectangle rect = new SvgRectangle();
+                columnHeight = column.RenderedSize.Height;
+                rect.Width = dtos(column.RenderedSize.Width);
+                rect.Height = dtos(column.RenderedSize.Height);
+                rect.X = dtos(horizontalOffset);
+                rect.Y = dtos(0.0);
+                rect.Stroke = blackPaint;
+
+                columnsGroup.Children.Add(rect);
+
+                horizontalOffset += column.RenderedSize.Width;
+            }
+
             SvgDocument result = new SvgDocument();
-            result.Width = dtos(horizontalOffset*1.1);
-            result.Height = dtos(height*1.1);
+            result.Width = dtos(horizontalOffset);
+            result.Height = dtos((headerHeight+columnHeight));
             result.Fill = new SvgColourServer(System.Drawing.Color.White);
             result.Children.Add(headerGroup);
+            result.Children.Add(columnsGroup);
             return result;
         }
     }
