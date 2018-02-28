@@ -16,11 +16,15 @@ namespace CoreSampleAnnotation.Reports.SVG
             {
                 BoundaryEditorColumnVM becVM = (BoundaryEditorColumnVM)vm;
                 ILayerBoundariesVM lbVM = becVM.BoundariesVM;
-                if (becVM.ColumnVM is BoundaryLineColumnVM) {
+                if (becVM.ColumnVM is BoundaryLineColumnVM)
+                {
                     BoundaryLineColumnVM blcVM = (BoundaryLineColumnVM)becVM.ColumnVM;
                     lbVM = blcVM.BoundariesVM;
                 }
                 return new BoundaryColumnPainter(headerView, view, vm, lbVM);
+            }
+            else if (vm is ImageColumnVM) {
+                return new ImageColumnPainter(headerView, view, (ImageColumnVM)vm);
             }
             else
                 return new ColumnPainter(headerView, view, vm);
