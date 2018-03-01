@@ -133,7 +133,7 @@ namespace CoreSampleAnnotation.AnnotationPlane
         }
     }
 
-    public class LayeredColumnVM : ColumnVM
+    public class LayeredColumnVM : ColumnVM, ILayerColumn
     {
         private ObservableCollection<LayerVM> layers = new ObservableCollection<LayerVM>();
 
@@ -159,7 +159,7 @@ namespace CoreSampleAnnotation.AnnotationPlane
     /// <summary>
     /// Wraps LayeredColumnVM, presenting each LayerVM as adapter wrapped
     /// </summary>
-    public class LayeredPresentationColumnVM : ColumnVM
+    public class LayeredPresentationColumnVM : ColumnVM, ILayerColumn
     {
         private LayeredColumnVM target;
         private Func<LayerVM, LayerVM> adapter;

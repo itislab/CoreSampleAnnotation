@@ -11,7 +11,10 @@ namespace CoreSampleAnnotation.Reports.SVG
 {
     public class ColumnPainterFactory
     {
-        public static ColumnPainter Create(UIElement headerView, ColumnView view, ColumnVM vm) {
+        private static ILayerPainter universalLayerPainter = new LayerPainter();
+
+        public static ColumnPainter Create(UIElement headerView, ColumnView view, ColumnVM vm)
+        {
             if (vm is BoundaryEditorColumnVM)
             {
                 BoundaryEditorColumnVM becVM = (BoundaryEditorColumnVM)vm;
@@ -27,9 +30,15 @@ namespace CoreSampleAnnotation.Reports.SVG
             {
                 return new ImageColumnPainter(headerView, view, (ImageColumnVM)vm);
             }
-            else if (vm is DepthAxisColumnVM) {
+            else if (vm is DepthAxisColumnVM)
+            {
                 return new DepthColumnPainter(headerView, view, (DepthAxisColumnVM)vm);
-            } else
+            }
+            else if (vm is ILayerColumn)
+            {
+                return new LayeredColumnPainter(headerView, view, vm, (ILayerColumn)vm, universalLayerPainter);
+            }
+            else
                 return new ColumnPainter(headerView, view, vm);
         }
     }
