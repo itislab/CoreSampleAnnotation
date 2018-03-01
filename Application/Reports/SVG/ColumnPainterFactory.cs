@@ -9,6 +9,9 @@ using System.Windows;
 
 namespace CoreSampleAnnotation.Reports.SVG
 {
+    /// <summary>
+    /// Knows about different column types and construct suitable painer for each particular column
+    /// </summary>
     public class ColumnPainterFactory
     {
         private static ILayerPainter universalLayerPainter = new LayerPainter();
@@ -37,6 +40,9 @@ namespace CoreSampleAnnotation.Reports.SVG
             else if (vm is ILayerColumn)
             {
                 return new LayeredColumnPainter(headerView, view, vm, (ILayerColumn)vm, universalLayerPainter);
+            }
+            else if (vm is SamplesColumnVM) {
+                return new SamplesColumnPainter(headerView, view, (SamplesColumnVM)vm);
             }
             else
                 return new ColumnPainter(headerView, view, vm);

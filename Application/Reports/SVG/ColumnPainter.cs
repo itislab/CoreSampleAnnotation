@@ -9,6 +9,9 @@ using Svg;
 
 namespace CoreSampleAnnotation.Reports.SVG
 {
+    /// <summary>
+    /// Capable of generating SVG for the column header and for the column body
+    /// </summary>
     public class ColumnPainter : ISvgRenderableColumn
     {
         protected readonly UIElement headerView;
