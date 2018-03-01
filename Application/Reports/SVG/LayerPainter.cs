@@ -26,6 +26,14 @@ namespace CoreSampleAnnotation.Reports.SVG
                 text.Transforms.Add(new Svg.Transforms.SvgTranslate((float)textXoffset, (float)(availableHeight * 0.5 + textYoffset)));
                 return text;
             }
+            else if (vm is LengthLayerVM) {
+                LengthLayerVM lrlcVM = (LengthLayerVM)vm;
+                SvgText text = new SvgText(string.Format("{0:0.##} м",lrlcVM.RealLength));
+                text.FontSize = Helpers.dtos(fontSize);
+                text.Fill = blackPaint;
+                text.Transforms.Add(new Svg.Transforms.SvgTranslate((float)textXoffset, (float)(availableHeight * 0.5 + textYoffset)));
+                return text;
+            }
             else
                 return new SvgGroup();
         }
