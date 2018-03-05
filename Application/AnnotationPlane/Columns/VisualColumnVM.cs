@@ -12,50 +12,65 @@ namespace CoreSampleAnnotation.AnnotationPlane.Columns
     {
         protected SingleClassificationLayerVM target;
 
-        public VisualLayerPresentingVM(SingleClassificationLayerVM target) {
+        public VisualLayerPresentingVM(SingleClassificationLayerVM target)
+        {
             this.target = target;
             target.PropertyChanged += Target_PropertyChanged;
         }
 
         private void Target_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
-            switch (e.PropertyName) {
+            switch (e.PropertyName)
+            {
                 case nameof(target.CurrentClass):
                     RaisePropertyChanged(nameof(BackgroundBrush));
+                    break;
+                case nameof(target.Length):
+                    RaisePropertyChanged(nameof(Height));
                     break;
             }
         }
 
         private double y;
-        public double Y {
-            get {
+        public double Y
+        {
+            get
+            {
                 return y;
             }
-            set {
-                if (y != value) {
+            set
+            {
+                if (y != value)
+                {
                     y = value;
                     RaisePropertyChanged(nameof(Y));
                 }
             }
         }
-        
-        public double Height {
-            get { return target.Length; }            
+
+        public double Height
+        {
+            get { return target.Length; }
         }
 
         private double width;
-        public double Width {
+        public double Width
+        {
             get { return width; }
-            set {
-                if (width != value) {
+            set
+            {
+                if (width != value)
+                {
                     width = value;
                     RaisePropertyChanged(nameof(Width));
                 }
             }
         }
 
-        public Brush BackgroundBrush {
-            get {                
+        public Brush BackgroundBrush
+        {
+            get
+            {
                 if (target.CurrentClass == null || target.CurrentClass.BackgroundBrush == null)
                     return null;
                 else
@@ -88,22 +103,27 @@ namespace CoreSampleAnnotation.AnnotationPlane.Columns
         }
 
         private double columnWidth;
-        public double ColumnWidth {
-            get {
+        public double ColumnWidth
+        {
+            get
+            {
                 return columnWidth;
             }
-            set {
-                if (columnWidth != value) {
+            set
+            {
+                if (columnWidth != value)
+                {
                     columnWidth = value;
                     RaisePropertyChanged(nameof(ColumnWidth));
                 }
             }
         }
 
-        private void Subscribe(VisualLayerPresentingVM vlpVM, SingleClassificationLayerVM sclVM) {
-            vlpVM.Width = ColumnWidth;            
+        private void Subscribe(VisualLayerPresentingVM vlpVM, SingleClassificationLayerVM sclVM)
+        {
+            vlpVM.Width = ColumnWidth;
         }
-        
+
 
         public VisualColumnVM(string heading, LayeredColumnVM lVm, Func<SingleClassificationLayerVM, VisualLayerPresentingVM> adapter) : base(heading)
         {
@@ -112,14 +132,39 @@ namespace CoreSampleAnnotation.AnnotationPlane.Columns
             target.Layers.CollectionChanged += Layers_CollectionChanged;
             target.PropertyChanged += Target_PropertyChanged;
             columnWidth = 80.0;
-            double y = 0;
+            
             foreach (SingleClassificationLayerVM vm in target.Layers)
             {
+                vm.PropertyChanged += Vm_PropertyChanged;
                 var adapted = adapter(vm);
-                adapted.Y = y;
-                y += vm.Length;
                 Subscribe(adapted, vm);
                 layers.Add(adapted);
+            }
+            ReclacYs();
+        }
+
+        private void Vm_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            switch (e.PropertyName) {
+                case nameof(SingleClassificationLayerVM.Length):
+                    ReclacYs();
+                    break;
+            }
+            ReclacYs();
+        }
+
+        private void ReclacYs()
+        {
+            SingleClassificationLayerVM[] layers = target.Layers.Select(l => (SingleClassificationLayerVM)l).ToArray();
+            VisualLayerPresentingVM[] vLayer = Layers.ToArray();
+            int length = layers.Length;
+            double y = 0;
+            for (int i = 0; i < length; i++)
+            {
+                SingleClassificationLayerVM vm = layers[i];
+                VisualLayerPresentingVM vvm = vLayer[i];
+                vvm.Y = y;
+                y += vm.Length;
             }
         }
 
@@ -154,11 +199,13 @@ namespace CoreSampleAnnotation.AnnotationPlane.Columns
                         else
                             Layers.Insert(e.NewStartingIndex + i, craftedVM);
                     }
+                    ReclacYs();
                     break;
                 case System.Collections.Specialized.NotifyCollectionChangedAction.Remove:
                     if (e.OldItems.Count != 1)
                         throw new InvalidOperationException();
                     Layers.RemoveAt(e.OldStartingIndex);
+                    ReclacYs();
                     break;
                 default:
                     throw new NotImplementedException();
