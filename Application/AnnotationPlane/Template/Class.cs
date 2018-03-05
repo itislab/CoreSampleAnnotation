@@ -13,7 +13,13 @@ namespace CoreSampleAnnotation.AnnotationPlane.Template
     public class Class
     {
         public string ID { get; set; }
+
         public Color? Color { get; set; }
+
+        /// <summary>
+        /// Крап
+        /// </summary>
+        public string BackgroundPatternSVG { get; set; }
         public string ShortName { get; set; }
         public string Description { get; set; }
 

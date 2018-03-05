@@ -27,6 +27,9 @@
         <DataTemplate DataType="{x:Type local:LayerSamplesDefinitionVM}">
             <TextBlock VerticalAlignment="Center" FontSize="20">Колонка с образцами</TextBlock>
         </DataTemplate>
+        <DataTemplate DataType="{x:Type local:VisualColumnDefinitionVM}">
+            <local:VisualColumnDefinitionView />
+        </DataTemplate>
         <core:VisibilityHiddenConverter x:Key="visibilityHiddenConverter" />
     </UserControl.Resources>
     <Grid>

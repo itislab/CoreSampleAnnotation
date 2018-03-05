@@ -8,6 +8,7 @@ using System.Runtime.Serialization;
 using System.IO;
 using System.Windows;
 using FileHelpers;
+using System.Windows.Media;
 
 namespace CoreSampleAnnotation.Persistence
 {
@@ -24,6 +25,7 @@ namespace CoreSampleAnnotation.Persistence
     {
         private const string NamesFile = "Names.csv";
         private const string MulticlassFile = "Multiclass";
+        private const string BackgroundFillFolder = "BackgroundFill";
         private string path;
 
         /// <summary>
@@ -35,11 +37,17 @@ namespace CoreSampleAnnotation.Persistence
             path = templateFolderPath;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="path">Path to property definition folder</param>
+        /// <returns></returns>
         private Property LoadPropertyTemplate(string path) {
             string propID = Path.GetFileName(path).ToLowerInvariant();
             propID = propID.ToLowerInvariant();
             string namesFileFullPath = Path.Combine(path, NamesFile);
             string muticlassFileFullPath = Path.Combine(path, MulticlassFile);
+            string backgroundImagesDirFullPath = Path.Combine(path,BackgroundFillFolder);
 
             Dictionary<string, Class> loadedClasses = new Dictionary<string, Class>();
 
@@ -47,24 +55,39 @@ namespace CoreSampleAnnotation.Persistence
             {
                 var engine = new FileHelperEngine<NamesFileRow>();
                 var rows = engine.ReadFile(namesFileFullPath);
+
+                bool backgroundBrushFolderAvailable = Directory.Exists(backgroundImagesDirFullPath);
+
                 foreach (NamesFileRow row in rows)
                 {
+                    string classID = row.ID.ToLowerInvariant();
+
+                    //tring to load corresponding background SVG image
+                    string backgroundPatternSVG = null;
+                    string bgClassBgPatternPath = Path.Combine(backgroundImagesDirFullPath, string.Format("{0}.svg", classID));
+                    if (File.Exists(bgClassBgPatternPath)) {
+                        backgroundPatternSVG = File.ReadAllText(bgClassBgPatternPath);
+                    }
+
                     loadedClasses.Add(row.ID.ToLowerInvariant(),
                         new Class()
                         {
-                            ID = row.ID.ToLowerInvariant(),
+                            ID = classID,
                             Acronym = row.Acronym,
                             ShortName = row.Name,
+                            BackgroundPatternSVG = backgroundPatternSVG,
                             Description = row.Description
                         });
                 }
+
+                
 
                 return new Property()
                 {
                     ID = propID,
                     Classes = loadedClasses.Select(p => p.Value).ToArray(),
                     Name = propID,
-                    IsMulticlass = System.IO.File.Exists(muticlassFileFullPath)
+                    IsMulticlass = File.Exists(muticlassFileFullPath)
                 };
             }
             else

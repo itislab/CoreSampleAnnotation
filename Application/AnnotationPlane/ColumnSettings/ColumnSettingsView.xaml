@@ -27,6 +27,7 @@
                 <Button Style="{StaticResource MetroButton}" Command="{Binding AddLayerBoundsCommand}">Границы слоев</Button>
                 <Button Style="{StaticResource MetroButton}" Command="{Binding AddLayerPropCommand}">Свойство слоя</Button>
                 <Button Style="{StaticResource MetroButton}" Command="{Binding AddLayerSamplesCommand}">Образцы</Button>
+                <Button Style="{StaticResource MetroButton}" Command="{Binding AddVisualCommand}">Крап</Button>                    
                 </WrapPanel>
             </StackPanel>
         </StackPanel>

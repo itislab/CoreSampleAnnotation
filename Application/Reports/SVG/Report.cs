@@ -81,6 +81,7 @@ namespace CoreSampleAnnotation.Reports.SVG
             result.Fill = new SvgColourServer(System.Drawing.Color.White);
             result.Children.Add(headerGroup);
             result.Children.Add(columnsGroup);
+            
             return result;
         }
     }

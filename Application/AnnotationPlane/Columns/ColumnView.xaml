@@ -23,6 +23,9 @@
         <DataTemplate DataType="{x:Type local:ImageColumnVM}">
             <local:ImageColumnView />
         </DataTemplate>
+        <DataTemplate DataType="{x:Type columns:VisualColumnVM}">
+            <columns:VisualColumnView />
+        </DataTemplate>
         <DataTemplate DataType="{x:Type app:ViewModel}">
             <TextBlock>Column template is not set</TextBlock>
         </DataTemplate>
