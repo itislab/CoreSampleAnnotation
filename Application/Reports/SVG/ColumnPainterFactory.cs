@@ -1,4 +1,5 @@
 ﻿using CoreSampleAnnotation.AnnotationPlane;
+using CoreSampleAnnotation.AnnotationPlane.Columns;
 using CoreSampleAnnotation.AnnotationPlane.LayerBoundaries;
 using System;
 using System.Collections.Generic;
@@ -41,8 +42,12 @@ namespace CoreSampleAnnotation.Reports.SVG
             {
                 return new LayeredColumnPainter(headerView, view, vm, (ILayerColumn)vm, universalLayerPainter);
             }
-            else if (vm is SamplesColumnVM) {
+            else if (vm is SamplesColumnVM)
+            {
                 return new SamplesColumnPainter(headerView, view, (SamplesColumnVM)vm);
+            }
+            else if (vm is VisualColumnVM) {
+                return new VisualColumnPainter(headerView, view,(VisualColumnVM)vm);
             }
             else
                 return new ColumnPainter(headerView, view, vm);

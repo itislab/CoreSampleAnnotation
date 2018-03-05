@@ -298,6 +298,7 @@
     <Compile Include="Reports\SVG\LayerPainter.cs" />
     <Compile Include="Reports\SVG\Report.cs" />
     <Compile Include="Reports\SVG\SamplesColumnPainter.cs" />
+    <Compile Include="Reports\SVG\VisualColumnPainter.cs" />
     <Compile Include="StartupMenu.xaml.cs">
       <DependentUpon>StartupMenu.xaml</DependentUpon>
     </Compile>

@@ -285,12 +285,15 @@ namespace CoreSampleAnnotation.AnnotationPlane
             if (cl.BackgroundPatternSVG != null) {
                 Svg.SvgPatternServer pa = Svg.SvgDocument.FromSvg<Svg.SvgDocument>(cl.BackgroundPatternSVG).Children[0] as Svg.SvgPatternServer;
 
+                Svg.SvgPatternServer paOrig = (Svg.SvgPatternServer)pa.DeepCopy();
+
                 Svg.SvgColourServer whitePaint = new Svg.SvgColourServer(System.Drawing.Color.White);
 
                 //creating a brush from the pattern
                 Svg.SvgDocument doc = new Svg.SvgDocument();                
                 Svg.SvgDefinitionList defs = new Svg.SvgDefinitionList();
-                pa.ID = "fillPattern";
+                pa.ID = string.Format("pattern-{0}",Guid.NewGuid().ToString());
+                paOrig.ID = pa.ID;
                 pa.PatternUnits = Svg.SvgCoordinateUnits.Inherit;
                 pa.Width = new Svg.SvgUnit(0.25f);
                 pa.Height = new Svg.SvgUnit(0.25f);
@@ -324,7 +327,7 @@ namespace CoreSampleAnnotation.AnnotationPlane
                 BindingOperations.SetBinding(brush, ImageBrush.ViewportProperty, new Binding("ImageSource") { Converter = new Columns.ViewPortConverter(), RelativeSource = RelativeSource.Self});
 
                 result.BackgroundBrush = brush;
-                result.BackgroundPattern = pa;
+                result.BackgroundPattern = paOrig;
             }
             if (cl.Description != null)
                 result.Description = cl.Description;

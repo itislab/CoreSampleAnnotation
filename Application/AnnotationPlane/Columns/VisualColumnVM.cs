@@ -12,6 +12,12 @@ namespace CoreSampleAnnotation.AnnotationPlane.Columns
     {
         protected SingleClassificationLayerVM target;
 
+        public SingleClassificationLayerVM Origin {
+            get {
+                return target;
+            }
+        }
+
         public VisualLayerPresentingVM(SingleClassificationLayerVM target)
         {
             this.target = target;

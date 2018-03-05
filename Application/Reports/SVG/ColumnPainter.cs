@@ -42,5 +42,11 @@ namespace CoreSampleAnnotation.Reports.SVG
             result.SVG = text;
             return result;
         }
+
+        public virtual SvgDefinitionList Definitions {
+            get {
+                return new SvgDefinitionList();
+            }
+        }
     }
 }

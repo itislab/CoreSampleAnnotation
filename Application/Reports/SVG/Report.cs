@@ -20,6 +20,7 @@ namespace CoreSampleAnnotation.Reports.SVG
     public interface ISvgRenderableColumn {
         RenderedSvg RenderHeader();
         RenderedSvg RenderColumn();
+        SvgDefinitionList Definitions { get; }
     }
 
     public static class Report
@@ -75,7 +76,20 @@ namespace CoreSampleAnnotation.Reports.SVG
                 horizontalOffset += column.RenderedSize.Width;
             }
 
+            //gathering definitions
+            SvgDefinitionList allDefs = new SvgDefinitionList();
+            for (int i = 0; i < columns.Length; i++)
+            {
+                SvgDefinitionList defs = columns[i].Definitions;
+                foreach (SvgPatternServer def in defs.Children)
+                {
+                    //overridings tile size                    
+                    allDefs.Children.Add(def);
+                }
+            }
+
             SvgDocument result = new SvgDocument();
+            result.Children.Add(allDefs);
             result.Width = Helpers.dtos(horizontalOffset);
             result.Height = Helpers.dtos((headerHeight+columnHeight));
             result.Fill = new SvgColourServer(System.Drawing.Color.White);
