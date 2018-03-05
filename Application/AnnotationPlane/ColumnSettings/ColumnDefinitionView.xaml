@@ -30,6 +30,9 @@
         <DataTemplate DataType="{x:Type local:VisualColumnDefinitionVM}">
             <local:VisualColumnDefinitionView />
         </DataTemplate>
+        <DataTemplate DataType="{x:Type local:IconsColumnDefinitionVM}">
+            <local:IconsColumnDefinitionView />
+        </DataTemplate>
         <core:VisibilityHiddenConverter x:Key="visibilityHiddenConverter" />
     </UserControl.Resources>
     <Grid>

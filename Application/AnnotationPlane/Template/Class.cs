@@ -16,6 +16,8 @@ namespace CoreSampleAnnotation.AnnotationPlane.Template
 
         public Color? Color { get; set; }
 
+        public string IconSVG { get; set; }
+
         /// <summary>
         /// Крап
         /// </summary>

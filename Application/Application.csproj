@@ -122,6 +122,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="AnnotationPlane\ColumnSettings\IconsColumnDefinitionView.xaml.cs">
+      <DependentUpon>IconsColumnDefinitionView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="AnnotationPlane\ColumnSettings\IconsColumnDefinitionVM.cs" />
     <Compile Include="AnnotationPlane\ColumnSettings\LayerEditColumnDefinitionView.xaml.cs">
       <DependentUpon>LayerEditColumnDefinitionView.xaml</DependentUpon>
     </Compile>
@@ -325,6 +329,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="AnnotationPlane\ColumnSettings\DepthColumnDefinitionView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="AnnotationPlane\ColumnSettings\IconsColumnDefinitionView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

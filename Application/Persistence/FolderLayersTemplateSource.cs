@@ -26,6 +26,7 @@ namespace CoreSampleAnnotation.Persistence
         private const string NamesFile = "Names.csv";
         private const string MulticlassFile = "Multiclass";
         private const string BackgroundFillFolder = "BackgroundFill";
+        private const string IconsFolder = "Icons";
         private string path;
 
         /// <summary>
@@ -48,6 +49,7 @@ namespace CoreSampleAnnotation.Persistence
             string namesFileFullPath = Path.Combine(path, NamesFile);
             string muticlassFileFullPath = Path.Combine(path, MulticlassFile);
             string backgroundImagesDirFullPath = Path.Combine(path,BackgroundFillFolder);
+            string iconDirFullPath = Path.Combine(path, IconsFolder);
 
             Dictionary<string, Class> loadedClasses = new Dictionary<string, Class>();
 
@@ -69,6 +71,14 @@ namespace CoreSampleAnnotation.Persistence
                         backgroundPatternSVG = File.ReadAllText(bgClassBgPatternPath);
                     }
 
+                    //tring to load corresponding icon SVG
+                    string iconSVG = null;
+                    string iconClassPath = Path.Combine(iconDirFullPath, string.Format("{0}.svg", classID));
+                    if (File.Exists(iconClassPath))
+                    {
+                        iconSVG = File.ReadAllText(iconClassPath);
+                    }
+
                     loadedClasses.Add(row.ID.ToLowerInvariant(),
                         new Class()
                         {
@@ -76,6 +86,7 @@ namespace CoreSampleAnnotation.Persistence
                             Acronym = row.Acronym,
                             ShortName = row.Name,
                             BackgroundPatternSVG = backgroundPatternSVG,
+                            IconSVG = iconSVG,
                             Description = row.Description
                         });
                 }

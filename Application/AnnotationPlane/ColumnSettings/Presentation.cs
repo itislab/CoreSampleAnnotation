@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace CoreSampleAnnotation.AnnotationPlane.ColumnSettings
 {
-    public enum Presentation { BackgroundImage, Acronym, ShortName, Description }
+    public enum Presentation { BackgroundImage, Acronym, ShortName, Description, Icon }
 
     public class Variant
     {
@@ -36,6 +36,8 @@ namespace CoreSampleAnnotation.AnnotationPlane.ColumnSettings
                         enumText = "Расширеное текстовое описание"; break;
                     case Presentation.ShortName:
                         enumText = "Короткое имя"; break;
+                    case Presentation.Icon:
+                        enumText = "Значок"; break;
                     default:
                         throw new NotImplementedException();
                 }
