@@ -9,10 +9,10 @@ using System.Windows.Input;
 namespace CoreSampleAnnotation.AnnotationPlane
 {
     [Serializable]
-    public class SampleVM :ViewModel, ISerializable {
+    public class SampleVM : ViewModel, ISerializable {
         private double level;
         /// <summary>
-        /// Detpth in WPF units
+        /// Depth in WPF units
         /// </summary>
         public double Level {
             get {
@@ -67,7 +67,7 @@ namespace CoreSampleAnnotation.AnnotationPlane
         protected SampleVM(SerializationInfo info, StreamingContext context) {
             Depth = info.GetDouble("Depth");
         }
-        public virtual  void GetObjectData(SerializationInfo info, StreamingContext context)
+        public virtual void GetObjectData(SerializationInfo info, StreamingContext context)
         {
             info.AddValue("Depth",Depth);
         }
