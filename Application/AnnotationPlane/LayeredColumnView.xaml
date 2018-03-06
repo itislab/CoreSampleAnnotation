@@ -13,6 +13,21 @@
         <DataTemplate DataType="{x:Type local:LengthLayerVM}">
             <TextBlock Text="{Binding RealLength, StringFormat={}{0:0.00} м}" VerticalAlignment="Center" HorizontalAlignment="Center"></TextBlock>
         </DataTemplate>
+        <DataTemplate DataType="{x:Type local:MultiClassificationLayerIconPresentingVM}">
+            <ItemsControl ItemsSource="{Binding Icons}">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" />
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <!--<Rectangle Width="10" Height="10" Fill="DarkCyan"/>-->
+                        <Image Source="{Binding .}" Width="32"/>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </DataTemplate>
         <DataTemplate DataType="{x:Type local:LayerVM}">
             <TextBlock Text="LayerVM template is not set"></TextBlock>
         </DataTemplate>

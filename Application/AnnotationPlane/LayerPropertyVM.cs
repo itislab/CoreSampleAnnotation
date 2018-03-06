@@ -265,6 +265,36 @@ namespace CoreSampleAnnotation.AnnotationPlane
         }
     }
 
+    public class MultiClassificationLayerIconPresentingVM : ClassificationLayerPresentingVM
+    {
+        private new MultiClassificationLayerVM target;
+
+        public MultiClassificationLayerIconPresentingVM(MultiClassificationLayerVM target) : base(target) {
+            this.target = target;
+            target.PropertyChanged += Target_PropertyChanged;
+        }
+        
+        public ImageSource[] Icons {
+            get {
+                if (target.CurrentClasses == null)
+                    return null;
+                var results = target.CurrentClasses.Select(c => c.IconImage).ToArray();
+                return results;
+            }
+        }
+
+        private void Target_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            MultiClassificationLayerVM vm = sender as MultiClassificationLayerVM;
+            switch (e.PropertyName)
+            {
+                case nameof(vm.CurrentClasses):
+                    RaisePropertyChanged(nameof(Icons));
+                    break;
+            }
+        }
+    }
+
     public class LayerClassVM : ViewModel
     {
         public string ID { private set; get; }
@@ -357,7 +387,32 @@ namespace CoreSampleAnnotation.AnnotationPlane
             set {
                 if (backgroundPattern != value) {
                     backgroundPattern = value;
-                    RaisePropertyChanged(nameof(backgroundPattern));
+                    RaisePropertyChanged(nameof(BackgroundPattern));
+                }
+            }
+        }
+
+        private ImageSource iconImage;
+
+        public ImageSource IconImage {
+            get {
+                return iconImage;
+            }
+            set {
+                if (iconImage != value) {
+                    iconImage = value;
+                    RaisePropertyChanged(nameof(IconImage));
+                }
+            }
+        }
+
+        private Svg.SvgElement iconSvg;
+        public Svg.SvgElement IconSvg {
+            get { return IconSvg; }
+            set {
+                if (iconSvg != value) {
+                    iconSvg = value;
+                    RaisePropertyChanged(nameof(IconSvg));
                 }
             }
         }
