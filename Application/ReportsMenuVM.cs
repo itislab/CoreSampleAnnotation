@@ -30,7 +30,7 @@ namespace CoreSampleAnnotation {
             }
         }
 
-        public ReportsMenuVM(ProjectVM project) {//, ObservableCollection<ColumnVM> columns
+        public ReportsMenuVM(ProjectVM project) {
             projectVM = project;
         }
     }

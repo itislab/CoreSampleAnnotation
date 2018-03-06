@@ -23,7 +23,6 @@ namespace CoreSampleAnnotation.Reports.SamplesCSV {
     public static class Report {
         public static void Generate(string fileName, SamplesColumnVM samplesCol) {
             var engine = new FileHelperEngine<SampleVMCSV>();
-            var SampleVMCSVs = new List<SampleVMCSV>();
             engine.WriteFile(fileName, samplesCol.Samples.Select(x => new SampleVMCSV(x.Number, x.Depth)));
         }
     }

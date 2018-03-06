@@ -61,16 +61,6 @@ namespace CoreSampleAnnotation.AnnotationPlane
                     {
                         svg.Write(writer);
                     }
-
-                    SamplesColumnVM sampleColVM = vm.AnnoGridVM.Columns.Single(c => c is SamplesColumnVM) as SamplesColumnVM;
-
-                    SaveFileDialog dlg = new SaveFileDialog();
-                    dlg.FileName = "layers"; // Default file name
-                    dlg.DefaultExt = ".csv"; // Default file extension
-                    dlg.Filter = "CSV files|*.csv";
-                    bool? result = dlg.ShowDialog();
-                    if (result == true)
-                        Reports.SamplesCSV.Report.Generate(dlg.FileName, sampleColVM);
                     
                     /*
                     FixedDocument fixedDoc = new FixedDocument();
