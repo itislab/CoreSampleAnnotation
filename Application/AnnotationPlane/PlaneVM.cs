@@ -9,8 +9,10 @@ using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Input;
+using System.Windows.Interop;
 using System.Windows.Media;
 
 namespace CoreSampleAnnotation.AnnotationPlane
@@ -280,8 +282,53 @@ namespace CoreSampleAnnotation.AnnotationPlane
             LayerClassVM result = new LayerClassVM(cl.ID);
             if (cl.Acronym != null)
                 result.Acronym = cl.Acronym;
-            if (cl.Color != null && cl.Color.HasValue)
-                result.Color = cl.Color.Value;
+            if (cl.BackgroundPatternSVG != null) {
+                Svg.SvgPatternServer pa = Svg.SvgDocument.FromSvg<Svg.SvgDocument>(cl.BackgroundPatternSVG).Children[0] as Svg.SvgPatternServer;
+
+                Svg.SvgPatternServer paOrig = (Svg.SvgPatternServer)pa.DeepCopy();
+
+                Svg.SvgColourServer whitePaint = new Svg.SvgColourServer(System.Drawing.Color.White);
+
+                //creating a brush from the pattern
+                Svg.SvgDocument doc = new Svg.SvgDocument();                
+                Svg.SvgDefinitionList defs = new Svg.SvgDefinitionList();
+                pa.ID = string.Format("pattern-{0}",Guid.NewGuid().ToString());
+                paOrig.ID = pa.ID;
+                pa.PatternUnits = Svg.SvgCoordinateUnits.Inherit;
+                pa.Width = new Svg.SvgUnit(0.25f);
+                pa.Height = new Svg.SvgUnit(0.25f);
+                defs.Children.Add(pa);
+                doc.Children.Add(defs);                
+
+                Svg.SvgRectangle rect = new Svg.SvgRectangle();
+                rect.Width = 256;
+                rect.Height = 256;
+                rect.Fill = pa;
+                doc.Children.Add(rect);
+
+                var bitmap = doc.Draw();
+
+                //bitmap.Save("pattern.png");
+
+                var bitmapSource = Imaging.CreateBitmapSourceFromHBitmap(bitmap.GetHbitmap(),
+                                                                            IntPtr.Zero,
+                                                                            Int32Rect.Empty,
+                                                                            System.Windows.Media.Imaging.BitmapSizeOptions.FromEmptyOptions()
+                                                                         );
+                bitmap.Dispose();
+                
+                var brush = new ImageBrush(bitmapSource) { TileMode = TileMode.Tile,
+                    Stretch = Stretch.None,
+                    AlignmentX = AlignmentX.Left,
+                    AlignmentY = AlignmentY.Top,
+                    ViewportUnits = BrushMappingMode.Absolute
+                };
+
+                BindingOperations.SetBinding(brush, ImageBrush.ViewportProperty, new Binding("ImageSource") { Converter = new Columns.ViewPortConverter(), RelativeSource = RelativeSource.Self});
+
+                result.BackgroundBrush = brush;
+                result.BackgroundPattern = paOrig;
+            }
             if (cl.Description != null)
                 result.Description = cl.Description;
             if (cl.ShortName != null)
@@ -638,7 +685,7 @@ namespace CoreSampleAnnotation.AnnotationPlane
                             case Presentation.Acronym: centreTextExtractor = vm1 => vm1.Acronym; break;
                             case Presentation.Description: centreTextExtractor = vm1 => vm1.Description; break;
                             case Presentation.ShortName: centreTextExtractor = vm1 => vm1.ShortName; break;
-                            case Presentation.Colour: throw new InvalidOperationException();
+                            case Presentation.BackgroundImage: throw new InvalidOperationException();
                             default: throw new NotImplementedException();
                         }
 
@@ -680,6 +727,13 @@ namespace CoreSampleAnnotation.AnnotationPlane
                 else if (columnDefinition is LayerSamplesDefinitionVM)
                 {
                     AnnoGridVM.Columns.Add(samplesColumnVM);
+                }
+                else if (columnDefinition is VisualColumnDefinitionVM) {
+                    VisualColumnDefinitionVM vcdVM = (VisualColumnDefinitionVM)columnDefinition;
+                    LayeredColumnVM propColumnVM = LayerProps.Where(p => p.Heading == vcdVM.SelectedBackgroundImageProp.PropID).Single();
+                    Columns.VisualColumnVM vcVM = new Columns.VisualColumnVM("Колонка", propColumnVM, lVM => new Columns.VisualLayerPresentingVM(lVM));
+                    AnnoGridVM.Columns.Add(vcVM);
+                    RegisterForScaleSync(vcVM, true);
                 }
                 else throw new NotSupportedException("Незнакомое определение колонки");
             }

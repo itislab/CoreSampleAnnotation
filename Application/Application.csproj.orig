@@ -292,13 +292,16 @@
     <Compile Include="ProjectMenuVM.cs" />
     <Compile Include="ProjectVM.cs" />
     <Compile Include="Persistence\FolderPersister.cs" />
-    <Compile Include="Reports\SVG\BoundaryColumnPainter.cs" />
-    <Compile Include="Reports\SVG\LayeredColumnPainter.cs" />
+<<<<<<< HEAD
     <Compile Include="ReportsMenuView.xaml.cs">
       <DependentUpon>ReportsMenuView.xaml</DependentUpon>
     </Compile>
     <Compile Include="ReportsMenuVM.cs" />
     <Compile Include="Reports\SamplesCSV\Report.cs" />
+=======
+    <Compile Include="Reports\SVG\BoundaryColumnPainter.cs" />
+    <Compile Include="Reports\SVG\LayeredColumnPainter.cs" />
+>>>>>>> 44f600c1b9df1c2a75b6fb16b76664ca26cad8cc
     <Compile Include="Reports\SVG\ColumnPainter.cs" />
     <Compile Include="Reports\SVG\ColumnPainterFactory.cs" />
     <Compile Include="Reports\SVG\DepthColumnPainter.cs" />

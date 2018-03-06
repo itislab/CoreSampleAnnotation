@@ -338,6 +338,30 @@ namespace CoreSampleAnnotation.AnnotationPlane
             }
         }
 
+        private Brush backgroundBrush;        
+
+        public Brush BackgroundBrush {
+            get { return backgroundBrush; }
+            set {
+                if (backgroundBrush != value) {
+                    backgroundBrush = value;
+                    RaisePropertyChanged(nameof(BackgroundBrush));
+                }
+            }
+        }
+
+        private Svg.SvgPatternServer backgroundPattern;
+
+        public Svg.SvgPatternServer BackgroundPattern {
+            get { return backgroundPattern; }
+            set {
+                if (backgroundPattern != value) {
+                    backgroundPattern = value;
+                    RaisePropertyChanged(nameof(backgroundPattern));
+                }
+            }
+        }
+
         private Color color;
         public Color Color
         {

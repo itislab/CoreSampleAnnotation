@@ -43,6 +43,8 @@ namespace CoreSampleAnnotation.AnnotationPlane.ColumnSettings
         public ICommand AddLayerPropCommand { get; private set; }
         public ICommand AddLayerBoundsCommand { get; private set; }
         public ICommand AddLayerSamplesCommand { get; private set; }
+        public ICommand AddVisualCommand { get; private set; }
+        public ICommand AddIconsCommand { get; private set; }
 
         private ICommand activateAnnotationPlaneCommand;
         public ICommand ActivateAnnotationPlaneCommand {
@@ -160,6 +162,22 @@ namespace CoreSampleAnnotation.AnnotationPlane.ColumnSettings
             AddLayerSamplesCommand = new DelegateCommand(() => {
                 List<ColumnDefinitionVM> result = new List<ColumnDefinitionVM>(ColumnDefinitions);
                 ColumnDefinitionVM column = new LayerSamplesDefinitionVM();
+                InitializeColumn(column);
+                result.Add(column);
+                ColumnDefinitions = result.ToArray();
+            });
+
+            AddVisualCommand = new DelegateCommand(() => {
+                List<ColumnDefinitionVM> result = new List<ColumnDefinitionVM>(ColumnDefinitions);
+                ColumnDefinitionVM column = new VisualColumnDefinitionVM(layersTemplateSource);
+                InitializeColumn(column);
+                result.Add(column);
+                ColumnDefinitions = result.ToArray();
+            });
+
+            AddIconsCommand = new DelegateCommand(() => {
+                List<ColumnDefinitionVM> result = new List<ColumnDefinitionVM>(ColumnDefinitions);
+                ColumnDefinitionVM column = new IconsColumnDefinitionVM(layersTemplateSource);
                 InitializeColumn(column);
                 result.Add(column);
                 ColumnDefinitions = result.ToArray();

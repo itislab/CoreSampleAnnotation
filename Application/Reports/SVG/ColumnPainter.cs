@@ -9,19 +9,27 @@ using Svg;
 
 namespace CoreSampleAnnotation.Reports.SVG
 {
+    /// <summary>
+    /// Capable of generating SVG for the column header and for the column body
+    /// </summary>
     public class ColumnPainter : ISvgRenderableColumn
     {
         protected readonly UIElement headerView;
         protected readonly ColumnVM vm;
+        protected readonly ColumnView view;
 
         public ColumnPainter(UIElement headerView, ColumnView view, ColumnVM vm) {
             this.headerView = headerView;
             this.vm = vm;
+            this.view = view;
         }
 
-        public RenderedSvg RenderColumn()
+        public virtual RenderedSvg RenderColumn()
         {
-            throw new NotImplementedException();
+            RenderedSvg result = new RenderedSvg();
+            result.RenderedSize = view.RenderSize;
+            result.SVG = new Svg.SvgGroup();
+            return result;
         }
 
         public RenderedSvg RenderHeader()
@@ -33,6 +41,12 @@ namespace CoreSampleAnnotation.Reports.SVG
             result.RenderedSize = headerView.RenderSize;
             result.SVG = text;
             return result;
+        }
+
+        public virtual SvgDefinitionList Definitions {
+            get {
+                return new SvgDefinitionList();
+            }
         }
     }
 }
