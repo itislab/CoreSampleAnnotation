@@ -339,7 +339,7 @@ namespace CoreSampleAnnotation.AnnotationPlane
             if (cl.IconSVG != null)
             {
                 Svg.SvgDocument doc = Svg.SvgDocument.FromSvg<Svg.SvgDocument>(cl.IconSVG);
-                Svg.SvgElement docCopy = doc.DeepCopy();
+                Svg.SvgFragment docCopy = (Svg.SvgFragment)doc.DeepCopy();
                 doc.Fill = new Svg.SvgColourServer(System.Drawing.Color.White);
 
                 double ratio = doc.Bounds.Width / doc.Bounds.Height;

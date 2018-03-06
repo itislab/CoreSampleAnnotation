@@ -283,6 +283,15 @@ namespace CoreSampleAnnotation.AnnotationPlane
             }
         }
 
+        public Svg.SvgFragment[] IconsSVG {
+            get {
+                if (target.CurrentClasses == null)
+                    return null;
+                var results = target.CurrentClasses.Select(c => c.IconSvg).ToArray();
+                return results;
+            }
+        }
+
         private void Target_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
             MultiClassificationLayerVM vm = sender as MultiClassificationLayerVM;
@@ -406,9 +415,9 @@ namespace CoreSampleAnnotation.AnnotationPlane
             }
         }
 
-        private Svg.SvgElement iconSvg;
-        public Svg.SvgElement IconSvg {
-            get { return IconSvg; }
+        private Svg.SvgFragment iconSvg;
+        public Svg.SvgFragment IconSvg {
+            get { return iconSvg; }
             set {
                 if (iconSvg != value) {
                     iconSvg = value;

@@ -26,13 +26,50 @@ namespace CoreSampleAnnotation.Reports.SVG
                 text.Transforms.Add(new Svg.Transforms.SvgTranslate((float)textXoffset, (float)(availableHeight * 0.5 + textYoffset)));
                 return text;
             }
-            else if (vm is LengthLayerVM) {
+            else if (vm is LengthLayerVM)
+            {
                 LengthLayerVM lrlcVM = (LengthLayerVM)vm;
-                SvgText text = new SvgText(string.Format("{0:0.##} м",lrlcVM.RealLength));
+                SvgText text = new SvgText(string.Format("{0:0.##} м", lrlcVM.RealLength));
                 text.FontSize = Helpers.dtos(fontSize);
                 text.Fill = blackPaint;
                 text.Transforms.Add(new Svg.Transforms.SvgTranslate((float)textXoffset, (float)(availableHeight * 0.5 + textYoffset)));
                 return text;
+            }
+            else if (vm is MultiClassificationLayerIconPresentingVM) {
+                MultiClassificationLayerIconPresentingVM mclipVM = (MultiClassificationLayerIconPresentingVM)vm;
+                SvgGroup group = new SvgGroup();                
+                float iconWidth = 32.0f;                
+
+                if (mclipVM.IconsSVG != null)
+                {
+                    SvgFragment[] fragments = mclipVM.IconsSVG.Where(f => f != null).ToArray();
+
+                    if (fragments.Length == 0)
+                        return group;
+
+                    float maxHeight = fragments.Select(f => f.Bounds.Height).Max();
+
+                    float offset = (float)((availableWidth - fragments.Length*iconWidth)*0.5);
+
+                    foreach (var item in fragments)
+                    {
+                        SvgFragment copy = (SvgFragment)item.DeepCopy();
+
+                        float aspectRatio = copy.Bounds.Width / copy.Bounds.Height;
+
+                        float ratio = iconWidth /  copy.Bounds.Width;
+
+                        copy.ViewBox = copy.Bounds;
+                        copy.X += offset;
+                        copy.Y = (float)(availableHeight - maxHeight) * 0.5f;
+                        //copy.Transforms.Add(new Svg.Transforms.SvgScale(ratio));
+                        copy.Width = iconWidth;
+                        copy.Height = iconWidth / aspectRatio;
+                        group.Children.Add(copy);
+                        offset += iconWidth;
+                    }
+                }
+                return group;
             }
             else
                 return new SvgGroup();
