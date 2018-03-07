@@ -36,10 +36,10 @@ namespace CoreSampleAnnotation.AnnotationPlane.Columns
                     DragStartEventArgs dsea = new DragStartEventArgs();
                     dsea.FrameworkElement = sender as FrameworkElement;
                     dsea.GetEventPoint = (elem => e.GetPosition(elem));
-                    vm.DragStarted.Execute(dsea);
-                    e.Handled = true;
+                    vm.DragStarted.Execute(dsea);                    
                 }
             }
+            e.Handled = true;
         }
 
         private void Sample_TouchDown(object sender, TouchEventArgs e)

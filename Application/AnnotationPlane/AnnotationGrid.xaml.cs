@@ -376,17 +376,16 @@ namespace CoreSampleAnnotation.AnnotationPlane
             view.DataContext = colVM;
 
             //point selection related
-            view.PreviewMouseRightButtonDown += View_MouseRightButtonDown;
+            view.MouseDown += View_MouseRightButtonDown;
             view.TouchDown += View_TouchDown;
             view.TouchMove += View_TouchMove;
             view.TouchUp += View_TouchUp;
             view.IsManipulationEnabled = true;
             view.TouchLeave += View_TouchLeave;
 
-            string sharedWidthGroupName = "annotation_grid_" + Guid.NewGuid().ToString().Replace('-', '_');
+            view.SizeChanged += View_SizeChanged;
 
-            ColumnDefinition cd = new ColumnDefinition();
-            cd.SharedSizeGroup = sharedWidthGroupName;
+            ColumnDefinition cd = new ColumnDefinition();            
             cd.Width = GridLength.Auto;
             this.ColumnsGrid.ColumnDefinitions.Add(cd);
 
@@ -398,7 +397,6 @@ namespace CoreSampleAnnotation.AnnotationPlane
             //Handling header
             ColumnDefinition header_cd = new ColumnDefinition();
             header_cd.Width = GridLength.Auto;
-            header_cd.SharedSizeGroup = sharedWidthGroupName;
             this.HeadersGrid.ColumnDefinitions.Add(header_cd);
 
             RotateTransform headingRotation = new RotateTransform(-90);
@@ -414,6 +412,18 @@ namespace CoreSampleAnnotation.AnnotationPlane
             Grid.SetColumn(textBorder, this.HeadersGrid.ColumnDefinitions.Count - 1);
             Grid.SetRow(textBorder, 0);
             this.HeadersGrid.Children.Add(textBorder);
+        }
+
+        private void View_SizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            System.Diagnostics.Trace.WriteLine("Column size changed");
+            int elems = ColumnsGrid.Children.Count;
+            for (int i = 0; i < elems; i++)
+            {
+                var heading = HeadersGrid.Children[i] as Border;
+                var column = ColumnsGrid.Children[i] as ColumnView;
+                heading.Width = column.ActualWidth;
+            }
         }
 
         private void Columns_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)

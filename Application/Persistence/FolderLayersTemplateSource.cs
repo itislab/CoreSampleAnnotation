@@ -13,7 +13,8 @@ using System.Windows.Media.Imaging;
 
 namespace CoreSampleAnnotation.Persistence
 {
-    [DelimitedRecord(",")]
+    [DelimitedRecord("|")]
+    [IgnoreFirst]
     public class NamesFileRow {
         public string ID;
         public string Acronym;
