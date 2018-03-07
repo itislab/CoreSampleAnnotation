@@ -27,8 +27,13 @@ namespace CoreSampleAnnotation.AnnotationPlane
         {
             InitializeComponent();
 
-            this.AnnoGrid.PointSelected += Plane_PointSelected;
-            this.AnnoGrid.ElementDropped += AnnoGrod_ElementDropped;
+            AnnoGrid.PointSelected += Plane_PointSelected;
+            AnnoGrid.ElementDropped += AnnoGrod_ElementDropped;
+
+            Binding scaleBinding = new Binding("DataContext.ScaleFactor");
+            scaleBinding.Source = this;
+            scaleBinding.Mode = BindingMode.TwoWay;
+            AnnoGrid.SetBinding(AnnotationGrid.ScaleFactorProperty, scaleBinding);            
 
             DataContextChanged += Plane_DataContextChanged;
         }
