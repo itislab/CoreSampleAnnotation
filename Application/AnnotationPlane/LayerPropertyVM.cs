@@ -439,6 +439,17 @@ namespace CoreSampleAnnotation.AnnotationPlane
                 }
             }
         }
+
+        private ImageSource exampleImage;
+        public ImageSource ExampleImage {
+            get { return exampleImage; }
+            set {
+                if (exampleImage != value) {
+                    exampleImage = value;
+                    RaisePropertyChanged(nameof(ExampleImage));
+                }
+            }
+        }
     }
 }
 

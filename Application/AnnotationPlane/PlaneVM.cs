@@ -353,7 +353,7 @@ namespace CoreSampleAnnotation.AnnotationPlane
                 doc.Height = height;
                 var bitmap = doc.Draw();
 
-                bitmap.Save(string.Format("{0}-icon.png", cl.ID));
+                //bitmap.Save(string.Format("{0}-icon.png", cl.ID));
 
                 var bitmapSource = Imaging.CreateBitmapSourceFromHBitmap(bitmap.GetHbitmap(),
                                                                             IntPtr.Zero,
@@ -364,6 +364,8 @@ namespace CoreSampleAnnotation.AnnotationPlane
                 result.IconSvg = docCopy;
                 result.IconImage = bitmapSource;
             }
+            if (cl.ExampleImage != null)
+                result.ExampleImage = cl.ExampleImage;
             return result;
         }
 

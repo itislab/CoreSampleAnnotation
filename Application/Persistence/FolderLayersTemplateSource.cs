@@ -9,6 +9,7 @@ using System.IO;
 using System.Windows;
 using FileHelpers;
 using System.Windows.Media;
+using System.Windows.Media.Imaging;
 
 namespace CoreSampleAnnotation.Persistence
 {
@@ -27,6 +28,7 @@ namespace CoreSampleAnnotation.Persistence
         private const string MulticlassFile = "Multiclass";
         private const string BackgroundFillFolder = "BackgroundFill";
         private const string IconsFolder = "Icons";
+        private const string ExampleImagesFolder = "ExampleImages";
         private string path;
 
         /// <summary>
@@ -50,6 +52,7 @@ namespace CoreSampleAnnotation.Persistence
             string muticlassFileFullPath = Path.Combine(path, MulticlassFile);
             string backgroundImagesDirFullPath = Path.Combine(path,BackgroundFillFolder);
             string iconDirFullPath = Path.Combine(path, IconsFolder);
+            string exampleImagesDirFullPath = Path.Combine(path, ExampleImagesFolder);
 
             Dictionary<string, Class> loadedClasses = new Dictionary<string, Class>();
 
@@ -79,6 +82,12 @@ namespace CoreSampleAnnotation.Persistence
                         iconSVG = File.ReadAllText(iconClassPath);
                     }
 
+                    ImageSource exampleImage = null;
+                    string exampleImagePath = Path.Combine(exampleImagesDirFullPath, string.Format("{0}.jpg", classID));
+                    if (File.Exists(exampleImagePath)) {
+                        exampleImage = new BitmapImage(new Uri(Path.GetFullPath(exampleImagePath)));
+                    }
+
                     loadedClasses.Add(row.ID.ToLowerInvariant(),
                         new Class()
                         {
@@ -87,7 +96,8 @@ namespace CoreSampleAnnotation.Persistence
                             ShortName = row.Name,
                             BackgroundPatternSVG = backgroundPatternSVG,
                             IconSVG = iconSVG,
-                            Description = row.Description
+                            Description = row.Description,
+                            ExampleImage = exampleImage
                         });
                 }
 

@@ -37,12 +37,14 @@
                                     <Binding RelativeSource="{RelativeSource AncestorType=ItemsControl}" Path="DataContext.LayerVM.CurrentClasses"/>
                                 </MultiBinding>
                             </Border.Background>
-                        <Grid >
-                            <Grid.RowDefinitions>
-                                <RowDefinition />
-                                <RowDefinition />
-                            </Grid.RowDefinitions>
-                                <TextBlock Margin="10" Text="{Binding VisibleShortTextID}" Grid.Row="0" HorizontalAlignment="Center" TextAlignment="Justify" VerticalAlignment="Center">
+                            <Grid >
+                                <Grid.RowDefinitions>
+                                    <RowDefinition />
+                                    <RowDefinition />
+                                    <RowDefinition />
+                                </Grid.RowDefinitions>
+                                <Image Source="{Binding ExampleImage}" Grid.Row="1" Stretch="Uniform" MaxWidth="150" MaxHeight="100" />
+                                <TextBlock Margin="0,8,0,2" Text="{Binding VisibleShortTextID}" Grid.Row="0" HorizontalAlignment="Center" TextAlignment="Justify" VerticalAlignment="Center">
                                     <TextBlock.Foreground>
                                         <MultiBinding Converter="{StaticResource ftColConv}" >
                                             <Binding Path="."/>
@@ -50,8 +52,11 @@
                                             <Binding RelativeSource="{RelativeSource AncestorType=ItemsControl}" Path="DataContext.LayerVM.CurrentClasses"/>
                                         </MultiBinding>
                                     </TextBlock.Foreground>
+                                    <TextBlock.Effect>
+                                        <DropShadowEffect ShadowDepth="2" RenderingBias="Performance"/>
+                                    </TextBlock.Effect>
                                 </TextBlock>
-                                <TextBlock Margin="10" Text="{Binding VisibleLongTextID}" TextWrapping="Wrap" Grid.Row="1" HorizontalAlignment="Center"  TextAlignment="Justify" VerticalAlignment="Center">
+                                <TextBlock Margin="0,2,0,8" Text="{Binding VisibleLongTextID}" TextWrapping="Wrap" Grid.Row="2" HorizontalAlignment="Center"  TextAlignment="Justify" VerticalAlignment="Center">
                                     <TextBlock.Foreground>
                                         <MultiBinding Converter="{StaticResource ftColConv}" >
                                             <Binding Path="."/>
@@ -59,13 +64,15 @@
                                             <Binding RelativeSource="{RelativeSource AncestorType=ItemsControl}" Path="DataContext.LayerVM.CurrentClasses"/>
                                         </MultiBinding>
                                     </TextBlock.Foreground>
+                                    <TextBlock.Effect>
+                                        <DropShadowEffect ShadowDepth="2" RenderingBias="Performance"/>
+                                    </TextBlock.Effect>
                                 </TextBlock>
                             </Grid>
                         </Border>
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>
             </ItemsControl>
-            
         </Grid>
     </Border>
 </UserControl>
