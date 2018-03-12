@@ -607,8 +607,14 @@ namespace CoreSampleAnnotation.AnnotationPlane
                     }
                     layerVM.PossibleClasses = availableClasses[property.ID];
                     ColumnValues column = annotation.Columns.FirstOrDefault(c => c.PropID == property.ID);
-                    if (column != null) //setting choice                        
+                    if (column != null)
                     {
+                        //setting Remarks
+                        if (column.LayerValues[i].Remarks != null)
+                        {
+                            layerVM.Remark = column.LayerValues[i].Remarks;
+                        }
+                        //setting choice
                         if (column.LayerValues[i].Value != null)
                         {
                             foreach (string classID in column.LayerValues[i].Value)
@@ -772,7 +778,8 @@ namespace CoreSampleAnnotation.AnnotationPlane
                     AnnoGridVM.Columns.Add(vcVM);
                     RegisterForScaleSync(vcVM, true);
                 }
-                else if (columnDefinition is IconsColumnDefinitionVM) {
+                else if (columnDefinition is IconsColumnDefinitionVM)
+                {
                     IconsColumnDefinitionVM colDef = (IconsColumnDefinitionVM)columnDefinition;
                     LayeredColumnVM propColumnVM = LayerProps.Where(p => p.Heading == colDef.SelectedIconProp.PropID).FirstOrDefault();
 
@@ -792,7 +799,7 @@ namespace CoreSampleAnnotation.AnnotationPlane
                     colVM.ColumnHeight = colHeight;
 
                     AnnoGridVM.Columns.Add(colVM);
-                    RegisterForScaleSync(colVM, true);                    
+                    RegisterForScaleSync(colVM, true);
                 }
                 else throw new NotSupportedException("Незнакомое определение колонки");
             }
@@ -821,6 +828,9 @@ namespace CoreSampleAnnotation.AnnotationPlane
                 {
                     ClassificationLayerVM clVM = layer as ClassificationLayerVM;
                     LayerPropertyValue v = new LayerPropertyValue();
+                    //handling remarks                    
+                    v.Remarks = clVM.Remark;
+                    //handling selected values                    
                     if (clVM is SingleClassificationLayerVM)
                     {
                         SingleClassificationLayerVM sclVM = (SingleClassificationLayerVM)clVM;

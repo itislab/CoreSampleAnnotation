@@ -71,7 +71,21 @@ namespace CoreSampleAnnotation.AnnotationPlane
         }
     }
 
-    public abstract class ClassificationLayerVM : LayerVM
+    public class RemarkLayerVM : LayerVM {
+        private string remark;
+
+        public string Remark {
+            get { return remark; }
+            set {
+                if (remark != value) {
+                    remark = value;
+                    RaisePropertyChanged(nameof(Remark));
+                }
+            }
+        }
+    }
+
+    public abstract class ClassificationLayerVM : RemarkLayerVM
     {
 
 
@@ -109,6 +123,7 @@ namespace CoreSampleAnnotation.AnnotationPlane
         public override LayerVM DeepClone()
         {
             SingleClassificationLayerVM result = new SingleClassificationLayerVM();
+            result.Remark = Remark;
             result.PossibleClasses = new ObservableCollection<LayerClassVM>(PossibleClasses);
             result.CurrentClass = CurrentClass;
             return result;
@@ -136,6 +151,7 @@ namespace CoreSampleAnnotation.AnnotationPlane
         {
             MultiClassificationLayerVM result = new MultiClassificationLayerVM();
             result.PossibleClasses = new ObservableCollection<LayerClassVM>(PossibleClasses);
+            result.Remark = Remark;
             if (CurrentClasses == null)
                 result.CurrentClasses = new List<LayerClassVM>();
             else
@@ -153,6 +169,16 @@ namespace CoreSampleAnnotation.AnnotationPlane
             get { return target; }
         }
 
+        public string Remark {
+            get { return target.Remark; }
+            set {
+                if (target.Remark != value) {
+                    target.Remark = value;
+                    RaisePropertyChanged(nameof(Remark));
+                }
+            }
+        }
+
         public ClassificationLayerPresentingVM(ClassificationLayerVM target)
         {
             this.target = target;
@@ -168,6 +194,9 @@ namespace CoreSampleAnnotation.AnnotationPlane
                 case nameof(vm.Length):
                     Length = vm.Length;
                     RaisePropertyChanged(nameof(Length));
+                    break;
+                case nameof(vm.Remark):
+                    RaisePropertyChanged(nameof(Remark));
                     break;
             }
         }
