@@ -34,12 +34,9 @@
                     
                 </media:Arrow_In_circle>
             </Button>
-            <!--<Button Grid.Row="2" Style="{StaticResource MetroButton}" Width="50" Height="50" Command="{Binding RotateCurrentImageCommand}" Visibility="{Binding ImagePath, Converter={StaticResource fileExistsVisibilityConverter}}">
+            <Button Grid.Row="2" Style="{StaticResource MetroButton}" Width="50" Height="50" Command="{Binding RotateCurrentImageCommand}" Visibility="{Binding ImagePath, Converter={StaticResource fileExistsVisibilityConverter}}">
                 <media:RotateIcon/>
-            </Button>-->
-            <Button Grid.Row="2" Style="{StaticResource MetroButton}" Width="50" Height="50" Command="{Binding RotateCurrentImageCommand}" Visibility="Hidden">
-                <media:RotateIcon/>
-            </Button>
+            </Button>            
             <Button Grid.Row="3" Style="{StaticResource MetroButton}" Width="50" Height="50" Command="{Binding RemoveCurrentImageCommand}" Visibility="{Binding ImagePath, Converter={StaticResource fileExistsVisibilityConverter}}">
                 <media:CrossIcon/>
             </Button>
