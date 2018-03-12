@@ -131,6 +131,10 @@ namespace CoreSampleAnnotation.AnnotationPlane
 
         private SamplesColumnVM samplesColumnVM;
 
+        public SamplesColumnVM SamplesColumnVM {
+            get { return samplesColumnVM; }
+        }
+
         /// <summary>
         /// 
         /// </summary>
@@ -369,6 +373,11 @@ namespace CoreSampleAnnotation.AnnotationPlane
             return result;
         }
 
+        /// <param name="upper">in meters (positive values)</param>
+        /// <param name="lower">in meters (positive values)</param>
+        public void SetDepthBoundaries(double upper, double lower) {
+            
+        }
 
         /// <summary>
         /// Fills the LayerProps view models with the information passed in annotatioN
@@ -590,12 +599,16 @@ namespace CoreSampleAnnotation.AnnotationPlane
             samplesColumnVM.DragStart = layerBoundaryEditorVM.DragStart;
 
             double colHeight = LayerSyncController.DepthToWPF(lowerDepth) - LayerSyncController.DepthToWPF(upperDepth);
-
+            
+            //filling up classification columns (not UI column, logical columns. One column for each property)
             foreach (var property in layersTemplateSource.Template)
             {
                 LayeredColumnVM columnVM = new LayeredColumnVM(property.ID);
                 for (int i = 0; i < layersCount; i++)
                 {
+                    double layerUp = boundaries[i];
+                    double layerBottom = boundaries[i + 1];
+                   
                     ClassificationLayerVM layerVM;
                     if (property.IsMulticlass)
                     {
@@ -644,7 +657,7 @@ namespace CoreSampleAnnotation.AnnotationPlane
                         }
 
                     }
-                    layerVM.Length = LayerSyncController.LengthToWPF(boundaries[i + 1] - boundaries[i]);
+                    layerVM.Length = LayerSyncController.LengthToWPF(layerBottom - layerUp);
                     columnVM.Layers.Add(layerVM);
                 }
                 columnVM.ColumnHeight = colHeight;
@@ -655,6 +668,7 @@ namespace CoreSampleAnnotation.AnnotationPlane
                 LayerProps.Add(columnVM);
             }
 
+            
             samplesColumnVM.ColumnHeight = colHeight;
             RegisterForScaleSync(samplesColumnVM, false);
 
@@ -816,47 +830,54 @@ namespace CoreSampleAnnotation.AnnotationPlane
             Initialize(layersAnnotation);
         }
 
-        public void GetObjectData(SerializationInfo info, StreamingContext context)
-        {
-            //Dumping layer prop VMs to LayersAnnotation
-            LayersAnnotation layersAnnotation = new LayersAnnotation();
-            layersAnnotation.LayerBoundaries = LayerSyncController.DepthBoundaries;
-            layersAnnotation.Columns = LayerProps.Select(col =>
-            {
-                List<LayerPropertyValue> values = new List<LayerPropertyValue>();
-                foreach (var layer in col.Layers)
+        public LayersAnnotation AsLayersAnnotation {
+            get {
+                //Dumping layer prop VMs to LayersAnnotation
+                LayersAnnotation layersAnnotation = new LayersAnnotation();
+                layersAnnotation.LayerBoundaries = LayerSyncController.DepthBoundaries;
+                layersAnnotation.Columns = LayerProps.Select(col =>
                 {
-                    ClassificationLayerVM clVM = layer as ClassificationLayerVM;
-                    LayerPropertyValue v = new LayerPropertyValue();
-                    //handling remarks                    
-                    v.Remarks = clVM.Remark;
-                    //handling selected values                    
-                    if (clVM is SingleClassificationLayerVM)
+                    List<LayerPropertyValue> values = new List<LayerPropertyValue>();
+                    foreach (var layer in col.Layers)
                     {
-                        SingleClassificationLayerVM sclVM = (SingleClassificationLayerVM)clVM;
-                        if (sclVM.CurrentClass != null)
+                        ClassificationLayerVM clVM = layer as ClassificationLayerVM;
+                        LayerPropertyValue v = new LayerPropertyValue();
+                        //handling remarks                    
+                        v.Remarks = clVM.Remark;
+                        //handling selected values                    
+                        if (clVM is SingleClassificationLayerVM)
                         {
-                            v.Value = new string[] { sclVM.CurrentClass.ID };
-                        }
-                    }
-                    else if (clVM is MultiClassificationLayerVM)
-                    {
-                        MultiClassificationLayerVM mclVM = (MultiClassificationLayerVM)clVM;
-                        {
-                            if (mclVM.CurrentClasses != null)
+                            SingleClassificationLayerVM sclVM = (SingleClassificationLayerVM)clVM;
+                            if (sclVM.CurrentClass != null)
                             {
-                                v.Value = mclVM.CurrentClasses.Select(c => c.ID).ToArray();
+                                v.Value = new string[] { sclVM.CurrentClass.ID };
                             }
                         }
-                    }
-                    else throw new InvalidOperationException("Unexpected VM type");
+                        else if (clVM is MultiClassificationLayerVM)
+                        {
+                            MultiClassificationLayerVM mclVM = (MultiClassificationLayerVM)clVM;
+                            {
+                                if (mclVM.CurrentClasses != null)
+                                {
+                                    v.Value = mclVM.CurrentClasses.Select(c => c.ID).ToArray();
+                                }
+                            }
+                        }
+                        else throw new InvalidOperationException("Unexpected VM type");
 
-                    values.Add(v);
-                }
-                return new ColumnValues() { PropID = col.Heading, LayerValues = values.ToArray() };
-            }).ToArray();
+                        values.Add(v);
+                    }
+                    return new ColumnValues() { PropID = col.Heading, LayerValues = values.ToArray() };
+                }).ToArray();
+                return layersAnnotation;
+            }
+        }
+
+        public void GetObjectData(SerializationInfo info, StreamingContext context)
+        {
+            
             info.AddValue("Samples", samplesColumnVM);
-            info.AddValue("LayersAnnotation", layersAnnotation);
+            info.AddValue("LayersAnnotation", AsLayersAnnotation);
             info.AddValue("LayersTemplate", layersTemplateSource);
             info.AddValue("LayerBoundaries", layerBoundaryEditorVM);
         }

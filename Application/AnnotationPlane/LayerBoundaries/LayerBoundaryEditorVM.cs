@@ -45,7 +45,7 @@ namespace CoreSampleAnnotation.AnnotationPlane.LayerBoundaries
 
         #region Serialization
 
-        protected LayerBoundary(SerializationInfo info, StreamingContext context) {
+        protected LayerBoundary(SerializationInfo info, StreamingContext context) {            
             Rank = info.GetInt32("Rank");
             Level = info.GetDouble("Level");
             id = Guid.NewGuid();
@@ -71,6 +71,8 @@ namespace CoreSampleAnnotation.AnnotationPlane.LayerBoundaries
         /// <param name="boundaries"></param>
         /// <returns></returns>
         private static LayerBoundary[] RecalcBoundaryNumbers(LayerBoundary[] boundaries) {
+            if (boundaries.Length == 0)
+                return boundaries;
             int minRank = boundaries.Select(b => b.Rank).Min();
             int maxRank = boundaries.Select(b => b.Rank).Max();
             int[] numbers = Enumerable.Repeat(2,maxRank-minRank+1).ToArray();

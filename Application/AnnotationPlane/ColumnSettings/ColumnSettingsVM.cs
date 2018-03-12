@@ -68,9 +68,9 @@ namespace CoreSampleAnnotation.AnnotationPlane.ColumnSettings
         private void InitializeColumn(ColumnDefinitionVM column)
         {
 
-            int columns = ColumnDefinitions.Length;
+            int nonZeroOrderColumns = ColumnDefinitions.Count(c => c.ColumnOrder > 0);
             if (column.ColumnOrder == 0)
-                column.ColumnOrder = columns + 1;
+                column.ColumnOrder = nonZeroOrderColumns + 1;
 
             column.RemoveCommand = new DelegateCommand((parameter) =>
             {

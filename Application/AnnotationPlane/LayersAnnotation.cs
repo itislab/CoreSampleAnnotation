@@ -22,6 +22,9 @@ namespace CoreSampleAnnotation.AnnotationPlane
     [Serializable]
     public class LayersAnnotation
     {
+        /// <summary>
+        /// In meters (positive values)
+        /// </summary>
         public double[] LayerBoundaries { get; set;  }
 
         public ColumnValues[] Columns;        
