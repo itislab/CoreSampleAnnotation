@@ -81,7 +81,7 @@
                     </ItemsControl.ItemContainerStyle>
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
-                            <Line X1="0" X2="1000" Y1="0" Y2="0" StrokeThickness="2" Stroke="Black"></Line>
+                            <Line X1="0" X2="1000" Y1="0" Y2="0" StrokeThickness="2" Stroke="{Binding Path=DataContext.LineStrokeBrush,RelativeSource={RelativeSource AncestorType=Grid}}"></Line>
                         </DataTemplate>
                     </ItemsControl.ItemTemplate>
                 </ItemsControl>

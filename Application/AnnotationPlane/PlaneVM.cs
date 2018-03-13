@@ -693,9 +693,13 @@ namespace CoreSampleAnnotation.AnnotationPlane
                 if (columnDefinition is DepthColumnDefinitionVM)
                 {
                     DepthAxisColumnVM colVM = new DepthAxisColumnVM("Шкала глубин");
-                    colVM.ColumnHeight = colHeight;
-                    AnnoGridVM.Columns.Add(colVM);
-                    RegisterForScaleSync(colVM, true);
+
+                    RankMoreOrEqualBoundaryCollection filter = new RankMoreOrEqualBoundaryCollection(layerBoundaryEditorVM, 0);
+                    BoundaryLineColumnVM blVM = new BoundaryLineColumnVM(colVM, filter, Colors.Green);
+
+                    blVM.ColumnHeight = colHeight;
+                    AnnoGridVM.Columns.Add(blVM);
+                    RegisterForScaleSync(blVM, true);
                 }
                 else if (columnDefinition is LayerLengthColumnDefinitionVM)
                 {
@@ -714,13 +718,15 @@ namespace CoreSampleAnnotation.AnnotationPlane
                 }
                 else if (columnDefinition is PhotoColumnDefinitionVM)
                 {
-                    ImageColumnVM imColVM = new ImageColumnVM("Фото керна");
-                    //BoundaryEditorColumnVM beVM = new BoundaryEditorColumnVM(imColVM, layerBoundaryEditorVM);
+                    ImageColumnVM imColVM = new ImageColumnVM("Фото керна");                    
 
-                    imColVM.ColumnHeight = colHeight;
+                    RankMoreOrEqualBoundaryCollection filter = new RankMoreOrEqualBoundaryCollection(layerBoundaryEditorVM, 0);                    
+                    BoundaryLineColumnVM blVM = new BoundaryLineColumnVM(imColVM, filter, Colors.Lime);
+
+                    blVM.ColumnHeight = colHeight;
                     imColVM.ImageRegions = photos;
-                    AnnoGridVM.Columns.Add(imColVM);
-                    RegisterForScaleSync(imColVM, true);
+                    AnnoGridVM.Columns.Add(blVM);
+                    RegisterForScaleSync(blVM, true);
                 }
                 else if (columnDefinition is LayeredTextColumnDefinitionVM)
                 {
@@ -771,7 +777,7 @@ namespace CoreSampleAnnotation.AnnotationPlane
                     RankMoreOrEqualBoundaryCollection filter = new RankMoreOrEqualBoundaryCollection(layerBoundaryEditorVM, rank);
                     RankMatchingBoundaryCollection filter2 = new RankMatchingBoundaryCollection(layerBoundaryEditorVM, rank);
 
-                    BoundaryLineColumnVM blVM = new BoundaryLineColumnVM(blankColumnVM, filter);
+                    BoundaryLineColumnVM blVM = new BoundaryLineColumnVM(blankColumnVM, filter, Colors.Black);
                     BoundaryEditorColumnVM beVM = new BoundaryEditorColumnVM(blVM, filter2);
 
 
