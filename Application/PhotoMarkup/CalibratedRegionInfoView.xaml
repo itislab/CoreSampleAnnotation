@@ -18,7 +18,7 @@
                 <Run Text="Участок №"/>
                 <Run Text="{Binding Order, FallbackValue=1}"/>
             </TextBlock>
-            <app:TextInput HintText="Введите длину участка (см)" Text="{Binding Length, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource nanToEmptyStringDoubleConverter}}" MinWidth="350"></app:TextInput>
+            <app:TextInput HintText="Введите длину участка (см)" Text="{Binding Length, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource nanToEmptyStringDoubleConverter}, ConverterParameter=#}" MinWidth="350"></app:TextInput>
             <Button Margin="2,10" FontSize="20" Visibility="{Binding CanMoveUp,Converter={StaticResource visibilityHiddenConverter}}" Command="{Binding MoveUp}" CommandParameter="{Binding Order}" Style="{StaticResource MetroButton}" Width="50">
                 <media:Arrow_In_circle>
                 </media:Arrow_In_circle>

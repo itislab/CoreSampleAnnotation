@@ -44,9 +44,12 @@ namespace CoreSampleAnnotation.Intervals
         /// </summary>
         public double AnnotatedLength
         {
-            get { return imageRegions.Sum(arr => arr.Sum(r => r.Length)) * 0.01; }
+            get { return imageRegions.Sum(arr => arr.Select(r => r.Length).Where(l => !double.IsNaN(l)).Sum()) * 0.01; }
         }
 
+        /// <summary>
+        /// How much of extracted interval is annotated
+        /// </summary>
         public double AnnotatedPercentage
         {
             get
@@ -54,7 +57,7 @@ namespace CoreSampleAnnotation.Intervals
                 if (double.IsNaN(ExtractedLength) || double.IsNaN(AnnotatedLength) || (MaxPossibleExtractionLength == 0.0))
                     return 0.0;
                 else
-                    return AnnotatedLength / MaxPossibleExtractionLength * 100.0;
+                    return AnnotatedLength / ExtractedLength * 100.0;
             }
         }
 
@@ -574,6 +577,9 @@ namespace CoreSampleAnnotation.Intervals
             {
                 case nameof(base.LowerDepth):
                 case nameof(base.UpperDepth):
+                    RaisePropertyChanged(nameof(AnnotatedPercentage));
+                    break;
+                case nameof(ExtractedLength):
                     RaisePropertyChanged(nameof(AnnotatedPercentage));
                     break;
             }

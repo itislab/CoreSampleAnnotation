@@ -77,7 +77,7 @@ namespace CoreSampleAnnotation
                 if (double.IsNaN(d.Value))
                     return "";
                 else
-                    return d.Value.ToString();
+                    return d.Value.ToString((string)parameter);
             }
             else
                 return "";
