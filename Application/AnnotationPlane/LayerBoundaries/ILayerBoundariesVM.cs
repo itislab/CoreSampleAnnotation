@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace CoreSampleAnnotation.AnnotationPlane.LayerBoundaries
 {
-    public interface ILayerBoundariesVM
+    public interface ILayerBoundariesVM : INotifyPropertyChanged
     {
         LayerBoundary[] Boundaries { get; }
     }

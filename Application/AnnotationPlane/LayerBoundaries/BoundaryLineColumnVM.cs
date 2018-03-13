@@ -7,31 +7,12 @@ using System.Windows.Media;
 
 namespace CoreSampleAnnotation.AnnotationPlane.LayerBoundaries
 {
-    public class BoundaryLineColumnVM: ColumnVM
+    public class BoundaryLineColumnVM: BoundaryColumnVM
     {
-
-        public BoundaryLineColumnVM(ColumnVM targetColumn, ILayerBoundariesVM boundariesVM, Color linesColor) :base(targetColumn.Heading) {
-            ColumnVM = targetColumn;
-            BoundariesVM = boundariesVM;
-            this.linesColor = linesColor;
-            PropertyChanged += BoundaryLineColumnVM_PropertyChanged;
+        public BoundaryLineColumnVM(ColumnVM targetColumn, ILayerBoundariesVM boundariesVM, Color linesColor) :base(targetColumn, boundariesVM) {
+            this.linesColor = linesColor;            
         }
-
-        private void BoundaryLineColumnVM_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
-        {
-            switch (e.PropertyName) {
-                case nameof(ColumnHeight):
-                    ColumnVM.ColumnHeight = ColumnHeight;
-                    break;
-                case nameof(UpperBound):
-                    ColumnVM.UpperBound = UpperBound;
-                    break;
-                case nameof(LowerBound):
-                    ColumnVM.LowerBound = LowerBound;
-                    break;
-            }
-        }
-
+        
         private Color linesColor;
         public Color LinesColor {
             get { return linesColor; }
@@ -48,9 +29,6 @@ namespace CoreSampleAnnotation.AnnotationPlane.LayerBoundaries
             get {
                 return new SolidColorBrush(LinesColor);
             }
-        }
-
-        public ILayerBoundariesVM BoundariesVM { get; private set; }
-        public ColumnVM ColumnVM { get; private set; }
+        }        
     }
 }

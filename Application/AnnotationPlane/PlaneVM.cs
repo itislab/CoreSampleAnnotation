@@ -506,7 +506,7 @@ namespace CoreSampleAnnotation.AnnotationPlane
                 PointSelectedEventArgs psea = obj as PointSelectedEventArgs;
                 System.Diagnostics.Debug.WriteLine("Selected point with offset {0} in {1} column", psea.WpfTopOffset, psea.ColumnIdx);
 
-                Type[] newLayerTypes = new Type[] { typeof(ImageColumnVM), typeof(DepthAxisColumnVM), typeof(BoundaryEditorColumnVM) };
+                Type[] newLayerTypes = new Type[] { typeof(ImageColumnVM), typeof(DepthAxisColumnVM), typeof(BoundaryEditorColumnVM), typeof(BoundaryLineColumnVM) };
                 ColumnVM relatedVM = AnnoGridVM.Columns[psea.ColumnIdx];
                 Type relatedVmType = relatedVM.GetType();
                 if (newLayerTypes.Contains(relatedVmType))
@@ -774,17 +774,20 @@ namespace CoreSampleAnnotation.AnnotationPlane
                     int rank = colDef.SelectedIndex;
                     string heading = string.Format("Границы между {0}", colDef.Selected.ToLowerInvariant());
                     BlankColumnVM blankColumnVM = new BlankColumnVM(heading);
-                    RankMoreOrEqualBoundaryCollection filter = new RankMoreOrEqualBoundaryCollection(layerBoundaryEditorVM, rank);
-                    RankMatchingBoundaryCollection filter2 = new RankMatchingBoundaryCollection(layerBoundaryEditorVM, rank);
+                    RankMoreOrEqualBoundaryCollection filteredForLines = new RankMoreOrEqualBoundaryCollection(layerBoundaryEditorVM, rank);
+                    ZeroBoundaryDecoratorLBVM zeroBoundaryAdded = new ZeroBoundaryDecoratorLBVM(filteredForLines);
+                    NumberResettingDecorator renumberedForLabels = new NumberResettingDecorator(zeroBoundaryAdded, rank,1);                    
+                    RankMatchingBoundaryCollection filteredForDraggables = new RankMatchingBoundaryCollection(layerBoundaryEditorVM, rank);
 
-                    BoundaryLineColumnVM blVM = new BoundaryLineColumnVM(blankColumnVM, filter, Colors.Black);
-                    BoundaryEditorColumnVM beVM = new BoundaryEditorColumnVM(blVM, filter2);
+                    BoundaryLabelColumnVM blaVM = new BoundaryLabelColumnVM(blankColumnVM, renumberedForLabels);
+                    BoundaryLineColumnVM blVM = new BoundaryLineColumnVM(blaVM, filteredForLines, Colors.Black);
+                    BoundaryEditorColumnVM beVM = new BoundaryEditorColumnVM(blVM, filteredForDraggables);
 
 
                     blankColumnVM.ColumnHeight = colHeight;
                     blankColumnVM.ColumnWidth = 100;
                     AnnoGridVM.Columns.Add(beVM);
-                    RegisterForScaleSync(blankColumnVM, true);
+                    RegisterForScaleSync(beVM, true);
                 }
                 else if (columnDefinition is LayerSamplesDefinitionVM)
                 {

@@ -22,13 +22,19 @@ namespace CoreSampleAnnotation.Reports.SVG
             if (vm is BoundaryEditorColumnVM)
             {
                 BoundaryEditorColumnVM becVM = (BoundaryEditorColumnVM)vm;
+
                 ILayerBoundariesVM lbVM = becVM.BoundariesVM;
+
                 if (becVM.ColumnVM is BoundaryLineColumnVM)
                 {
                     BoundaryLineColumnVM blcVM = (BoundaryLineColumnVM)becVM.ColumnVM;
                     lbVM = blcVM.BoundariesVM;
                 }
                 return new BoundaryColumnPainter(headerView, view, vm, lbVM);
+            }
+            else if (vm is BoundaryLineColumnVM) {
+                BoundaryLineColumnVM blcVM = (BoundaryLineColumnVM)vm;
+                return Create(headerView, view, blcVM.ColumnVM);
             }
             else if (vm is ImageColumnVM)
             {
@@ -46,8 +52,9 @@ namespace CoreSampleAnnotation.Reports.SVG
             {
                 return new SamplesColumnPainter(headerView, view, (SamplesColumnVM)vm);
             }
-            else if (vm is VisualColumnVM) {
-                return new VisualColumnPainter(headerView, view,(VisualColumnVM)vm);
+            else if (vm is VisualColumnVM)
+            {
+                return new VisualColumnPainter(headerView, view, (VisualColumnVM)vm);
             }
             else
                 return new ColumnPainter(headerView, view, vm);

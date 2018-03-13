@@ -151,6 +151,8 @@
       <DependentUpon>VisualColumnView.xaml</DependentUpon>
     </Compile>
     <Compile Include="AnnotationPlane\Columns\VisualColumnVM.cs" />
+    <Compile Include="AnnotationPlane\LayerBoundaries\BoundaryColumnVM.cs" />
+    <Compile Include="AnnotationPlane\LayerBoundaries\BoundaryLabelColumnVM.cs" />
     <Compile Include="AnnotationPlane\LayerBoundaries\BoundaryLineColumnVM.cs" />
     <Compile Include="AnnotationPlane\LayerBoundaries\ILayerBoundariesVM.cs" />
     <Compile Include="AnnotationPlane\LayerBoundaries\LayerLabel.xaml.cs">
