@@ -32,11 +32,10 @@
                         <MultiBinding Converter="{StaticResource polygonPointsConverter}">
                             <Binding Path="Width"></Binding>
                             <Binding Path="Height"></Binding>
+                            <Binding Path="RightSideForm"></Binding>
                         </MultiBinding>
                     </Polygon.Points>
                 </Polygon>
-                <!--<Rectangle Width="{Binding Width}" Height="{Binding Height}" Fill="" >                  
-                </Rectangle> -->
             </DataTemplate>
         </ItemsControl.ItemTemplate>
     </ItemsControl>

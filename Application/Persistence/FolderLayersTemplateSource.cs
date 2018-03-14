@@ -15,13 +15,16 @@ namespace CoreSampleAnnotation.Persistence
 {
     [DelimitedRecord("|")]
     [IgnoreFirst]
-    public class NamesFileRow {
+    public class NamesFileRow
+    {
         public string ID;
         public string Acronym;
         public string Name;
-        public string Description;        
+        public string Description;
         [OptionalField]
         public double? WidthPercentage;
+        [OptionalField]
+        public string RightSideForm;
     }
 
     [Serializable]
@@ -39,7 +42,8 @@ namespace CoreSampleAnnotation.Persistence
         /// </summary>
         public string FolderPath { get { return path; } set { path = value; } }
 
-        public FolderLayersTemplateSource(string templateFolderPath) {
+        public FolderLayersTemplateSource(string templateFolderPath)
+        {
             path = templateFolderPath;
         }
 
@@ -48,12 +52,13 @@ namespace CoreSampleAnnotation.Persistence
         /// </summary>
         /// <param name="path">Path to property definition folder</param>
         /// <returns></returns>
-        private Property LoadPropertyTemplate(string path) {
+        private Property LoadPropertyTemplate(string path)
+        {
             string propID = Path.GetFileName(path).ToLowerInvariant();
             propID = propID.ToLowerInvariant();
             string namesFileFullPath = Path.Combine(path, NamesFile);
             string muticlassFileFullPath = Path.Combine(path, MulticlassFile);
-            string backgroundImagesDirFullPath = Path.Combine(path,BackgroundFillFolder);
+            string backgroundImagesDirFullPath = Path.Combine(path, BackgroundFillFolder);
             string iconDirFullPath = Path.Combine(path, IconsFolder);
             string exampleImagesDirFullPath = Path.Combine(path, ExampleImagesFolder);
 
@@ -74,14 +79,15 @@ namespace CoreSampleAnnotation.Persistence
                     else
                     if (row.WidthPercentage < 0 || row.WidthPercentage > 100.0)
                     {
-                        MessageBox.Show(string.Format("значение ширна крапа вне допустимых значений. допустимый интервал 0 - 100 (%), в файле задано {0}. Будет использовано значение 100%",row.WidthPercentage),"Ширина крапа", MessageBoxButton.OK, MessageBoxImage.Warning);
+                        MessageBox.Show(string.Format("значение ширна крапа вне допустимых значений. допустимый интервал 0 - 100 (%), в файле задано {0}. Будет использовано значение 100%", row.WidthPercentage), "Ширина крапа", MessageBoxButton.OK, MessageBoxImage.Warning);
                         row.WidthPercentage = 100.0;
                     }
 
                     //tring to load corresponding background SVG image
                     string backgroundPatternSVG = null;
                     string bgClassBgPatternPath = Path.Combine(backgroundImagesDirFullPath, string.Format("{0}.svg", classID));
-                    if (File.Exists(bgClassBgPatternPath)) {
+                    if (File.Exists(bgClassBgPatternPath))
+                    {
                         backgroundPatternSVG = File.ReadAllText(bgClassBgPatternPath);
                     }
 
@@ -95,9 +101,27 @@ namespace CoreSampleAnnotation.Persistence
 
                     ImageSource exampleImage = null;
                     string exampleImagePath = Path.Combine(exampleImagesDirFullPath, string.Format("{0}.jpg", classID));
-                    if (File.Exists(exampleImagePath)) {
+                    if (File.Exists(exampleImagePath))
+                    {
                         exampleImage = new BitmapImage(new Uri(Path.GetFullPath(exampleImagePath)));
                     }
+
+                    RightSideFormEnum rightSide = RightSideFormEnum.Straight;
+                    if (!string.IsNullOrEmpty(row.RightSideForm))
+                        switch (row.RightSideForm.ToLowerInvariant())
+                        {                            
+                            case "прямая": rightSide = RightSideFormEnum.Straight; break;
+                            case "ступеньки": rightSide = RightSideFormEnum.Steps; break;
+                            case "волна": rightSide = RightSideFormEnum.Wave; break;
+                            default:
+                                MessageBox.Show(
+                                    string.Format("Форма правой границы крапа \"{0}\", указанная в шаблоне, не поддерживается. Будет использована прямая форма. ({1})", row.RightSideForm, row.ToString()),
+                                    "Форма правой границы крапа",
+                                    MessageBoxButton.OK,
+                                    MessageBoxImage.Warning);
+                                break;
+
+                        }
 
                     loadedClasses.Add(row.ID.ToLowerInvariant(),
                         new Class()
@@ -109,11 +133,12 @@ namespace CoreSampleAnnotation.Persistence
                             IconSVG = iconSVG,
                             Description = row.Description,
                             WidthRatio = row.WidthPercentage.Value * 0.01,// percent to ratio
-                            ExampleImage = exampleImage
+                            ExampleImage = exampleImage,
+                            RightSideForm = rightSide
                         });
                 }
 
-                
+
 
                 return new Property()
                 {
@@ -124,20 +149,23 @@ namespace CoreSampleAnnotation.Persistence
                 };
             }
             else
-                throw new InvalidDataException(String.Format("Не найден файл {0} с именами классов свойства слоя {1}", namesFileFullPath,propID));
+                throw new InvalidDataException(String.Format("Не найден файл {0} с именами классов свойства слоя {1}", namesFileFullPath, propID));
         }
 
         public Property[] Template
-        {            
+        {
             get
             {
                 List<Property> loadedProperties = new List<Property>();
                 string[] folders = Directory.GetDirectories(FolderPath);
-                foreach (string folder in folders) {
-                    try {                        
+                foreach (string folder in folders)
+                {
+                    try
+                    {
                         loadedProperties.Add(LoadPropertyTemplate(folder));
                     }
-                    catch (Exception ex) {
+                    catch (Exception ex)
+                    {
                         MessageBox.Show(string.Format("Ошибка чтения шаблона свойства слоя керна. Свойство не загружено! (путь {0}):{1}", folder, ex.ToString()), "Не удалось загрузить шаблон свойства слоя", MessageBoxButton.OK, MessageBoxImage.Warning);
                     }
                 }
@@ -146,7 +174,8 @@ namespace CoreSampleAnnotation.Persistence
         }
 
         #region serialization
-        protected FolderLayersTemplateSource(SerializationInfo info, StreamingContext context) {
+        protected FolderLayersTemplateSource(SerializationInfo info, StreamingContext context)
+        {
             FolderPath = Path.Combine(Directory.GetCurrentDirectory(), info.GetString("Folder"));
         }
 

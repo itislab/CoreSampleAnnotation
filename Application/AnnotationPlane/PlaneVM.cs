@@ -293,6 +293,7 @@ namespace CoreSampleAnnotation.AnnotationPlane
             if (!double.IsNaN(cl.WidthRatio) && !double.IsInfinity(cl.WidthRatio)) {
                 result.WidthRatio = cl.WidthRatio;
             }
+            result.RightSideForm = cl.RightSideForm;
             if (cl.BackgroundPatternSVG != null)
             {
                 Svg.SvgPatternServer pa = Svg.SvgDocument.FromSvg<Svg.SvgDocument>(cl.BackgroundPatternSVG).Children[0] as Svg.SvgPatternServer;

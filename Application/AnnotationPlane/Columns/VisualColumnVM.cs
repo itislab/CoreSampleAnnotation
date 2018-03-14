@@ -78,7 +78,6 @@ namespace CoreSampleAnnotation.AnnotationPlane.Columns
             }
         }
 
-        private double widthRatio;
         public double WidthRatio {
             get {
                 if (target.CurrentClass == null)
@@ -86,12 +85,21 @@ namespace CoreSampleAnnotation.AnnotationPlane.Columns
                 else
                     return target.CurrentClass.WidthRatio;
             }
-            
+
         }
 
         public double Width {
             get {
                 return AvailableWidth * WidthRatio;
+            }
+        }
+
+        public Template.RightSideFormEnum RightSideForm {
+            get {
+                if (target.CurrentClass == null)
+                    return Template.RightSideFormEnum.Straight;
+                else
+                    return target.CurrentClass.RightSideForm;
             }
         }
 

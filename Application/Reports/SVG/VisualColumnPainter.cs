@@ -37,13 +37,15 @@ namespace CoreSampleAnnotation.Reports.SVG
             SvgGroup group = new SvgGroup();
             VisualLayerPresentingVM[] layers = vm.Layers.ToArray();
 
-            ISideCurveGenerator sideCurveGenerator = new OscillatingSignalCurveGenerator(20,3,new SinOscillationGenerator(10));
+            
 
             for (int i = 0; i < layers.Length; i++)
             {
                 VisualLayerPresentingVM lvm = layers[i];
                 if (lvm.Origin.CurrentClass != null)
                 {
+                    ISideCurveGenerator sideCurveGenerator = SideCurveGeneratorFactory.GetGeneratorFor(lvm.Origin.CurrentClass.RightSideForm);
+
                     SvgPatternServer sps = lvm.Origin.CurrentClass.BackgroundPattern;
                     sps.PatternContentUnits = SvgCoordinateUnits.ObjectBoundingBox;
                     sps.PatternUnits = SvgCoordinateUnits.UserSpaceOnUse;

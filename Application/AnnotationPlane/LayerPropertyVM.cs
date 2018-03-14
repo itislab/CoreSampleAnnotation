@@ -71,13 +71,17 @@ namespace CoreSampleAnnotation.AnnotationPlane
         }
     }
 
-    public class RemarkLayerVM : LayerVM {
+    public class RemarkLayerVM : LayerVM
+    {
         private string remark;
 
-        public string Remark {
+        public string Remark
+        {
             get { return remark; }
-            set {
-                if (remark != value) {
+            set
+            {
+                if (remark != value)
+                {
                     remark = value;
                     RaisePropertyChanged(nameof(Remark));
                 }
@@ -104,7 +108,8 @@ namespace CoreSampleAnnotation.AnnotationPlane
         }
     }
 
-    public class SingleClassificationLayerVM : ClassificationLayerVM {
+    public class SingleClassificationLayerVM : ClassificationLayerVM
+    {
         private LayerClassVM currentClass = null;
 
         public LayerClassVM CurrentClass
@@ -160,7 +165,8 @@ namespace CoreSampleAnnotation.AnnotationPlane
         }
     }
 
-    public class ClassificationLayerPresentingVM : LayerVM {
+    public class ClassificationLayerPresentingVM : LayerVM
+    {
 
         protected ClassificationLayerVM target;
 
@@ -169,10 +175,13 @@ namespace CoreSampleAnnotation.AnnotationPlane
             get { return target; }
         }
 
-        public string Remark {
+        public string Remark
+        {
             get { return target.Remark; }
-            set {
-                if (target.Remark != value) {
+            set
+            {
+                if (target.Remark != value)
+                {
                     target.Remark = value;
                     RaisePropertyChanged(nameof(Remark));
                 }
@@ -225,16 +234,19 @@ namespace CoreSampleAnnotation.AnnotationPlane
         /// </summary>
         protected abstract Func<string> TextFormatter { get; }
 
-        public ClassificationLayerTextPresentingVM(ClassificationLayerVM target) : base(target) {
+        public ClassificationLayerTextPresentingVM(ClassificationLayerVM target) : base(target)
+        {
         }
     }
 
-    public class SingleClassificationLayerTextPresentingVM : ClassificationLayerTextPresentingVM {
-        private SingleClassificationLayerVM specificTarget;        
+    public class SingleClassificationLayerTextPresentingVM : ClassificationLayerTextPresentingVM
+    {
+        private SingleClassificationLayerVM specificTarget;
 
         protected override Func<string> TextFormatter
         {
-            get {
+            get
+            {
                 if (specificTarget != null)
                     if (specificTarget.CurrentClass != null)
                         return () => TextExtractor(specificTarget.CurrentClass);
@@ -256,25 +268,30 @@ namespace CoreSampleAnnotation.AnnotationPlane
             }
         }
 
-        public SingleClassificationLayerTextPresentingVM(SingleClassificationLayerVM target) : base(target) {
+        public SingleClassificationLayerTextPresentingVM(SingleClassificationLayerVM target) : base(target)
+        {
             specificTarget = target;
             target.PropertyChanged += Target_PropertyChanged;
         }
-    }    
+    }
 
-    public class MultiClassificationLayerTextPresentingVM : ClassificationLayerTextPresentingVM {
+    public class MultiClassificationLayerTextPresentingVM : ClassificationLayerTextPresentingVM
+    {
         private MultiClassificationLayerVM specificTarget;
 
-        public MultiClassificationLayerTextPresentingVM(MultiClassificationLayerVM target) : base(target) {
+        public MultiClassificationLayerTextPresentingVM(MultiClassificationLayerVM target) : base(target)
+        {
             specificTarget = target;
             target.PropertyChanged += Target_PropertyChanged;
         }
 
-        protected override Func<string> TextFormatter {
-            get {
+        protected override Func<string> TextFormatter
+        {
+            get
+            {
                 if (specificTarget != null)
                     if (specificTarget.CurrentClasses != null)
-                        return () => string.Join(", ",specificTarget.CurrentClasses.Select(c => TextExtractor(c)).ToArray());
+                        return () => string.Join(", ", specificTarget.CurrentClasses.Select(c => TextExtractor(c)).ToArray());
                     else
                         return () => null;
                 else
@@ -298,13 +315,16 @@ namespace CoreSampleAnnotation.AnnotationPlane
     {
         private new MultiClassificationLayerVM target;
 
-        public MultiClassificationLayerIconPresentingVM(MultiClassificationLayerVM target) : base(target) {
+        public MultiClassificationLayerIconPresentingVM(MultiClassificationLayerVM target) : base(target)
+        {
             this.target = target;
             target.PropertyChanged += Target_PropertyChanged;
         }
-        
-        public ImageSource[] Icons {
-            get {
+
+        public ImageSource[] Icons
+        {
+            get
+            {
                 if (target.CurrentClasses == null)
                     return null;
                 var results = target.CurrentClasses.Select(c => c.IconImage).ToArray();
@@ -312,8 +332,10 @@ namespace CoreSampleAnnotation.AnnotationPlane
             }
         }
 
-        public Svg.SvgFragment[] IconsSVG {
-            get {
+        public Svg.SvgFragment[] IconsSVG
+        {
+            get
+            {
                 if (target.CurrentClasses == null)
                     return null;
                 var results = target.CurrentClasses.Select(c => c.IconSvg).ToArray();
@@ -384,19 +406,23 @@ namespace CoreSampleAnnotation.AnnotationPlane
             }
         }
 
-        public string VisibleShortTextID {
-            get {
+        public string VisibleShortTextID
+        {
+            get
+            {
                 if (string.IsNullOrEmpty(acronym))
                 {
                     return ID;
                 }
                 else
-                    return Acronym;       
+                    return Acronym;
             }
         }
 
-        public string VisibleLongTextID {
-            get {
+        public string VisibleLongTextID
+        {
+            get
+            {
                 if (string.IsNullOrEmpty(Description))
                 {
                     return ShortName;
@@ -406,24 +432,43 @@ namespace CoreSampleAnnotation.AnnotationPlane
             }
         }
 
-        private Brush backgroundBrush;        
+        private Brush backgroundBrush;
 
-        public Brush BackgroundBrush {
+        public Brush BackgroundBrush
+        {
             get { return backgroundBrush; }
-            set {
-                if (backgroundBrush != value) {
+            set
+            {
+                if (backgroundBrush != value)
+                {
                     backgroundBrush = value;
                     RaisePropertyChanged(nameof(BackgroundBrush));
                 }
             }
         }
 
+        private Template.RightSideFormEnum rightSideForm;
+
+        public Template.RightSideFormEnum RightSideForm
+        {
+            get { return rightSideForm; }
+            set {
+                if (rightSideForm != value) {
+                    rightSideForm = value;
+                    RaisePropertyChanged(nameof(RightSideForm));
+                }
+            }
+        }
+
         private Svg.SvgPatternServer backgroundPattern;
 
-        public Svg.SvgPatternServer BackgroundPattern {
+        public Svg.SvgPatternServer BackgroundPattern
+        {
             get { return backgroundPattern; }
-            set {
-                if (backgroundPattern != value) {
+            set
+            {
+                if (backgroundPattern != value)
+                {
                     backgroundPattern = value;
                     RaisePropertyChanged(nameof(BackgroundPattern));
                 }
@@ -434,10 +479,13 @@ namespace CoreSampleAnnotation.AnnotationPlane
         /// <summary>
         /// Which part of background fill column occupies background fill (0.0 - 1.0)
         /// </summary>
-        public double WidthRatio {
+        public double WidthRatio
+        {
             get { return widthRatio; }
-            set {
-                if (widthRatio != value) {
+            set
+            {
+                if (widthRatio != value)
+                {
                     widthRatio = value;
                     RaisePropertyChanged(nameof(WidthRatio));
                 }
@@ -446,12 +494,16 @@ namespace CoreSampleAnnotation.AnnotationPlane
 
         private ImageSource iconImage;
 
-        public ImageSource IconImage {
-            get {
+        public ImageSource IconImage
+        {
+            get
+            {
                 return iconImage;
             }
-            set {
-                if (iconImage != value) {
+            set
+            {
+                if (iconImage != value)
+                {
                     iconImage = value;
                     RaisePropertyChanged(nameof(IconImage));
                 }
@@ -459,10 +511,13 @@ namespace CoreSampleAnnotation.AnnotationPlane
         }
 
         private Svg.SvgFragment iconSvg;
-        public Svg.SvgFragment IconSvg {
+        public Svg.SvgFragment IconSvg
+        {
             get { return iconSvg; }
-            set {
-                if (iconSvg != value) {
+            set
+            {
+                if (iconSvg != value)
+                {
                     iconSvg = value;
                     RaisePropertyChanged(nameof(IconSvg));
                 }
@@ -484,10 +539,13 @@ namespace CoreSampleAnnotation.AnnotationPlane
         }
 
         private ImageSource exampleImage;
-        public ImageSource ExampleImage {
+        public ImageSource ExampleImage
+        {
             get { return exampleImage; }
-            set {
-                if (exampleImage != value) {
+            set
+            {
+                if (exampleImage != value)
+                {
                     exampleImage = value;
                     RaisePropertyChanged(nameof(ExampleImage));
                 }

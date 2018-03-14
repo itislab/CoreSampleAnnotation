@@ -7,6 +7,8 @@ using System.Windows.Media;
 
 namespace CoreSampleAnnotation.AnnotationPlane.Template
 {
+    public enum RightSideFormEnum { Straight, Steps, Wave}
+
     /// <summary>
     /// A class that one property can take
     /// </summary>
@@ -27,7 +29,12 @@ namespace CoreSampleAnnotation.AnnotationPlane.Template
 
         public string Acronym { get; set; }
 
+        /// <summary>
+        /// 0.0 - 1.0
+        /// </summary>
         public double WidthRatio { get; set; }
+
+        public RightSideFormEnum RightSideForm { get; set; }
 
         public ImageSource ExampleImage { get; set; }
 
