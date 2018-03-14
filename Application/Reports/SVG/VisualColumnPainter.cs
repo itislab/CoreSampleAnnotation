@@ -19,10 +19,19 @@ namespace CoreSampleAnnotation.Reports.SVG
             this.vm = vm;
         }
 
+        /// <summary>
+        /// Addts a point to points
+        /// </summary>
+        /// <param name="points"></param>
+        /// <param name="point"></param>
+        private static void AddPointToCollection(SvgPointCollection points, Point point) {
+            points.Add(Helpers.dtos(point.X));
+            points.Add(Helpers.dtos(point.Y));
+        }
+
         public override RenderedSvg RenderColumn()
         {
             var result = base.RenderColumn();
-
             
 
             SvgGroup group = new SvgGroup();
@@ -39,15 +48,24 @@ namespace CoreSampleAnnotation.Reports.SVG
                     sps.Width /= ratio;
                     sps.Height /= ratio;
 
-                    SvgRectangle rect = new SvgRectangle();
-                    rect.Fill = sps;
-                    rect.X = 0;
-                    rect.Y = Helpers.dtos(lvm.Y);
-                    rect.Width = Helpers.dtos(lvm.AvailableWidth);
-                    rect.Height = Helpers.dtos(lvm.Height);
-                    //rect.Stroke = new SvgColourServer(System.Drawing.Color.Red);
-                    //rect.StrokeWidth = 2;
-                    group.Children.Add(rect);
+                    SvgPolygon poly = new SvgPolygon();
+                    poly.Stroke = new SvgColourServer(System.Drawing.Color.Black);
+                    poly.StrokeWidth = 1f;
+                    poly.Fill = sps;
+
+                    var points = Drawing.GetPolygon(lvm.Width, lvm.Height).ToArray();
+
+                    SvgPointCollection svgPoints = new SvgPointCollection();
+                    for (int j = 0; j < points.Length; j++)
+                    {
+                        var point = points[j];
+                        point.Y += lvm.Y;
+                        AddPointToCollection(svgPoints, point);
+                    }
+                    
+                    poly.Points = svgPoints;
+                    
+                    group.Children.Add(poly);
                 }
             }
 
