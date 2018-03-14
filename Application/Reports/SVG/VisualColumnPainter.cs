@@ -36,6 +36,9 @@ namespace CoreSampleAnnotation.Reports.SVG
 
             SvgGroup group = new SvgGroup();
             VisualLayerPresentingVM[] layers = vm.Layers.ToArray();
+
+            ISideCurveGenerator sideCurveGenerator = new OscillatingSignalCurveGenerator(20,3,new SinOscillationGenerator(10));
+
             for (int i = 0; i < layers.Length; i++)
             {
                 VisualLayerPresentingVM lvm = layers[i];
@@ -53,7 +56,7 @@ namespace CoreSampleAnnotation.Reports.SVG
                     poly.StrokeWidth = 1f;
                     poly.Fill = sps;
 
-                    var points = Drawing.GetPolygon(lvm.Width, lvm.Height).ToArray();
+                    var points = Drawing.GetPolygon(lvm.Width, lvm.Height, sideCurveGenerator).ToArray();
 
                     SvgPointCollection svgPoints = new SvgPointCollection();
                     for (int j = 0; j < points.Length; j++)

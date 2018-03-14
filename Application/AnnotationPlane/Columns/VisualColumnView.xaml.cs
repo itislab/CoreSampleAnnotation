@@ -35,27 +35,17 @@ namespace CoreSampleAnnotation.AnnotationPlane.Columns
         #endregion
     }
 
-    public static class Drawing {
-        public static IEnumerable<Point> GetPolygon(double width, double height)
-        {
-            List<Point> result = new List<Point>();
-            result.Add(new Point(0.0, 0.0));
-            result.Add(new Point(width, 0.0));
-            result.Add(new Point(width, height));
-            result.Add(new Point(0.0, height));
-            return result;
-        }
-    }
-
     public class PolygonPointsConverter : IMultiValueConverter
-    {        
+    {
+        private ISideCurveGenerator sideCurveGenerator = new OscillatingSignalCurveGenerator(20,3,new SinOscillationGenerator(10));
+
         public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
         {
             if (values.Length != 2)
                 return null;
             double width = (double)values[0];
             double height = (double)values[1];            
-            return new PointCollection(Drawing.GetPolygon(width,height));
+            return new PointCollection(Drawing.GetPolygon(width,height, sideCurveGenerator));
         }
 
         public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)
