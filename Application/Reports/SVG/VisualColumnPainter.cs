@@ -43,7 +43,7 @@ namespace CoreSampleAnnotation.Reports.SVG
                     rect.Fill = sps;
                     rect.X = 0;
                     rect.Y = Helpers.dtos(lvm.Y);
-                    rect.Width = Helpers.dtos(lvm.Width);
+                    rect.Width = Helpers.dtos(lvm.AvailableWidth);
                     rect.Height = Helpers.dtos(lvm.Height);
                     //rect.Stroke = new SvgColourServer(System.Drawing.Color.Red);
                     //rect.StrokeWidth = 2;

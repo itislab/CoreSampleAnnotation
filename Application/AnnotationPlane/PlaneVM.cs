@@ -290,6 +290,9 @@ namespace CoreSampleAnnotation.AnnotationPlane
                 result.Description = cl.Description;
             if (cl.ShortName != null)
                 result.ShortName = cl.ShortName;
+            if (!double.IsNaN(cl.WidthRatio) && !double.IsInfinity(cl.WidthRatio)) {
+                result.WidthRatio = cl.WidthRatio;
+            }
             if (cl.BackgroundPatternSVG != null)
             {
                 Svg.SvgPatternServer pa = Svg.SvgDocument.FromSvg<Svg.SvgDocument>(cl.BackgroundPatternSVG).Children[0] as Svg.SvgPatternServer;
@@ -735,7 +738,9 @@ namespace CoreSampleAnnotation.AnnotationPlane
                     {
                         string propID = colDef.SelectedCentreTextProp.PropID;
 
-                        LayeredColumnVM propColumnVM = LayerProps.Where(p => p.Heading == propID).Single();
+                        LayeredColumnVM propColumnVM = LayerProps.Where(p => p.Heading == propID).FirstOrDefault();
+                        if (propColumnVM == null)
+                            continue;
 
                         //Creating presentation column.
 
@@ -796,7 +801,11 @@ namespace CoreSampleAnnotation.AnnotationPlane
                 else if (columnDefinition is VisualColumnDefinitionVM)
                 {
                     VisualColumnDefinitionVM vcdVM = (VisualColumnDefinitionVM)columnDefinition;
-                    LayeredColumnVM propColumnVM = LayerProps.Where(p => p.Heading == vcdVM.SelectedBackgroundImageProp.PropID).Single();
+                    if (vcdVM.SelectedBackgroundImageProp == null)
+                        continue;
+                    LayeredColumnVM propColumnVM = LayerProps.Where(p => p.Heading == vcdVM.SelectedBackgroundImageProp.PropID).FirstOrDefault();
+                    if (propColumnVM == null)
+                        continue;
                     Columns.VisualColumnVM vcVM = new Columns.VisualColumnVM("Колонка", propColumnVM, lVM => new Columns.VisualLayerPresentingVM(lVM));
                     AnnoGridVM.Columns.Add(vcVM);
                     RegisterForScaleSync(vcVM, true);
@@ -804,6 +813,8 @@ namespace CoreSampleAnnotation.AnnotationPlane
                 else if (columnDefinition is IconsColumnDefinitionVM)
                 {
                     IconsColumnDefinitionVM colDef = (IconsColumnDefinitionVM)columnDefinition;
+                    if (colDef.SelectedIconProp == null)
+                        continue;
                     LayeredColumnVM propColumnVM = LayerProps.Where(p => p.Heading == colDef.SelectedIconProp.PropID).FirstOrDefault();
 
                     if (propColumnVM == null)

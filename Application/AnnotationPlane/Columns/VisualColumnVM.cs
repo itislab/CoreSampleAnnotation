@@ -30,6 +30,7 @@ namespace CoreSampleAnnotation.AnnotationPlane.Columns
             {
                 case nameof(target.CurrentClass):
                     RaisePropertyChanged(nameof(BackgroundBrush));
+                    RaisePropertyChanged(nameof(Width));
                     break;
                 case nameof(target.Length):
                     RaisePropertyChanged(nameof(Height));
@@ -59,17 +60,38 @@ namespace CoreSampleAnnotation.AnnotationPlane.Columns
             get { return target.Length; }
         }
 
-        private double width;
-        public double Width
+        private double availableWidth;
+        /// <summary>
+        /// How much width (in WPF) can the layer presentation occupy
+        /// </summary>
+        public double AvailableWidth
         {
-            get { return width; }
+            get { return availableWidth; }
             set
             {
-                if (width != value)
+                if (availableWidth != value)
                 {
-                    width = value;
+                    availableWidth = value;
+                    RaisePropertyChanged(nameof(AvailableWidth));
                     RaisePropertyChanged(nameof(Width));
                 }
+            }
+        }
+
+        private double widthRatio;
+        public double WidthRatio {
+            get {
+                if (target.CurrentClass == null)
+                    return 1.0;
+                else
+                    return target.CurrentClass.WidthRatio;
+            }
+            
+        }
+
+        public double Width {
+            get {
+                return AvailableWidth * WidthRatio;
             }
         }
 
@@ -127,7 +149,7 @@ namespace CoreSampleAnnotation.AnnotationPlane.Columns
 
         private void Subscribe(VisualLayerPresentingVM vlpVM, SingleClassificationLayerVM sclVM)
         {
-            vlpVM.Width = ColumnWidth;
+            vlpVM.AvailableWidth = ColumnWidth;
         }
 
 
@@ -137,12 +159,13 @@ namespace CoreSampleAnnotation.AnnotationPlane.Columns
             this.target = lVm;
             target.Layers.CollectionChanged += Layers_CollectionChanged;
             target.PropertyChanged += Target_PropertyChanged;
-            columnWidth = 80.0;
+            columnWidth = 200.0;
             
             foreach (SingleClassificationLayerVM vm in target.Layers)
             {
                 vm.PropertyChanged += Vm_PropertyChanged;
                 var adapted = adapter(vm);
+                adapted.AvailableWidth = ColumnWidth;
                 Subscribe(adapted, vm);
                 layers.Add(adapted);
             }

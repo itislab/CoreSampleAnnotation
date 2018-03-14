@@ -19,7 +19,9 @@ namespace CoreSampleAnnotation.Persistence
         public string ID;
         public string Acronym;
         public string Name;
-        public string Description;
+        public string Description;        
+        [OptionalField]
+        public double? WidthPercentage;
     }
 
     [Serializable]
@@ -67,6 +69,14 @@ namespace CoreSampleAnnotation.Persistence
                 foreach (NamesFileRow row in rows)
                 {
                     string classID = row.ID.ToLowerInvariant();
+                    if (!row.WidthPercentage.HasValue)
+                        row.WidthPercentage = 100.0;
+                    else
+                    if (row.WidthPercentage < 0 || row.WidthPercentage > 100.0)
+                    {
+                        MessageBox.Show(string.Format("значение ширна крапа вне допустимых значений. допустимый интервал 0 - 100 (%), в файле задано {0}. Будет использовано значение 100%",row.WidthPercentage),"Ширина крапа", MessageBoxButton.OK, MessageBoxImage.Warning);
+                        row.WidthPercentage = 100.0;
+                    }
 
                     //tring to load corresponding background SVG image
                     string backgroundPatternSVG = null;
@@ -98,6 +108,7 @@ namespace CoreSampleAnnotation.Persistence
                             BackgroundPatternSVG = backgroundPatternSVG,
                             IconSVG = iconSVG,
                             Description = row.Description,
+                            WidthRatio = row.WidthPercentage.Value * 0.01,// percent to ratio
                             ExampleImage = exampleImage
                         });
                 }

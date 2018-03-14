@@ -430,6 +430,20 @@ namespace CoreSampleAnnotation.AnnotationPlane
             }
         }
 
+        private double widthRatio;
+        /// <summary>
+        /// Which part of background fill column occupies background fill (0.0 - 1.0)
+        /// </summary>
+        public double WidthRatio {
+            get { return widthRatio; }
+            set {
+                if (widthRatio != value) {
+                    widthRatio = value;
+                    RaisePropertyChanged(nameof(WidthRatio));
+                }
+            }
+        }
+
         private ImageSource iconImage;
 
         public ImageSource IconImage {

@@ -27,6 +27,8 @@ namespace CoreSampleAnnotation.AnnotationPlane.Template
 
         public string Acronym { get; set; }
 
+        public double WidthRatio { get; set; }
+
         public ImageSource ExampleImage { get; set; }
 
         public InputField[] InputFields { get; set; }
