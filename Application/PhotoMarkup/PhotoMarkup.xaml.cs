@@ -28,7 +28,7 @@ namespace CoreSampleAnnotation.PhotoMarkup
     /// </summary>
     public partial class PhotoMarkup : UserControl
     {
-        private bool isDragging = false;
+        private bool isMarkerDragging = false;
         private Point markerClickOffset = new Point();
         private Point dragStartLocation = new Point();
         private PhotoCalibrationMarker currentDraggingMarker = null;
@@ -40,16 +40,17 @@ namespace CoreSampleAnnotation.PhotoMarkup
 
         private List<PhotoCalibrationMarker> regionDraft = new List<PhotoCalibrationMarker>();        
         
-        private double angle = 0.0;
-
         private Point touchPoint;
+        private bool isMouseDragging = false;
+
+        private Point mouseDownInitialPoint;
         private Timer holdTimer = null;
 
         public PhotoMarkup()
         {
             InitializeComponent();
 
-            CommonCanvas.MouseMove += InfoLayerCanvas_MouseMove;
+            CommonCanvas.MouseMove += CommonCanvas_MouseMove;
 
             Image.ManipulationStarting += Image_ManipulationStarting;
             Image.ManipulationDelta += Image_ManipulationDelta;
@@ -57,6 +58,11 @@ namespace CoreSampleAnnotation.PhotoMarkup
             Image.PreviewTouchDown += Image_TouchDown;
             Image.PreviewTouchUp += Image_TouchUp;
             Image.PreviewTouchMove += Image_TouchMove;
+
+            CommonCanvas.MouseLeftButtonDown += PhotoMarkup_MouseLeftButtonDown;
+            CommonCanvas.MouseLeftButtonUp += CommonCanvas_MouseLeftButtonUp;
+            CommonCanvas.MouseLeave += CommonCanvas_MouseLeave;
+
 
             this.canvasMarkers.CollectionChanged += Markers_CollectionChanged;
             this.canvasPolygons.CollectionChanged += Polygons_CollectionChanged;
@@ -67,6 +73,22 @@ namespace CoreSampleAnnotation.PhotoMarkup
 
             RegionInfoView.Visibility = Visibility.Collapsed;
 
+        }
+
+        private void CommonCanvas_MouseLeave(object sender, MouseEventArgs e)
+        {
+            isMouseDragging = false;
+        }
+
+        private void CommonCanvas_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        {
+            isMouseDragging = false;
+        }
+
+        private void PhotoMarkup_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            mouseDownInitialPoint = e.GetPosition(CommonCanvas);
+            isMouseDragging = true;
         }
 
         public IEnumerable<CalibratedRegionVM> CalibratedRegions
@@ -181,9 +203,21 @@ namespace CoreSampleAnnotation.PhotoMarkup
 
         private void Image_MouseWheel(object sender, MouseWheelEventArgs e)
         {
-            var delta = e.Delta * 0.01;
-            angle += delta;
-            Image.RenderTransform = new RotateTransform(angle);
+            double scaleStep = 1.1;
+            var scale = (e.Delta > 0) ? scaleStep : (1 / scaleStep);
+            var prevTransform = Image.RenderTransform;
+
+            var mousePosition = e.GetPosition(this);
+
+            var scaleTransform = new ScaleTransform(scale, scale, mousePosition.X, mousePosition.Y);
+
+            TransformGroup group = new TransformGroup();
+            group.Children.Add(prevTransform);
+            group.Children.Add(scaleTransform);
+
+            var matrix = group.Value;
+
+            Image.RenderTransform = new MatrixTransform(matrix);
         }
 
         public MarkupState CurrentState
@@ -422,27 +456,37 @@ namespace CoreSampleAnnotation.PhotoMarkup
 
         private void Marker_MouseUp(object sender, MouseButtonEventArgs e)
         {
-            isDragging = false;
+            isMarkerDragging = false;
         }
 
         private void Marker_MouseDown(object sender, MouseButtonEventArgs e)
         {
             var marker = (PhotoCalibrationMarker)sender;
-            isDragging = true;
+            isMarkerDragging = true;
             this.currentDraggingMarker = marker;
             this.markerClickOffset = e.GetPosition(CommonCanvas);
             this.dragStartLocation = marker.CentreLocation;
             e.Handled = true;
         }
 
-        private void InfoLayerCanvas_MouseMove(object sender, MouseEventArgs e)
+        private void CommonCanvas_MouseMove(object sender, MouseEventArgs e)
         {
-            if (isDragging)
+            if (isMarkerDragging)
             {
                 var pos = e.GetPosition(CommonCanvas);
                 var offset = new Point(pos.X - this.markerClickOffset.X, pos.Y - this.markerClickOffset.Y);
                 var newLoc = new Point(this.dragStartLocation.X + offset.X, this.dragStartLocation.Y + offset.Y);
                 this.currentDraggingMarker.CentreLocation = newLoc;
+            }
+            if (isMouseDragging) {
+                var pos = e.GetPosition(CommonCanvas);
+                var offset = new Point(pos.X - this.mouseDownInitialPoint.X, pos.Y - this.mouseDownInitialPoint.Y);
+
+                Matrix m = Image.RenderTransform.Value;
+                m.Append(new TranslateTransform(offset.X,offset.Y).Value);
+                mouseDownInitialPoint = pos;
+                Image.RenderTransform = new MatrixTransform(m);
+
             }
         }
 

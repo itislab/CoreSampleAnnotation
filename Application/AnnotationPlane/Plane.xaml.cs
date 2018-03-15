@@ -28,8 +28,13 @@ namespace CoreSampleAnnotation.AnnotationPlane
         {
             InitializeComponent();
 
-            this.AnnoGrid.PointSelected += Plane_PointSelected;
-            this.AnnoGrid.ElementDropped += AnnoGrod_ElementDropped;
+            AnnoGrid.PointSelected += Plane_PointSelected;
+            AnnoGrid.ElementDropped += AnnoGrod_ElementDropped;
+
+            Binding scaleBinding = new Binding("DataContext.ScaleFactor");
+            scaleBinding.Source = this;
+            scaleBinding.Mode = BindingMode.TwoWay;
+            AnnoGrid.SetBinding(AnnotationGrid.ScaleFactorProperty, scaleBinding);            
 
             DataContextChanged += Plane_DataContextChanged;
         }
@@ -50,43 +55,55 @@ namespace CoreSampleAnnotation.AnnotationPlane
                 vm.DragReferenceElem = AnnoGrid.LowerGrid;
                 vm.SaveImageCommand = new DelegateCommand(() =>
                 {
-                    List<Reports.SVG.ISvgRenderableColumn> columnRenderers = new List<Reports.SVG.ISvgRenderableColumn>();
-                    int idx = 0;
-                    foreach (UIElement elem in AnnoGrid.HeadersGrid.Children) {
-                        columnRenderers.Add(Reports.SVG.ColumnPainterFactory.Create(elem,AnnoGrid.ColumnsGrid.Children[idx] as ColumnView,vm.AnnoGridVM.Columns[idx]));
-                        idx++;
-                    }
-                    var svg = Reports.SVG.Report.Generate(columnRenderers.ToArray());
-                    using (XmlTextWriter writer = new XmlTextWriter("result.svg", Encoding.UTF8))
+                    var dialog = new Microsoft.Win32.SaveFileDialog();
+                    dialog.DefaultExt = "svg";
+                    dialog.Filter = "Scalable Vector Graphics (.svg)|*.svg";
+                    var res = dialog.ShowDialog();
+                    if (res.HasValue && res.Value)
                     {
-                        svg.Write(writer);
+                        string filepath = dialog.FileName;
+
+
+                        List<Reports.SVG.ISvgRenderableColumn> columnRenderers = new List<Reports.SVG.ISvgRenderableColumn>();
+                        int idx = 0;
+                        foreach (UIElement elem in AnnoGrid.HeadersGrid.Children)
+                        {
+                            columnRenderers.Add(Reports.SVG.ColumnPainterFactory.Create(elem, AnnoGrid.ColumnsGrid.Children[idx] as ColumnView, vm.AnnoGridVM.Columns[idx]));
+                            idx++;
+                        }
+                        var svg = Reports.SVG.Report.Generate(columnRenderers.ToArray());
+                        using (XmlTextWriter writer = new XmlTextWriter(filepath, Encoding.UTF8))
+                        {
+                            svg.Write(writer);
+                        }
+
+                        MessageBox.Show(string.Format("SVG отчет успешно сохранен в файл {0}", filepath), "Успешно", MessageBoxButton.OK, MessageBoxImage.Information);
+                        /*
+                        FixedDocument fixedDoc = new FixedDocument();
+                        PageContent pageContent = new PageContent();
+                        FixedPage fixedPage = new FixedPage();
+                        fixedPage.Width = ActualWidth;
+                        fixedPage.Height = AnnoGrid.HeadersGrid.ActualHeight + AnnoGrid.ColumnsGrid.ActualHeight;
+
+                        Plane planeToPrint = new Plane();
+                        Grid.SetIsSharedSizeScope(planeToPrint, true);
+                        //planeToPrint.Width = 800;
+                        //planeToPrint.Height = 8000;
+                        planeToPrint.DataContext = vm;
+
+                        //Create first page of document
+                        fixedPage.Children.Add(planeToPrint);
+                        ((System.Windows.Markup.IAddChild)pageContent).AddChild(fixedPage);
+                        fixedDoc.Pages.Add(pageContent);
+                        //Create any other required pages here
+
+                        //save the document
+                        XpsDocument xpsd = new XpsDocument("report.xps", FileAccess.Write);
+                        System.Windows.Xps.XpsDocumentWriter xw = XpsDocument.CreateXpsDocumentWriter(xpsd);
+                        xw.Write(fixedDoc);
+                        xpsd.Close();
+                        */
                     }
-                    
-                    /*
-                    FixedDocument fixedDoc = new FixedDocument();
-                    PageContent pageContent = new PageContent();
-                    FixedPage fixedPage = new FixedPage();
-                    fixedPage.Width = ActualWidth;
-                    fixedPage.Height = AnnoGrid.HeadersGrid.ActualHeight + AnnoGrid.ColumnsGrid.ActualHeight;
-
-                    Plane planeToPrint = new Plane();
-                    Grid.SetIsSharedSizeScope(planeToPrint, true);
-                    //planeToPrint.Width = 800;
-                    //planeToPrint.Height = 8000;
-                    planeToPrint.DataContext = vm;
-
-                    //Create first page of document
-                    fixedPage.Children.Add(planeToPrint);
-                    ((System.Windows.Markup.IAddChild)pageContent).AddChild(fixedPage);
-                    fixedDoc.Pages.Add(pageContent);
-                    //Create any other required pages here
-
-                    //save the document
-                    XpsDocument xpsd = new XpsDocument("report.xps", FileAccess.Write);
-                    System.Windows.Xps.XpsDocumentWriter xw = XpsDocument.CreateXpsDocumentWriter(xpsd);
-                    xw.Write(fixedDoc);
-                    xpsd.Close();
-                    */
                 });
             }
         }

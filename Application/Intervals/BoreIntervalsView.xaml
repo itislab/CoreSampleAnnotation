@@ -40,9 +40,9 @@
                                 <ColumnDefinition SharedSizeGroup="intervals_4"></ColumnDefinition>
                                 <ColumnDefinition SharedSizeGroup="intervals_5"></ColumnDefinition>
                             </Grid.ColumnDefinitions>
-                            <app:TextInput Grid.Column="0" MinWidth="50" HintText="Введите верхнюю границу" HintFontSize="15" InputFontSize="20" Text="{Binding UpperDepth, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource nanToEmptyStringDoubleConverter}}" />
-                            <app:TextInput Grid.Column="1" MinWidth="50" HintText="Введите нижнюю границу" HintFontSize="15" InputFontSize="20"  Text="{Binding LowerDepth, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource nanToEmptyStringDoubleConverter}}" />
-                            <app:TextInput Grid.Column="2" MinWidth="100" HintText="Введите выход" HintFontSize="15" InputFontSize="20"  Text="{Binding ExtractedLength, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource nanToEmptyStringDoubleConverter}}" />
+                            <app:TextInput Grid.Column="0" MinWidth="50" HintText="Введите верхнюю границу" HintFontSize="15" InputFontSize="20" Text="{Binding UpperDepth, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource nanToEmptyStringDoubleConverter}, ConverterParameter=#.00}" />
+                            <app:TextInput Grid.Column="1" MinWidth="50" HintText="Введите нижнюю границу" HintFontSize="15" InputFontSize="20"  Text="{Binding LowerDepth, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource nanToEmptyStringDoubleConverter}, ConverterParameter=#.00}" />
+                            <app:TextInput Grid.Column="2" MinWidth="100" HintText="Введите выход" HintFontSize="15" InputFontSize="20"  Text="{Binding ExtractedLength, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource nanToEmptyStringDoubleConverter}, ConverterParameter=#.00}" />
                             <TextBlock Grid.Column="3" Text="{Binding AnnotatedPercentage, StringFormat={}{0:0.#} %}" FontSize="20" VerticalAlignment="Center" HorizontalAlignment="Center"></TextBlock>
                             <Button Grid.Column="4" Margin="20,0" VerticalAlignment="Center" FontSize="15" Style="{StaticResource MetroButton}" Content="{Binding ImagesButtonText}" CommandParameter="{Binding}">
                                 <Button.Command>

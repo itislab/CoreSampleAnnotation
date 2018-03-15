@@ -8,6 +8,7 @@
              d:DesignHeight="300" d:DesignWidth="300">
     <UserControl.Resources>
         <local:ViewPortConverter x:Key="viewPortConverter"/>
+        <local:PolygonPointsConverter x:Key="polygonPointsConverter"/>
     </UserControl.Resources>
     <ItemsControl ItemsSource="{Binding Layers}"  Height="{Binding ColumnHeight}" Width="{Binding ColumnWidth}">
         <ItemsControl.ItemsPanel>
@@ -26,8 +27,15 @@
         </ItemsControl.ItemContainerStyle>
         <ItemsControl.ItemTemplate>
             <DataTemplate>
-                <Rectangle Width="{Binding Width}" Height="{Binding Height}" Fill="{Binding BackgroundBrush}" >                    
-                </Rectangle>
+                <Polygon  Stroke="Black" Fill="{Binding BackgroundBrush}" StrokeThickness="1">
+                    <Polygon.Points>
+                        <MultiBinding Converter="{StaticResource polygonPointsConverter}">
+                            <Binding Path="Width"></Binding>
+                            <Binding Path="Height"></Binding>
+                            <Binding Path="RightSideForm"></Binding>
+                        </MultiBinding>
+                    </Polygon.Points>
+                </Polygon>
             </DataTemplate>
         </ItemsControl.ItemTemplate>
     </ItemsControl>

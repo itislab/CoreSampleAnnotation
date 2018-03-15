@@ -100,7 +100,7 @@ namespace CoreSampleAnnotation.Intervals
             AddNewCommand = new DelegateCommand(() =>
             {
                 Intervals.Add(new PhotoCalibratedBoreIntervalVM(imageStorage));
-            });
+            });            
 
             RemoveIntervalCommand = new DelegateCommand((arg) =>
             {

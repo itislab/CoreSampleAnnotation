@@ -131,6 +131,10 @@ namespace CoreSampleAnnotation.AnnotationPlane
 
         private SamplesColumnVM samplesColumnVM;
 
+        public SamplesColumnVM SamplesColumnVM {
+            get { return samplesColumnVM; }
+        }
+
         /// <summary>
         /// 
         /// </summary>
@@ -282,7 +286,16 @@ namespace CoreSampleAnnotation.AnnotationPlane
             LayerClassVM result = new LayerClassVM(cl.ID);
             if (cl.Acronym != null)
                 result.Acronym = cl.Acronym;
-            if (cl.BackgroundPatternSVG != null) {
+            if (cl.Description != null)
+                result.Description = cl.Description;
+            if (cl.ShortName != null)
+                result.ShortName = cl.ShortName;
+            if (!double.IsNaN(cl.WidthRatio) && !double.IsInfinity(cl.WidthRatio)) {
+                result.WidthRatio = cl.WidthRatio;
+            }
+            result.RightSideForm = cl.RightSideForm;
+            if (cl.BackgroundPatternSVG != null)
+            {
                 Svg.SvgPatternServer pa = Svg.SvgDocument.FromSvg<Svg.SvgDocument>(cl.BackgroundPatternSVG).Children[0] as Svg.SvgPatternServer;
 
                 Svg.SvgPatternServer paOrig = (Svg.SvgPatternServer)pa.DeepCopy();
@@ -290,15 +303,15 @@ namespace CoreSampleAnnotation.AnnotationPlane
                 Svg.SvgColourServer whitePaint = new Svg.SvgColourServer(System.Drawing.Color.White);
 
                 //creating a brush from the pattern
-                Svg.SvgDocument doc = new Svg.SvgDocument();                
+                Svg.SvgDocument doc = new Svg.SvgDocument();
                 Svg.SvgDefinitionList defs = new Svg.SvgDefinitionList();
-                pa.ID = string.Format("pattern-{0}",Guid.NewGuid().ToString());
+                pa.ID = string.Format("pattern-{0}", Guid.NewGuid().ToString());
                 paOrig.ID = pa.ID;
                 pa.PatternUnits = Svg.SvgCoordinateUnits.Inherit;
                 pa.Width = new Svg.SvgUnit(0.25f);
                 pa.Height = new Svg.SvgUnit(0.25f);
                 defs.Children.Add(pa);
-                doc.Children.Add(defs);                
+                doc.Children.Add(defs);
 
                 Svg.SvgRectangle rect = new Svg.SvgRectangle();
                 rect.Width = 256;
@@ -316,26 +329,59 @@ namespace CoreSampleAnnotation.AnnotationPlane
                                                                             System.Windows.Media.Imaging.BitmapSizeOptions.FromEmptyOptions()
                                                                          );
                 bitmap.Dispose();
-                
-                var brush = new ImageBrush(bitmapSource) { TileMode = TileMode.Tile,
+
+                var brush = new ImageBrush(bitmapSource)
+                {
+                    TileMode = TileMode.Tile,
                     Stretch = Stretch.None,
                     AlignmentX = AlignmentX.Left,
                     AlignmentY = AlignmentY.Top,
                     ViewportUnits = BrushMappingMode.Absolute
                 };
 
-                BindingOperations.SetBinding(brush, ImageBrush.ViewportProperty, new Binding("ImageSource") { Converter = new Columns.ViewPortConverter(), RelativeSource = RelativeSource.Self});
+                BindingOperations.SetBinding(brush, ImageBrush.ViewportProperty, new Binding("ImageSource") { Converter = new Columns.ViewPortConverter(), RelativeSource = RelativeSource.Self });
 
                 result.BackgroundBrush = brush;
                 result.BackgroundPattern = paOrig;
             }
-            if (cl.Description != null)
-                result.Description = cl.Description;
-            if (cl.ShortName != null)
-                result.ShortName = cl.ShortName;
+            if (cl.IconSVG != null)
+            {
+                Svg.SvgDocument doc = Svg.SvgDocument.FromSvg<Svg.SvgDocument>(cl.IconSVG);
+                Svg.SvgFragment docCopy = (Svg.SvgFragment)doc.DeepCopy();
+                doc.Fill = new Svg.SvgColourServer(System.Drawing.Color.White);
+
+                double ratio = doc.Bounds.Width / doc.Bounds.Height;
+
+                int width = 32;
+                int height = (int)(width / ratio);
+
+                doc.ViewBox = new Svg.SvgViewBox(0, 0, doc.Bounds.Width, doc.Bounds.Height);
+
+                doc.Width = width;
+                doc.Height = height;
+                var bitmap = doc.Draw();
+
+                //bitmap.Save(string.Format("{0}-icon.png", cl.ID));
+
+                var bitmapSource = Imaging.CreateBitmapSourceFromHBitmap(bitmap.GetHbitmap(),
+                                                                            IntPtr.Zero,
+                                                                            Int32Rect.Empty,
+                                                                            System.Windows.Media.Imaging.BitmapSizeOptions.FromEmptyOptions()
+                                                                        );
+                bitmap.Dispose();
+                result.IconSvg = docCopy;
+                result.IconImage = bitmapSource;
+            }
+            if (cl.ExampleImage != null)
+                result.ExampleImage = cl.ExampleImage;
             return result;
         }
 
+        /// <param name="upper">in meters (positive values)</param>
+        /// <param name="lower">in meters (positive values)</param>
+        public void SetDepthBoundaries(double upper, double lower) {
+            
+        }
 
         /// <summary>
         /// Fills the LayerProps view models with the information passed in annotatioN
@@ -358,7 +404,7 @@ namespace CoreSampleAnnotation.AnnotationPlane
 
 
             AnnoGridVM = new AnnotationGridVM();
-            classificationVM = new ClassificationVM();            
+            classificationVM = new ClassificationVM();
 
             ElementDropped = new DelegateCommand(obj =>
             {
@@ -438,12 +484,14 @@ namespace CoreSampleAnnotation.AnnotationPlane
                         sample.Depth = depth;
                         samplesColumnVM.Samples = samplesColumnVM.Samples.ToArray(); //asignment forces refresh
                     }
-                    else {                        
+                    else
+                    {
                         var res = MessageBox.Show(
-                            string.Format("Удалить образец {0} с глубины {1:#.##}м?",sample.Number, sample.Depth),
+                            string.Format("Удалить образец {0} с глубины {1:#.##}м?", sample.Number, sample.Depth),
                             "Подтверждение удаления образца",
-                            MessageBoxButton.OKCancel,MessageBoxImage.Question);
-                        switch (res) {
+                            MessageBoxButton.OKCancel, MessageBoxImage.Question);
+                        switch (res)
+                        {
                             case MessageBoxResult.OK:
                                 samplesColumnVM.Samples = samplesColumnVM.Samples.Where(s => s != sample).ToArray();
                                 break;
@@ -462,7 +510,7 @@ namespace CoreSampleAnnotation.AnnotationPlane
                 PointSelectedEventArgs psea = obj as PointSelectedEventArgs;
                 System.Diagnostics.Debug.WriteLine("Selected point with offset {0} in {1} column", psea.WpfTopOffset, psea.ColumnIdx);
 
-                Type[] newLayerTypes = new Type[] { typeof(ImageColumnVM), typeof(DepthAxisColumnVM), typeof(BoundaryEditorColumnVM) };
+                Type[] newLayerTypes = new Type[] { typeof(ImageColumnVM), typeof(DepthAxisColumnVM), typeof(BoundaryEditorColumnVM), typeof(BoundaryLineColumnVM) };
                 ColumnVM relatedVM = AnnoGridVM.Columns[psea.ColumnIdx];
                 Type relatedVmType = relatedVM.GetType();
                 if (newLayerTypes.Contains(relatedVmType))
@@ -555,12 +603,16 @@ namespace CoreSampleAnnotation.AnnotationPlane
             samplesColumnVM.DragStart = layerBoundaryEditorVM.DragStart;
 
             double colHeight = LayerSyncController.DepthToWPF(lowerDepth) - LayerSyncController.DepthToWPF(upperDepth);
-
+            
+            //filling up classification columns (not UI column, logical columns. One column for each property)
             foreach (var property in layersTemplateSource.Template)
             {
                 LayeredColumnVM columnVM = new LayeredColumnVM(property.ID);
                 for (int i = 0; i < layersCount; i++)
                 {
+                    double layerUp = boundaries[i];
+                    double layerBottom = boundaries[i + 1];
+                   
                     ClassificationLayerVM layerVM;
                     if (property.IsMulticlass)
                     {
@@ -572,8 +624,14 @@ namespace CoreSampleAnnotation.AnnotationPlane
                     }
                     layerVM.PossibleClasses = availableClasses[property.ID];
                     ColumnValues column = annotation.Columns.FirstOrDefault(c => c.PropID == property.ID);
-                    if (column != null) //setting choice                        
+                    if (column != null)
                     {
+                        //setting Remarks
+                        if (column.LayerValues[i].Remarks != null)
+                        {
+                            layerVM.Remark = column.LayerValues[i].Remarks;
+                        }
+                        //setting choice
                         if (column.LayerValues[i].Value != null)
                         {
                             foreach (string classID in column.LayerValues[i].Value)
@@ -603,7 +661,7 @@ namespace CoreSampleAnnotation.AnnotationPlane
                         }
 
                     }
-                    layerVM.Length = LayerSyncController.LengthToWPF(boundaries[i + 1] - boundaries[i]);
+                    layerVM.Length = LayerSyncController.LengthToWPF(layerBottom - layerUp);
                     columnVM.Layers.Add(layerVM);
                 }
                 columnVM.ColumnHeight = colHeight;
@@ -614,6 +672,7 @@ namespace CoreSampleAnnotation.AnnotationPlane
                 LayerProps.Add(columnVM);
             }
 
+            
             samplesColumnVM.ColumnHeight = colHeight;
             RegisterForScaleSync(samplesColumnVM, false);
 
@@ -638,9 +697,13 @@ namespace CoreSampleAnnotation.AnnotationPlane
                 if (columnDefinition is DepthColumnDefinitionVM)
                 {
                     DepthAxisColumnVM colVM = new DepthAxisColumnVM("Шкала глубин");
-                    colVM.ColumnHeight = colHeight;
-                    AnnoGridVM.Columns.Add(colVM);
-                    RegisterForScaleSync(colVM, true);
+
+                    RankMoreOrEqualBoundaryCollection filter = new RankMoreOrEqualBoundaryCollection(layerBoundaryEditorVM, 0);
+                    BoundaryLineColumnVM blVM = new BoundaryLineColumnVM(colVM, filter, Colors.Green);
+
+                    blVM.ColumnHeight = colHeight;
+                    AnnoGridVM.Columns.Add(blVM);
+                    RegisterForScaleSync(blVM, true);
                 }
                 else if (columnDefinition is LayerLengthColumnDefinitionVM)
                 {
@@ -659,13 +722,15 @@ namespace CoreSampleAnnotation.AnnotationPlane
                 }
                 else if (columnDefinition is PhotoColumnDefinitionVM)
                 {
-                    ImageColumnVM imColVM = new ImageColumnVM("Фото керна");
-                    //BoundaryEditorColumnVM beVM = new BoundaryEditorColumnVM(imColVM, layerBoundaryEditorVM);
+                    ImageColumnVM imColVM = new ImageColumnVM("Фото керна");                    
 
-                    imColVM.ColumnHeight = colHeight;
+                    RankMoreOrEqualBoundaryCollection filter = new RankMoreOrEqualBoundaryCollection(layerBoundaryEditorVM, 0);                    
+                    BoundaryLineColumnVM blVM = new BoundaryLineColumnVM(imColVM, filter, Colors.Lime);
+
+                    blVM.ColumnHeight = colHeight;
                     imColVM.ImageRegions = photos;
-                    AnnoGridVM.Columns.Add(imColVM);
-                    RegisterForScaleSync(imColVM, true);
+                    AnnoGridVM.Columns.Add(blVM);
+                    RegisterForScaleSync(blVM, true);
                 }
                 else if (columnDefinition is LayeredTextColumnDefinitionVM)
                 {
@@ -674,7 +739,9 @@ namespace CoreSampleAnnotation.AnnotationPlane
                     {
                         string propID = colDef.SelectedCentreTextProp.PropID;
 
-                        LayeredColumnVM propColumnVM = LayerProps.Where(p => p.Heading == propID).Single();
+                        LayeredColumnVM propColumnVM = LayerProps.Where(p => p.Heading == propID).FirstOrDefault();
+                        if (propColumnVM == null)
+                            continue;
 
                         //Creating presentation column.
 
@@ -686,6 +753,7 @@ namespace CoreSampleAnnotation.AnnotationPlane
                             case Presentation.Description: centreTextExtractor = vm1 => vm1.Description; break;
                             case Presentation.ShortName: centreTextExtractor = vm1 => vm1.ShortName; break;
                             case Presentation.BackgroundImage: throw new InvalidOperationException();
+                            case Presentation.Icon: throw new InvalidOperationException();
                             default: throw new NotImplementedException();
                         }
 
@@ -712,28 +780,61 @@ namespace CoreSampleAnnotation.AnnotationPlane
                     int rank = colDef.SelectedIndex;
                     string heading = string.Format("Границы между {0}", colDef.Selected.ToLowerInvariant());
                     BlankColumnVM blankColumnVM = new BlankColumnVM(heading);
-                    RankMoreOrEqualBoundaryCollection filter = new RankMoreOrEqualBoundaryCollection(layerBoundaryEditorVM, rank);
-                    RankMatchingBoundaryCollection filter2 = new RankMatchingBoundaryCollection(layerBoundaryEditorVM, rank);
+                    RankMoreOrEqualBoundaryCollection filteredForLines = new RankMoreOrEqualBoundaryCollection(layerBoundaryEditorVM, rank);
+                    ZeroBoundaryDecoratorLBVM zeroBoundaryAdded = new ZeroBoundaryDecoratorLBVM(filteredForLines);
+                    NumberResettingDecorator renumberedForLabels = new NumberResettingDecorator(zeroBoundaryAdded, rank,1);                    
+                    RankMatchingBoundaryCollection filteredForDraggables = new RankMatchingBoundaryCollection(layerBoundaryEditorVM, rank);
 
-                    BoundaryLineColumnVM blVM = new BoundaryLineColumnVM(blankColumnVM, filter);
-                    BoundaryEditorColumnVM beVM = new BoundaryEditorColumnVM(blVM, filter2);
+                    BoundaryLabelColumnVM blaVM = new BoundaryLabelColumnVM(blankColumnVM, renumberedForLabels);
+                    BoundaryLineColumnVM blVM = new BoundaryLineColumnVM(blaVM, filteredForLines, Colors.Black);
+                    BoundaryEditorColumnVM beVM = new BoundaryEditorColumnVM(blVM, filteredForDraggables);
 
 
                     blankColumnVM.ColumnHeight = colHeight;
                     blankColumnVM.ColumnWidth = 100;
                     AnnoGridVM.Columns.Add(beVM);
-                    RegisterForScaleSync(blankColumnVM, true);
+                    RegisterForScaleSync(beVM, true);
                 }
                 else if (columnDefinition is LayerSamplesDefinitionVM)
                 {
                     AnnoGridVM.Columns.Add(samplesColumnVM);
                 }
-                else if (columnDefinition is VisualColumnDefinitionVM) {
+                else if (columnDefinition is VisualColumnDefinitionVM)
+                {
                     VisualColumnDefinitionVM vcdVM = (VisualColumnDefinitionVM)columnDefinition;
-                    LayeredColumnVM propColumnVM = LayerProps.Where(p => p.Heading == vcdVM.SelectedBackgroundImageProp.PropID).Single();
+                    if (vcdVM.SelectedBackgroundImageProp == null)
+                        continue;
+                    LayeredColumnVM propColumnVM = LayerProps.Where(p => p.Heading == vcdVM.SelectedBackgroundImageProp.PropID).FirstOrDefault();
+                    if (propColumnVM == null)
+                        continue;
                     Columns.VisualColumnVM vcVM = new Columns.VisualColumnVM("Колонка", propColumnVM, lVM => new Columns.VisualLayerPresentingVM(lVM));
                     AnnoGridVM.Columns.Add(vcVM);
                     RegisterForScaleSync(vcVM, true);
+                }
+                else if (columnDefinition is IconsColumnDefinitionVM)
+                {
+                    IconsColumnDefinitionVM colDef = (IconsColumnDefinitionVM)columnDefinition;
+                    if (colDef.SelectedIconProp == null)
+                        continue;
+                    LayeredColumnVM propColumnVM = LayerProps.Where(p => p.Heading == colDef.SelectedIconProp.PropID).FirstOrDefault();
+
+                    if (propColumnVM == null)
+                        continue;
+
+                    LayeredPresentationColumnVM colVM = new LayeredPresentationColumnVM(
+                            colDef.SelectedIconProp.TexturalString,
+                            propColumnVM,
+                            lVM =>
+                            {
+                                if (lVM is MultiClassificationLayerVM)
+                                    return new MultiClassificationLayerIconPresentingVM((MultiClassificationLayerVM)lVM);
+                                else throw new InvalidOperationException("Unexpected VM type");
+                            });
+
+                    colVM.ColumnHeight = colHeight;
+
+                    AnnoGridVM.Columns.Add(colVM);
+                    RegisterForScaleSync(colVM, true);
                 }
                 else throw new NotSupportedException("Незнакомое определение колонки");
             }
@@ -746,48 +847,58 @@ namespace CoreSampleAnnotation.AnnotationPlane
             LayersAnnotation layersAnnotation = (LayersAnnotation)info.GetValue("LayersAnnotation", typeof(LayersAnnotation));
             layersTemplateSource = (ILayersTemplateSource)info.GetValue("LayersTemplate", typeof(ILayersTemplateSource));
             layerBoundaryEditorVM = (LayerBoundaryEditorVM)info.GetValue("LayerBoundaries", typeof(LayerBoundaryEditorVM));
-            samplesColumnVM = (SamplesColumnVM)info.GetValue("Samples",typeof(SamplesColumnVM));
+            samplesColumnVM = (SamplesColumnVM)info.GetValue("Samples", typeof(SamplesColumnVM));
             Initialize(layersAnnotation);
+        }
+
+        public LayersAnnotation AsLayersAnnotation {
+            get {
+                //Dumping layer prop VMs to LayersAnnotation
+                LayersAnnotation layersAnnotation = new LayersAnnotation();
+                layersAnnotation.LayerBoundaries = LayerSyncController.DepthBoundaries;
+                layersAnnotation.Columns = LayerProps.Select(col =>
+                {
+                    List<LayerPropertyValue> values = new List<LayerPropertyValue>();
+                    foreach (var layer in col.Layers)
+                    {
+                        ClassificationLayerVM clVM = layer as ClassificationLayerVM;
+                        LayerPropertyValue v = new LayerPropertyValue();
+                        //handling remarks                    
+                        v.Remarks = clVM.Remark;
+                        //handling selected values                    
+                        if (clVM is SingleClassificationLayerVM)
+                        {
+                            SingleClassificationLayerVM sclVM = (SingleClassificationLayerVM)clVM;
+                            if (sclVM.CurrentClass != null)
+                            {
+                                v.Value = new string[] { sclVM.CurrentClass.ID };
+                            }
+                        }
+                        else if (clVM is MultiClassificationLayerVM)
+                        {
+                            MultiClassificationLayerVM mclVM = (MultiClassificationLayerVM)clVM;
+                            {
+                                if (mclVM.CurrentClasses != null)
+                                {
+                                    v.Value = mclVM.CurrentClasses.Select(c => c.ID).ToArray();
+                                }
+                            }
+                        }
+                        else throw new InvalidOperationException("Unexpected VM type");
+
+                        values.Add(v);
+                    }
+                    return new ColumnValues() { PropID = col.Heading, LayerValues = values.ToArray() };
+                }).ToArray();
+                return layersAnnotation;
+            }
         }
 
         public void GetObjectData(SerializationInfo info, StreamingContext context)
         {
-            //Dumping layer prop VMs to LayersAnnotation
-            LayersAnnotation layersAnnotation = new LayersAnnotation();
-            layersAnnotation.LayerBoundaries = LayerSyncController.DepthBoundaries;
-            layersAnnotation.Columns = LayerProps.Select(col =>
-            {
-                List<LayerPropertyValue> values = new List<LayerPropertyValue>();
-                foreach (var layer in col.Layers)
-                {
-                    ClassificationLayerVM clVM = layer as ClassificationLayerVM;
-                    LayerPropertyValue v = new LayerPropertyValue();
-                    if (clVM is SingleClassificationLayerVM)
-                    {
-                        SingleClassificationLayerVM sclVM = (SingleClassificationLayerVM)clVM;
-                        if (sclVM.CurrentClass != null)
-                        {
-                            v.Value = new string[] { sclVM.CurrentClass.ID };
-                        }
-                    }
-                    else if (clVM is MultiClassificationLayerVM)
-                    {
-                        MultiClassificationLayerVM mclVM = (MultiClassificationLayerVM)clVM;
-                        {
-                            if (mclVM.CurrentClasses != null)
-                            {
-                                v.Value = mclVM.CurrentClasses.Select(c => c.ID).ToArray();
-                            }
-                        }
-                    }
-                    else throw new InvalidOperationException("Unexpected VM type");
-
-                    values.Add(v);
-                }
-                return new ColumnValues() { PropID = col.Heading, LayerValues = values.ToArray() };
-            }).ToArray();
-            info.AddValue("Samples",samplesColumnVM);
-            info.AddValue("LayersAnnotation", layersAnnotation);
+            
+            info.AddValue("Samples", samplesColumnVM);
+            info.AddValue("LayersAnnotation", AsLayersAnnotation);
             info.AddValue("LayersTemplate", layersTemplateSource);
             info.AddValue("LayerBoundaries", layerBoundaryEditorVM);
         }

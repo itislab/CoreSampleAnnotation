@@ -31,7 +31,7 @@ namespace CoreSampleAnnotation
 
         private void LoadProjectWithPersister(IProjectPersister persister)
         {
-            vm.ActivePersister = persister;            
+            vm.ActivePersister = persister;
 
             vm.CurrentProjectVM = persister.LoadProject();
             menuVM = new ProjectMenuVM(vm.CurrentProjectVM);
@@ -60,26 +60,130 @@ namespace CoreSampleAnnotation
 
             menuVM.ActivateAnnotationPlaneCommand = new DelegateCommand(() =>
             {
-                var regions = vm.CurrentProjectVM.BoreIntervalsVM.Intervals.SelectMany(i => ((Intervals.PhotoCalibratedBoreIntervalVM)i).GetRegionImages()).ToArray();
+                var intervals = vm.CurrentProjectVM.BoreIntervalsVM.Intervals.
+                    Select(i => (Intervals.PhotoCalibratedBoreIntervalVM)i).
+                    Where(i => !double.IsNaN(i.UpperDepth) && !double.IsNaN(i.LowerDepth) && !double.IsNaN(i.ExtractedLength)).ToArray();
+                var regions = intervals.SelectMany(i => i.GetRegionImages()).ToArray();
+                foreach (var interval in intervals)
+                {
+                    if (interval.AnnotatedPercentage < 100.0)
+                    {
+                        var res = MessageBox.Show(string.Format("В интервале {0:0.##} - {1:0.##} м на фото отмечен не весь измеренный выход (только {2:0.##}% отмечено). Действительно приступить к описанию слоев?", interval.UpperDepth, interval.LowerDepth, interval.AnnotatedPercentage), "Не закончена работа с фото", MessageBoxButton.YesNo, MessageBoxImage.Exclamation);
+                        switch (res)
+                        {
+                            case MessageBoxResult.Yes: break;
+                            case MessageBoxResult.No:
+                                return;
+                        }
+                    }
+                }
 
-                double upperBoundary = vm.CurrentProjectVM.BoreIntervalsVM.Intervals.Where(i => !double.IsNaN(i.UpperDepth) && !double.IsNaN(i.LowerDepth)).Select(i => i.UpperDepth).Min();
-                double lowerBoundary = vm.CurrentProjectVM.BoreIntervalsVM.Intervals.Where(i => !double.IsNaN(i.UpperDepth) && !double.IsNaN(i.LowerDepth)).Select(i => i.LowerDepth).Max();
+                double upperBoundary = intervals.Select(i => i.UpperDepth).Min();
+                double lowerBoundary = intervals.Select(i => i.UpperDepth + i.ExtractedLength).Max();
 
-                if (vm.CurrentProjectVM.PlaneVM == null) {
+                if (vm.CurrentProjectVM.PlaneVM == null)
+                {
                     LayersAnnotation emptyAnnotation = new LayersAnnotation();
-                    emptyAnnotation.LayerBoundaries = new double[] { upperBoundary , lowerBoundary };
+                    emptyAnnotation.LayerBoundaries = new double[] { upperBoundary, lowerBoundary };
                     emptyAnnotation.Columns = new ColumnValues[0];
 
-                    vm.CurrentProjectVM.PlaneVM = new PlaneVM(emptyAnnotation, vm.CurrentProjectVM.LayersTemplateSource);                  
+                    vm.CurrentProjectVM.PlaneVM = new PlaneVM(emptyAnnotation, vm.CurrentProjectVM.LayersTemplateSource);
+                }
+                else
+                {
+                    //check whether the intervals boundaries change
+                    LayersAnnotation layersAnnotation = vm.CurrentProjectVM.PlaneVM.AsLayersAnnotation;
+                    double[] boundaries = layersAnnotation.LayerBoundaries;
+                    bool boundariesChanged = false;
+                    int upperLayersRemovedCount = 0;
+                    //dealing with upper bound
+                    if (upperBoundary < boundaries[0])
+                    {
+                        //the depth interval growed
+                        boundaries[0] = upperBoundary;
+                        boundariesChanged = true;
+                    }
+                    else if (upperBoundary > boundaries[0])
+                    {
+                        boundariesChanged = true;
+                        int idx = Array.BinarySearch(boundaries, upperBoundary);
+                        bool isExactMatch = true;
+                        if (idx < 0)
+                        {
+                            idx = ~idx;
+                            isExactMatch = false;
+                        }
+
+                        upperLayersRemovedCount = idx;
+                        if (!isExactMatch)
+                            upperLayersRemovedCount--;
+
+                        foreach (var column in layersAnnotation.Columns)
+                        {
+                            column.LayerValues = column.LayerValues.Skip(upperLayersRemovedCount).ToArray();
+                        }
+                        boundaries = boundaries.Skip(upperLayersRemovedCount).ToArray();
+                        if (!isExactMatch)
+                            boundaries[0] = upperBoundary;
+                    }
+                    if (upperLayersRemovedCount > 0)
+                        MessageBox.Show(string.Format("{0} верхних слоев были удалены, так как соответствующие им глубины больше не входят в указанные интервалы отбора. Если это не то, что Вы ожидали, не сохраняйте проект на диск.", upperLayersRemovedCount), "Потеря информации о слоях", MessageBoxButton.OK, MessageBoxImage.Warning);
+
+                    int lowerLayersRemovedCount = 0;
+                    //dealing with lower bound
+                    if (lowerBoundary > boundaries[boundaries.Length - 1])
+                    {
+                        //the depth interval growed to the bottom
+                        boundaries[boundaries.Length - 1] = lowerBoundary;
+                        boundariesChanged = true;
+                    }
+                    else if (lowerBoundary < boundaries[boundaries.Length - 1])
+                    {
+                        boundariesChanged = true;
+                        int idx = Array.BinarySearch(boundaries, lowerBoundary);
+                        bool isExactMatch = true;
+                        if (idx < 0)
+                        {
+                            idx = ~idx;
+                            isExactMatch = false;
+                        }
+                        int layersToTake = idx;
+                        lowerLayersRemovedCount = boundaries.Length - 1 - layersToTake;
+                        foreach (var column in layersAnnotation.Columns)
+                        {
+                            column.LayerValues = column.LayerValues.Take(layersToTake).ToArray();
+                        }
+                        boundaries = boundaries.Take(layersToTake + 1).ToArray();
+                        if (!isExactMatch)
+                            boundaries[boundaries.Length - 1] = lowerBoundary;
+                    }
+
+                    if (lowerLayersRemovedCount > 0)
+                        MessageBox.Show(string.Format("{0} нижних слоев были удалены, так как соответствующие им глубины больше не входят в указанные интервалы отбора. Если это не то, что Вы ожидали, не сохраняйте проект на диск.", lowerLayersRemovedCount), "Потеря информации о слоях", MessageBoxButton.OK, MessageBoxImage.Warning);
+
+                    int samplesToRemove = vm.CurrentProjectVM.PlaneVM.SamplesColumnVM.Samples.Count(s => s.Depth < upperBoundary || s.Depth > lowerBoundary);
+                    double[] validSamples = vm.CurrentProjectVM.PlaneVM.SamplesColumnVM.Samples.Select(s => s.Depth).Where(s => s >= upperBoundary && s <= lowerBoundary).ToArray();
+
+                    if (samplesToRemove > 0)
+                        MessageBox.Show(string.Format("{0} точек взятия образцов были удалены, так как соответствующие им глубины больше не входят в указанные интервалы отбора. Если это не то, что Вы ожидали, не сохраняйте проект на диск.", samplesToRemove), "Потеря информации о слоях", MessageBoxButton.OK, MessageBoxImage.Warning);
+
+                    if (boundariesChanged)
+                    {
+                        //recreating VM with new corrected depth bounds
+                        layersAnnotation.LayerBoundaries = boundaries;
+                        vm.CurrentProjectVM.PlaneVM = new PlaneVM(layersAnnotation, vm.CurrentProjectVM.LayersTemplateSource);
+                        vm.CurrentProjectVM.PlaneVM.SamplesColumnVM.Samples = validSamples.Select(s => new SampleVM(s)).ToArray();
+                    }
                 }
 
                 vm.CurrentProjectVM.PlaneVM.SetPresentationColumns(vm.CurrentProjectVM.PlaneColumnSettingsVM,
-                    regions);                
-                
-                vm.CurrentProjectVM.PlaneVM.ActivateSettingsCommand = new DelegateCommand(() => {
+                    regions);
+
+                vm.CurrentProjectVM.PlaneVM.ActivateSettingsCommand = new DelegateCommand(() =>
+                {
                     vm.ActiveSectionVM = vm.CurrentProjectVM.PlaneColumnSettingsVM;
-                });                
-                
+                });
+
                 vm.ActiveSectionVM = vm.CurrentProjectVM.PlaneVM;
             });
 
@@ -140,7 +244,7 @@ namespace CoreSampleAnnotation
                             break;
                         default: throw new InvalidOperationException();
                     }
-                }           
+                }
             });
 
             vm.StartupMenuVM.ExitAppCommand = ExitCommand;
@@ -165,7 +269,8 @@ namespace CoreSampleAnnotation
                     {
                         LoadProjectWithPersister(restoredPersister);
                     }
-                    catch (System.IO.FileNotFoundException) {
+                    catch (System.IO.FileNotFoundException)
+                    {
                         MessageBox.Show("Выбранная вами папка не является папкой проекта описания скважины. Проверьте, правильную ли папку вы выбрали.", "Не папка проекта", MessageBoxButton.OK, MessageBoxImage.Exclamation);
                     }
                     catch (Exception ex)

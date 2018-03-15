@@ -44,9 +44,12 @@ namespace CoreSampleAnnotation.Intervals
         /// </summary>
         public double AnnotatedLength
         {
-            get { return imageRegions.Sum(arr => arr.Sum(r => r.Length)) * 0.01; }
+            get { return imageRegions.Sum(arr => arr.Select(r => r.Length).Where(l => !double.IsNaN(l)).Sum()) * 0.01; }
         }
 
+        /// <summary>
+        /// How much of extracted interval is annotated
+        /// </summary>
         public double AnnotatedPercentage
         {
             get
@@ -54,7 +57,7 @@ namespace CoreSampleAnnotation.Intervals
                 if (double.IsNaN(ExtractedLength) || double.IsNaN(AnnotatedLength) || (MaxPossibleExtractionLength == 0.0))
                     return 0.0;
                 else
-                    return AnnotatedLength / MaxPossibleExtractionLength * 100.0;
+                    return AnnotatedLength / ExtractedLength * 100.0;
             }
         }
 
@@ -241,7 +244,7 @@ namespace CoreSampleAnnotation.Intervals
         public PhotoRegion[] GetRegionImages()
         {
             List<PhotoRegion> result = new List<PhotoRegion>();
-            int N = ImagesCount;            
+            int N = ImagesCount;
             for (int i = 0; i < N; i++)
             {
                 List<PhotoRegion> subResult = new List<PhotoRegion>();
@@ -322,7 +325,7 @@ namespace CoreSampleAnnotation.Intervals
 
                 //transforming order into real depth
                 var reorderedRegions = subResult.OrderBy(r => r.ImageUpperDepth).ToList();
-                double prevBound = UpperDepth;                
+                double prevBound = UpperDepth;
                 for (int j = 0; j < reorderedRegions.Count; j++)
                 {
                     PhotoRegion curReg = reorderedRegions[j];
@@ -402,8 +405,10 @@ namespace CoreSampleAnnotation.Intervals
             }
         }
 
-        public ImageSource ImageSource {
-            get {
+        public ImageSource ImageSource
+        {
+            get
+            {
                 if (imageIDs.Count == 0) return null;
                 else
                 {
@@ -426,16 +431,12 @@ namespace CoreSampleAnnotation.Intervals
                 else
                 {
                     return Path.GetFullPath(imageStorage.GetFilePath(imageIDs[curImageIdx]));
-                    
+
                 }
             }
         }
 
         private ICommand addNewImageCommand = null;
-
-        private ICommand rotateCurrentImageCommand = null;
-
-        //private ICommand removeCurrentImageCommand = null;
 
         public ICommand AddNewImageCommand
         {
@@ -446,7 +447,7 @@ namespace CoreSampleAnnotation.Intervals
 
         public ICommand RotateCurrentImageCommand
         {
-            get { return rotateCurrentImageCommand; }
+            get; private set;
         }
 
         public ICommand RemoveCurrentImageCommand { get; private set; }
@@ -511,13 +512,18 @@ namespace CoreSampleAnnotation.Intervals
                 }
             });
 
-            rotateCurrentImageCommand = new DelegateCommand(() =>
-            {
-                //Image img = new Image();
-                //img.Source = new BitmapImage(new Uri(ImagePath));
+            RotateCurrentImageCommand = new DelegateCommand(() =>
+            {                
+                BitmapImage bi = new BitmapImage(new Uri(ImagePath), new System.Net.Cache.RequestCachePolicy(System.Net.Cache.RequestCacheLevel.NoCacheNoStore));                
+
+                Transform prevTransform = ImageTransform;
+
+                Point imageCentre = new Point(bi.Width * 0.5, bi.Height * 0.5);
+
+                Point movedCentre = prevTransform.Transform(imageCentre);
 
                 Matrix orig = ImageTransform.Value;
-                Matrix additional = new RotateTransform(-90.0).Value;
+                Matrix additional = new RotateTransform(90.0, movedCentre.X, movedCentre.Y).Value;
                 ImageTransform = new MatrixTransform(orig * additional);
             });
 
@@ -573,6 +579,9 @@ namespace CoreSampleAnnotation.Intervals
                 case nameof(base.UpperDepth):
                     RaisePropertyChanged(nameof(AnnotatedPercentage));
                     break;
+                case nameof(ExtractedLength):
+                    RaisePropertyChanged(nameof(AnnotatedPercentage));
+                    break;
             }
         }
 
@@ -589,7 +598,7 @@ namespace CoreSampleAnnotation.Intervals
             imageIDs = (List<Guid>)info.GetValue(nameof(imageIDs), typeof(List<Guid>));
 
             //TODO: avoid usage of explicit derived type here
-            imageStorage = (IImageStorage)info.GetValue(nameof(imageStorage),typeof(Persistence.FolderImageStorage));
+            imageStorage = (IImageStorage)info.GetValue(nameof(imageStorage), typeof(Persistence.FolderImageStorage));
 
             //restoring commands and event subscriptions
             Initialize();

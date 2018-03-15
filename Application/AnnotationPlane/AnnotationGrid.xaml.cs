@@ -16,7 +16,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 
 namespace CoreSampleAnnotation.AnnotationPlane
-{    
+{
     /// <summary>
     /// Interaction logic for AnnotationGrid.xaml
     /// </summary>
@@ -40,11 +40,28 @@ namespace CoreSampleAnnotation.AnnotationPlane
             b2.Source = this;
             b2.Mode = BindingMode.TwoWay;
             SetBinding(AnnotationGrid.InternalScaleFactorProperty, b2);
-            
+
             LowerGrid.PreviewMouseMove += LowerGrid_PreviewMouseMove;
             LowerGrid.PreviewMouseUp += LowerGrid_PreviewMouseUp;
             LowerGrid.PreviewTouchMove += LowerGrid_PreviewTouchMove;
             LowerGrid.PreviewTouchUp += LowerGrid_PreviewTouchUp;
+            LowerGrid.MouseWheel += LowerGrid_MouseWheel;
+        }
+
+        private void LowerGrid_MouseWheel(object sender, MouseWheelEventArgs e)
+        {
+            if (Keyboard.IsKeyDown(Key.LeftCtrl) || Keyboard.IsKeyDown(Key.RightCtrl))
+            {                
+                double change = 1.1;
+                if (e.Delta > 0)
+                    InternalScaleFactor *= change;
+                else
+                    InternalScaleFactor /= change;
+
+                System.Diagnostics.Trace.WriteLine(string.Format("InternalScale is {0}", InternalScaleFactor));
+
+                e.Handled = true;
+            }
         }
 
         private void LowerGrid_PreviewTouchUp(object sender, TouchEventArgs e)
@@ -55,22 +72,24 @@ namespace CoreSampleAnnotation.AnnotationPlane
 
         private void LowerGrid_PreviewTouchMove(object sender, TouchEventArgs e)
         {
-            if (HandleDrag(elem => e.GetTouchPoint(elem).Position))                
+            if (HandleDrag(elem => e.GetTouchPoint(elem).Position))
                 e.Handled = true;
         }
 
-        private bool IsInVisualTree(DependencyObject elem, DependencyObject parent) {
+        private bool IsInVisualTree(DependencyObject elem, DependencyObject parent)
+        {
             DependencyObject cur = elem;
             do
             {
                 if (cur == parent)
                     return true;
-                cur = VisualTreeHelper.GetParent(cur);                
+                cur = VisualTreeHelper.GetParent(cur);
             } while (cur != null);
             return false;
         }
 
-        private bool HandleDragEnd(Func<IInputElement,Point> eventPointExtractor) {
+        private bool HandleDragEnd(Func<IInputElement, Point> eventPointExtractor)
+        {
             AnnotationGridVM agVM = DataContext as AnnotationGridVM;
             if (agVM != null)
             {
@@ -106,7 +125,7 @@ namespace CoreSampleAnnotation.AnnotationPlane
                     return true;
                 }
             }
-            return false;           
+            return false;
         }
 
         private void LowerGrid_PreviewMouseUp(object sender, MouseButtonEventArgs e)
@@ -120,7 +139,8 @@ namespace CoreSampleAnnotation.AnnotationPlane
         /// </summary>
         /// <param name="eventPointExtractor"></param>
         /// <returns>whether the event is handled</returns>
-        private bool HandleDrag(Func<IInputElement, Point> eventPointExtractor) {
+        private bool HandleDrag(Func<IInputElement, Point> eventPointExtractor)
+        {
             AnnotationGridVM agVM = DataContext as AnnotationGridVM;
             if (agVM != null)
             {
@@ -147,7 +167,7 @@ namespace CoreSampleAnnotation.AnnotationPlane
         {
             if (HandleDrag(elem => e.GetPosition(elem)))
                 e.Handled = true;
-        }       
+        }
 
         private void ColumnsGrid_ManipulationDelta(object sender, ManipulationDeltaEventArgs e)
         {
@@ -162,7 +182,7 @@ namespace CoreSampleAnnotation.AnnotationPlane
             double newScaleFactor = InternalScaleFactor;
             //System.Diagnostics.Debug.WriteLine("scale changed by {2} to {0}, trandlation changed to {1}", InternalScaleFactor, e.DeltaManipulation.Translation.Y,factor);            
             var wpfMo = ColumnsGrid.PointFromScreen(new Point(0.0, e.ManipulationOrigin.Y));//as manipulation origin is in screen coods
-            double mo = wpfMo.Y;            
+            double mo = wpfMo.Y;
             double startOffset = GridScroll.VerticalOffset;
             double shift = -e.DeltaManipulation.Translation.Y;
 
@@ -178,7 +198,7 @@ namespace CoreSampleAnnotation.AnnotationPlane
 
 
 
-            GridScroll.ScrollToVerticalOffset(endOffsetInWPF);            
+            GridScroll.ScrollToVerticalOffset(endOffsetInWPF);
             e.Handled = true;
         }
 
@@ -289,7 +309,7 @@ namespace CoreSampleAnnotation.AnnotationPlane
         }
 
 
-        private void View_MouseRightButtonDown(object sender, MouseButtonEventArgs e)
+        private void View_MouseDown(object sender, MouseButtonEventArgs e)
         {
             ColumnView view = (ColumnView)sender;
             int idx = Grid.GetColumn(view);
@@ -367,26 +387,26 @@ namespace CoreSampleAnnotation.AnnotationPlane
                 foreach (ColumnVM colVM in newVM.Columns)
                     view.HandleColumnAdded(colVM);
             }
-            
+
         }
 
-        private void HandleColumnAdded(ColumnVM colVM) {
+        private void HandleColumnAdded(ColumnVM colVM)
+        {
             //handling column itself
             ColumnView view = new ColumnView();
             view.DataContext = colVM;
 
             //point selection related
-            view.PreviewMouseRightButtonDown += View_MouseRightButtonDown;
+            view.MouseDown += View_MouseDown;
             view.TouchDown += View_TouchDown;
             view.TouchMove += View_TouchMove;
             view.TouchUp += View_TouchUp;
             view.IsManipulationEnabled = true;
             view.TouchLeave += View_TouchLeave;
 
-            string sharedWidthGroupName = "annotation_grid_" + Guid.NewGuid().ToString().Replace('-', '_');
+            view.SizeChanged += View_SizeChanged;
 
             ColumnDefinition cd = new ColumnDefinition();
-            cd.SharedSizeGroup = sharedWidthGroupName;
             cd.Width = GridLength.Auto;
             this.ColumnsGrid.ColumnDefinitions.Add(cd);
 
@@ -398,7 +418,6 @@ namespace CoreSampleAnnotation.AnnotationPlane
             //Handling header
             ColumnDefinition header_cd = new ColumnDefinition();
             header_cd.Width = GridLength.Auto;
-            header_cd.SharedSizeGroup = sharedWidthGroupName;
             this.HeadersGrid.ColumnDefinitions.Add(header_cd);
 
             RotateTransform headingRotation = new RotateTransform(-90);
@@ -416,6 +435,17 @@ namespace CoreSampleAnnotation.AnnotationPlane
             this.HeadersGrid.Children.Add(textBorder);
         }
 
+        private void View_SizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            int elems = ColumnsGrid.Children.Count;
+            for (int i = 0; i < elems; i++)
+            {
+                var heading = HeadersGrid.Children[i] as Border;
+                var column = ColumnsGrid.Children[i] as ColumnView;
+                heading.Width = column.ActualWidth;
+            }
+        }
+
         private void Columns_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
         {
             if (e.NewItems != null)
@@ -430,7 +460,7 @@ namespace CoreSampleAnnotation.AnnotationPlane
         //todo: handle column removal        
     }
 
-    public class PointSelectedEventArgs: EventArgs
+    public class PointSelectedEventArgs : EventArgs
     {
         private double wpfTopOffset;
         private int columnIdx;
@@ -458,7 +488,7 @@ namespace CoreSampleAnnotation.AnnotationPlane
     }
 
     public class ElemDroppedEventArgs : PointSelectedEventArgs
-    {        
+    {
         public FrameworkElement DroppedElement { get; private set; }
 
         public ElemDroppedEventArgs(FrameworkElement fe, int columnIdx, double wpfTopOffset) : base(columnIdx, wpfTopOffset)

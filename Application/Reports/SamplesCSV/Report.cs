@@ -23,7 +23,8 @@ namespace CoreSampleAnnotation.Reports.SamplesCSV {
     public static class Report {
         public static void Generate(string fileName, SamplesColumnVM samplesCol) {
             var engine = new FileHelperEngine<SampleVMCSV>();
-            engine.WriteFile(fileName, samplesCol.Samples.Select(x => new SampleVMCSV(x.Number, x.Depth)));
+            engine.HeaderText = "Номер, Глубина";
+            engine.WriteFile(fileName, samplesCol.Samples.Select(x => new SampleVMCSV(x.Number, Math.Round(x.Depth, 3))));
         }
     }
 }

@@ -7,7 +7,7 @@
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300" HorizontalAlignment="Stretch">
     <Grid Height="40" Width="100">
-        <Rectangle HorizontalAlignment="Stretch" Height="40" Fill="Red" Name="Rect" Opacity="0.5"/>
+        <Rectangle HorizontalAlignment="Stretch" Height="40" Fill="LightCoral" Name="Rect"/>
         <TextBlock VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="16" Text="{Binding Number, FallbackValue=NA}"></TextBlock>
     </Grid>
 </UserControl>
