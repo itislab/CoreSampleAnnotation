@@ -31,6 +31,9 @@
         <DataTemplate DataType="{x:Type planeSettings:ColumnSettingsVM}">
             <planeSettings:ColumnSettingsView />
         </DataTemplate>
+        <DataTemplate DataType="{x:Type local:ReportsMenuVM}">
+            <local:ReportsMenuView />
+        </DataTemplate>
         <local:MenuButtonVisibilityConverter x:Key="menuButtonVisibilityConverter" />
     </Window.Resources>
     <Grid Background="LightGray">

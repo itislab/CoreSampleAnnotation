@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Win32;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -77,7 +78,6 @@ namespace CoreSampleAnnotation.AnnotationPlane
                         }
 
                         MessageBox.Show(string.Format("SVG отчет успешно сохранен в файл {0}", filepath), "Успешно", MessageBoxButton.OK, MessageBoxImage.Information);
-
                         /*
                         FixedDocument fixedDoc = new FixedDocument();
                         PageContent pageContent = new PageContent();

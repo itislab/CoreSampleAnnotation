@@ -1,4 +1,5 @@
 ﻿using CoreSampleAnnotation.AnnotationPlane;
+using Microsoft.Win32;
 using Microsoft.WindowsAPICodePack.Dialogs;
 using System;
 using System.Collections.Generic;
@@ -187,9 +188,27 @@ namespace CoreSampleAnnotation
             });
 
             vm.CurrentProjectVM.PlaneColumnSettingsVM.ActivateAnnotationPlaneCommand = menuVM.ActivateAnnotationPlaneCommand;
-
-            menuVM.ActivateReportGenerationCommand = new DelegateCommand(obj => { }, obj => false);
+            
             menuVM.ActivateTemplateEditorCommand = new DelegateCommand(obj => { }, obj => false);
+
+            menuVM.ActivateReportGenerationCommand = new DelegateCommand(obj => {
+                ReportsMenuVM reportsMenuVM = new ReportsMenuVM(vm.CurrentProjectVM);
+                reportsMenuVM.OpenSamplesCSVDialogCommand = new DelegateCommand(() => {
+                    var columns = vm.CurrentProjectVM.PlaneVM.AnnoGridVM.Columns;
+                    if (columns.Count > 0) {
+                        SamplesColumnVM sampleColVM = columns.Single(c => c is SamplesColumnVM) as SamplesColumnVM;
+                        SaveFileDialog dlg = new SaveFileDialog();
+                        dlg.FileName = "layers";
+                        dlg.DefaultExt = ".csv";
+                        dlg.Filter = "CSV files|*.csv";
+                        bool? result = dlg.ShowDialog();
+                        if (result == true)
+                            Reports.SamplesCSV.Report.Generate(dlg.FileName, sampleColVM);
+                    }
+                });
+
+                vm.ActiveSectionVM = reportsMenuVM;
+            });
         }
 
         public MainWindow()
