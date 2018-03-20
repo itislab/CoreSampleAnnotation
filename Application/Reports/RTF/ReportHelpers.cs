@@ -85,12 +85,12 @@ namespace CoreSampleAnnotation.Reports.RTF
             {
                 if (property.Values == null)
                     continue;
-                sb.AppendFormat(". {0} - {1}", property.Name, string.Join(",", property.Values));
+                sb.AppendFormat(". {0} - {1}", property.Name, string.Join(", ", property.Values.Select( v => v.ToLower())));
                 if (!string.IsNullOrEmpty(property.Comment)) {
                     sb.AppendFormat(". {0}", property.Comment);
-                }
-                sb.Append(".");
+                }                
             }
+            sb.Append(".");
 
             return new ReportRow(new TextCell[] {
                         new TextCell(sb.ToString(),LeftColWidth),

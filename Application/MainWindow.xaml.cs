@@ -104,6 +104,22 @@ namespace CoreSampleAnnotation
                     //preparing RTF specific layer data
                     Reports.RTF.LayerDescrition[] layers = new Reports.RTF.LayerDescrition[boundaries.Length - 1];
                     var layersAnnotation = vm.CurrentProjectVM.PlaneVM.AsLayersAnnotation;
+
+                    Dictionary<string, AnnotationPlane.Template.Property> propHelper = new Dictionary<string, AnnotationPlane.Template.Property>();
+                    foreach (var prop in vm.CurrentProjectVM.LayersTemplateSource.Template)
+                    {
+                        propHelper.Add(prop.ID, prop);
+                    }
+
+                    Func<AnnotationPlane.Template.Class, string> texturalRepresentation =
+                                classValue => {
+                                    if (!string.IsNullOrEmpty(classValue.ShortName))
+                                        return classValue.ShortName;
+                                    if (!string.IsNullOrEmpty(classValue.Acronym))
+                                        return classValue.Acronym;
+                                    return classValue.ID;
+                                };
+
                     for (int i = 0; i < layers.Length; i++)
                     {
                         List<Reports.RTF.PropertyDescription> props = new List<Reports.RTF.PropertyDescription>();
@@ -112,14 +128,23 @@ namespace CoreSampleAnnotation
                         {
                             var col = layersAnnotation.Columns[j];
                             var value = col.LayerValues;
+                            var prop1 = propHelper[col.PropID];
+
+                            string[] values = null;
+                            if (value[i].Value != null)
+                                values = value[i].Value.Select(v => texturalRepresentation(prop1.Classes.Single(c => c.ID == v))).ToArray();
+
                             Reports.RTF.PropertyDescription prop =
-                                new Reports.RTF.PropertyDescription(col.PropID,value[i].Value,value[i].Remarks);
+                            new Reports.RTF.PropertyDescription(
+                                prop1.Name,
+                                values,                                
+                                value[i].Remarks);
                             props.Add(prop);
                         }
                         layers[i] = new Reports.RTF.LayerDescrition(props.ToArray());
                     }
-                    
-                    
+
+
 
                     Reports.RTF.ReportTable table =
                         Reports.RTF.ReportHelpers.GenerateTableContents(
@@ -243,16 +268,16 @@ namespace CoreSampleAnnotation
                 }
                 else
                 {
-                    //check whether the intervals boundaries change
-                    LayersAnnotation layersAnnotation = vm.CurrentProjectVM.PlaneVM.AsLayersAnnotation;
+                //check whether the intervals boundaries change
+                LayersAnnotation layersAnnotation = vm.CurrentProjectVM.PlaneVM.AsLayersAnnotation;
                     double[] boundaries = layersAnnotation.LayerBoundaries;
                     bool boundariesChanged = false;
                     int upperLayersRemovedCount = 0;
-                    //dealing with upper bound
-                    if (upperBoundary < boundaries[0])
+                //dealing with upper bound
+                if (upperBoundary < boundaries[0])
                     {
-                        //the depth interval growed
-                        boundaries[0] = upperBoundary;
+                    //the depth interval growed
+                    boundaries[0] = upperBoundary;
                         boundariesChanged = true;
                     }
                     else if (upperBoundary > boundaries[0])
@@ -282,11 +307,11 @@ namespace CoreSampleAnnotation
                         MessageBox.Show(string.Format("{0} верхних слоев были удалены, так как соответствующие им глубины больше не входят в указанные интервалы отбора. Если это не то, что Вы ожидали, не сохраняйте проект на диск.", upperLayersRemovedCount), "Потеря информации о слоях", MessageBoxButton.OK, MessageBoxImage.Warning);
 
                     int lowerLayersRemovedCount = 0;
-                    //dealing with lower bound
-                    if (lowerBoundary > boundaries[boundaries.Length - 1])
+                //dealing with lower bound
+                if (lowerBoundary > boundaries[boundaries.Length - 1])
                     {
-                        //the depth interval growed to the bottom
-                        boundaries[boundaries.Length - 1] = lowerBoundary;
+                    //the depth interval growed to the bottom
+                    boundaries[boundaries.Length - 1] = lowerBoundary;
                         boundariesChanged = true;
                     }
                     else if (lowerBoundary < boundaries[boundaries.Length - 1])
@@ -321,8 +346,8 @@ namespace CoreSampleAnnotation
 
                     if (boundariesChanged)
                     {
-                        //recreating VM with new corrected depth bounds
-                        layersAnnotation.LayerBoundaries = boundaries;
+                    //recreating VM with new corrected depth bounds
+                    layersAnnotation.LayerBoundaries = boundaries;
                         vm.CurrentProjectVM.PlaneVM = new PlaneVM(layersAnnotation, vm.CurrentProjectVM.LayersTemplateSource);
                         vm.CurrentProjectVM.PlaneVM.SamplesColumnVM.Samples = validSamples.Select(s => new SampleVM(s)).ToArray();
                     }
