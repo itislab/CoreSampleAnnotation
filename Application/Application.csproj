@@ -14,6 +14,7 @@
     <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <WarningLevel>4</WarningLevel>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <IsWebBootstrapper>false</IsWebBootstrapper>
     <PublishUrl>publish\</PublishUrl>
     <Install>true</Install>
     <InstallFrom>Disk</InstallFrom>
@@ -26,7 +27,6 @@
     <MapFileExtensions>true</MapFileExtensions>
     <ApplicationRevision>0</ApplicationRevision>
     <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
-    <IsWebBootstrapper>false</IsWebBootstrapper>
     <UseApplicationTrust>false</UseApplicationTrust>
     <BootstrapperEnabled>true</BootstrapperEnabled>
   </PropertyGroup>
@@ -72,6 +72,10 @@
     </Reference>
     <Reference Include="Newtonsoft.Json, Version=11.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.11.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="nrtftree-library, Version=0.4.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\nrtftree-library.0.4.0\lib\net452\nrtftree-library.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="ReachFramework" />
@@ -212,7 +216,6 @@
     <Compile Include="AnnotationPlane\Plane.xaml.cs">
       <DependentUpon>Plane.xaml</DependentUpon>
     </Compile>
-    <Compile Include="AnnotationPlane\PlaneHalpers.cs" />
     <Compile Include="AnnotationPlane\PlaneVM.cs" />
     <Compile Include="AnnotationPlane\RegionImage.cs" />
     <Compile Include="AnnotationPlane\SyncronizerBoundaryAdapter.cs" />
@@ -295,6 +298,7 @@
     <Compile Include="ProjectMenuVM.cs" />
     <Compile Include="ProjectVM.cs" />
     <Compile Include="Persistence\FolderPersister.cs" />
+    <Compile Include="Reports\RTF\Report.cs" />
     <Compile Include="Reports\SVG\BoundaryColumnPainter.cs" />
     <Compile Include="Reports\SVG\LayeredColumnPainter.cs" />
     <Compile Include="ReportsMenuView.xaml.cs">
@@ -570,6 +574,7 @@
       <Install>false</Install>
     </BootstrapperPackage>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

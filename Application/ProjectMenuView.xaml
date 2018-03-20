@@ -12,7 +12,6 @@
             <local:TextInput MinWidth="400" HintText="Введите название скважины" Text="{Binding ProjectVM.BoreName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
             <Button Style="{StaticResource MetroButton}" Command="{Binding ActivateBoreIntervalsCommand}">Интервалы отбора</Button>
             <Button Style="{StaticResource MetroButton}" Command="{Binding ActivateAnnotationPlaneCommand}">Разметка слоев</Button>
-            <Button Style="{StaticResource MetroButton}" Command="{Binding ActivateTemplateEditorCommand}">Редактор шаблона</Button>
             <Button Style="{StaticResource MetroButton}" Command="{Binding ActivateReportGenerationCommand}">Отчеты</Button>
         </StackPanel>
         <StackPanel HorizontalAlignment="Left" VerticalAlignment="Bottom" Orientation="Horizontal">

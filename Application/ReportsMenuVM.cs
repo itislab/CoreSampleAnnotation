@@ -24,6 +24,19 @@ namespace CoreSampleAnnotation {
             }
         }
 
+        private ICommand openTextReportDialogCommand = null;
+        public ICommand OpenTextReportDialogCommand {
+            get {
+                return openTextReportDialogCommand;
+            }
+            set {
+                if (openTextReportDialogCommand != value) {
+                    openTextReportDialogCommand = value;
+                    RaisePropertyChanged(nameof(OpenTextReportDialogCommand));
+                }
+            }
+        }
+
         public ProjectVM ProjectVM {
             get {
                 return projectVM;
