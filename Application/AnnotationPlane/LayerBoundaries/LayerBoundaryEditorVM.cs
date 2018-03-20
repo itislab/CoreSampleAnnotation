@@ -96,6 +96,9 @@ namespace CoreSampleAnnotation.AnnotationPlane.LayerBoundaries
             return result;
         }
 
+        /// <summary>
+        /// Inner (inter layer) boundaries
+        /// </summary>
         public LayerBoundary[] Boundaries {
             get {
                 return boundaries;

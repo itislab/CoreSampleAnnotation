@@ -34,20 +34,17 @@ namespace CoreSampleAnnotation.Reports.RTF
         public double Depth { get; private set; }
 
         public int Rank { get; private set; }
-
-        public string RankName { get; private set; }
-
-        public LayerBoundary(int orderNumber, double depth, int rank, string rankName ) {
+        
+        public LayerBoundary(int orderNumber, double depth, int rank) {
             OrderNumber = orderNumber;
             Depth = depth;
             Rank = rank;
-            RankName = rankName;
         }
     }
 
     public static class ReportHelpers
     {
-        private static int LeftColWidth = 10000;
+        private static int LeftColWidth = 7000;
         private static int RightcolWidth = 3000;
 
         /// <summary>
@@ -59,7 +56,7 @@ namespace CoreSampleAnnotation.Reports.RTF
         /// <returns></returns>
         public static ReportRow GetIntervalRow(double upperDepth, double lowerDepth, double extractedLength) {
             return new ReportRow(new TextCell[] {
-                        new TextCell(string.Format("Интервал {0:0.#}-{1:0.##}/{3:0.##} м (присутствует {4:0.##} м)",upperDepth,lowerDepth,lowerDepth-upperDepth,extractedLength),LeftColWidth),
+                        new TextCell(string.Format("Интервал {0:0.#}-{1:0.##}/{2:0.##} м (присутствует {3:0.##} м)",upperDepth,lowerDepth,lowerDepth-upperDepth,extractedLength),LeftColWidth,isBold: true),
                         new TextCell("",RightcolWidth)
             });
         }
@@ -83,13 +80,16 @@ namespace CoreSampleAnnotation.Reports.RTF
         /// <returns></returns>
         public static ReportRow GetLayerDescrRow(int orderNum, double length, LayerDescrition description) {
             StringBuilder sb = new StringBuilder();
-            sb.AppendFormat("{0} слой ({1:0.##})\n", orderNum, length);
+            sb.AppendFormat("{0} слой ({1:0.##} м)", orderNum, length);
             foreach (PropertyDescription property in description.Properties)
             {
-                sb.AppendFormat("{0} - {1}. ", property.Name, string.Join(",", property.Values));
+                if (property.Values == null)
+                    continue;
+                sb.AppendFormat(". {0} - {1}", property.Name, string.Join(",", property.Values));
                 if (!string.IsNullOrEmpty(property.Comment)) {
-                    sb.AppendFormat("{0}. ", property.Comment);
+                    sb.AppendFormat(". {0}", property.Comment);
                 }
+                sb.Append(".");
             }
 
             return new ReportRow(new TextCell[] {
@@ -111,8 +111,8 @@ namespace CoreSampleAnnotation.Reports.RTF
         public static ReportTable GenerateTableContents(
         Intervals.BoreIntervalVM[] intervals,
         LayerBoundary[] boundaries,
-        string[] rankNames,
         LayerDescrition[] layers,
+        string[] rankNames,
         bool isDepthIncreases)
         {
             //asserting intervals
@@ -127,6 +127,16 @@ namespace CoreSampleAnnotation.Reports.RTF
                 intBounds.Add(new KeyValuePair<double, int>(interval.UpperDepth, 1)); // +1 opens the interval
                 intBounds.Add(new KeyValuePair<double, int>(interval.LowerDepth, -1)); // -1 closes the interval
             }
+            // detecting intervals with touching bounds; removing these bounds
+            double[] keys = intBounds.Select(kvp => kvp.Key).ToArray();            
+            foreach (int key in keys)
+            {
+                int curKeyValsSum = intBounds.Where(kvp => kvp.Key == key).Sum(kvp => kvp.Value);
+                if (curKeyValsSum == 0) {
+                    intBounds = intBounds.Where(kvp => kvp.Key != key).ToList();
+                }
+            }
+
             int[] events = intBounds.OrderBy(kvp => kvp.Key).Select(kvp => kvp.Value).ToArray();
             int sum = 0;
             for (int i = 0; i < events.Length; i++)
@@ -143,8 +153,10 @@ namespace CoreSampleAnnotation.Reports.RTF
                 throw new ArgumentException("Layers count must be exactly one more than boundary count");
 
             ReportRow header = new ReportRow(
+                new TextCell[] {
                 new TextCell("Описание керна сверху вниз. Интервал / выход керна в м", LeftColWidth, horizontalAlignement:TextAlignement.Centered, isBold:true),
-                new TextCell("№ образца/место отбора от начала керна, м", RightcolWidth, horizontalAlignement: TextAlignement.Centered, isBold: true));
+                new TextCell("№ образца/место отбора от начала керна, м", RightcolWidth, horizontalAlignement: TextAlignement.Centered, isBold: true)
+                });
 
             rows.Add(header);
             
@@ -153,19 +165,24 @@ namespace CoreSampleAnnotation.Reports.RTF
             {
                 intervals = intervals.OrderBy(i => i.UpperDepth).ToArray();
                 for (int i = 0; i < boundaries.Length - 1; i++)
-                    if (boundaries[i].Depth > boundaries[i - 1].Depth)
+                    if (boundaries[i+1].Depth < boundaries[i].Depth)
                         throw new NotSupportedException("Boundary depths must increase");
 
+                int reportedInIndex = -1;
                 int inIndex = 0;
-                int laIndex = 0;
-                rows.Add(GetIntervalRow(intervals[0].UpperDepth, intervals[0].LowerDepth, intervals[0].ExtractedLength));
+                int laIndex = 0;                
                 int layerOrderNum = 1;               
                 while (inIndex < intervals.Length && laIndex < layers.Length) {
+                    if (reportedInIndex != inIndex) {
+                        //adding row depicting interval start
+                        rows.Add(GetIntervalRow(intervals[inIndex].UpperDepth, intervals[inIndex].LowerDepth, intervals[inIndex].ExtractedLength));
+                        reportedInIndex = inIndex;
+                    }
                     LayerBoundary upperLabound = boundaries[laIndex];
                     double curLaUpper = upperLabound.Depth;
                     double curLaLower = boundaries[laIndex + 1].Depth; //boundraies array always contains one more element than layers
                     double curIntUpper = intervals[inIndex].UpperDepth;
-                    double curIntLower = intervals[inIndex].LowerDepth;
+                    double curIntLower = intervals[inIndex].UpperDepth + intervals[inIndex].ExtractedLength;
                     bool doInInc = false;
                     bool doLaInc = false;
                     bool skipReporting = false;
@@ -217,8 +234,9 @@ namespace CoreSampleAnnotation.Reports.RTF
                                         break;
                                 }
                                 int curOrder = 1;
-                                if (rank == upperLabound.Rank)//the outer (highest) rank is kept. All smaller ranks reset to 1
+                                if (rank == upperLabound.Rank) //the outer (highest) rank is kept. All smaller ranks reset to 1
                                     curOrder = upperLabound.OrderNumber;
+                                length = Math.Min(length, curIntLower - upperLabound.Depth);
                                 rows.Add(GetRankDescrRow(curOrder, rankNames[rank], length));
                             }
                             layerOrderNum = 1; //ranks higher than 0 reset the numbering of layers

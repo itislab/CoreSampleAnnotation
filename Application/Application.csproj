@@ -299,6 +299,8 @@
     <Compile Include="ProjectVM.cs" />
     <Compile Include="Persistence\FolderPersister.cs" />
     <Compile Include="Reports\RTF\Report.cs" />
+    <Compile Include="Reports\RTF\ReportHelpers.cs" />
+    <Compile Include="Reports\RTF\TableDocument.cs" />
     <Compile Include="Reports\SVG\BoundaryColumnPainter.cs" />
     <Compile Include="Reports\SVG\LayeredColumnPainter.cs" />
     <Compile Include="ReportsMenuView.xaml.cs">

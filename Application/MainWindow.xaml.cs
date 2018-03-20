@@ -83,13 +83,56 @@ namespace CoreSampleAnnotation
 
                 reportsMenuVM.OpenTextReportDialogCommand = new DelegateCommand(() =>
                 {
-                    Reports.RTF.TextCell[] testCells = new Reports.RTF.TextCell[] {
-                        new Reports.RTF.TextCell("столбец 1",4000),
-                        new Reports.RTF.TextCell("столбец 2",2000,horizontalAlignement: Reports.RTF.TextAlignement.Centered),
-                        new Reports.RTF.TextCell("столбец 3",4000, isBold:true),
-                    };
+                    //Reports.RTF.TextCell[] testCells = new Reports.RTF.TextCell[] {
+                    //    new Reports.RTF.TextCell("столбец 1",4000),
+                    //    new Reports.RTF.TextCell("столбец 2",2000,horizontalAlignement: Reports.RTF.TextAlignement.Centered),
+                    //    new Reports.RTF.TextCell("столбец 3",4000, isBold:true),
+                    //};
 
-                    Reports.RTF.Report.Genenerate(testCells);
+                    string[] rankNames = vm.CurrentProjectVM.LayerRankNameSource.NominativeNames;
+
+                    //transforming boundaryVMs to report specific boundaries
+                    Reports.RTF.LayerBoundary[] boundaries =
+                        vm.CurrentProjectVM.PlaneVM.LayerBoundaries
+                            .Select(b =>
+                                new Reports.RTF.LayerBoundary(
+                                    b.Number,
+                                    vm.CurrentProjectVM.PlaneVM.LayerSyncController.WpfToDepth(b.Level),
+                                    b.Rank
+                                    )).ToArray();
+
+                    //preparing RTF specific layer data
+                    Reports.RTF.LayerDescrition[] layers = new Reports.RTF.LayerDescrition[boundaries.Length - 1];
+                    var layersAnnotation = vm.CurrentProjectVM.PlaneVM.AsLayersAnnotation;
+                    for (int i = 0; i < layers.Length; i++)
+                    {
+                        List<Reports.RTF.PropertyDescription> props = new List<Reports.RTF.PropertyDescription>();
+
+                        for (int j = 0; j < layersAnnotation.Columns.Length; j++)
+                        {
+                            var col = layersAnnotation.Columns[j];
+                            var value = col.LayerValues;
+                            Reports.RTF.PropertyDescription prop =
+                                new Reports.RTF.PropertyDescription(col.PropID,value[i].Value,value[i].Remarks);
+                            props.Add(prop);
+                        }
+                        layers[i] = new Reports.RTF.LayerDescrition(props.ToArray());
+                    }
+                    
+                    
+
+                    Reports.RTF.ReportTable table =
+                        Reports.RTF.ReportHelpers.GenerateTableContents(
+                            vm.CurrentProjectVM.BoreIntervalsVM.Intervals
+                                .Where(i => !double.IsNaN(i.UpperDepth) && !double.IsNaN(i.LowerDepth))
+                                .ToArray(),
+                            boundaries,
+                            layers,
+                            rankNames,
+                            true
+                            );
+
+                    Reports.RTF.TableDocument.FormRTFDocument(table);
                 });
 
                 vm.ActiveSectionVM = reportsMenuVM;

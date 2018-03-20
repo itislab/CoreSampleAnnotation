@@ -31,7 +31,7 @@ namespace CoreSampleAnnotation.Reports.RTF
         public int BorderWidth { get; private set; }
 
         /// <param name="width">Twips</param>        
-        public TextCell(string text, int width, int borderWidth = 35, TextAlignement horizontalAlignement = TextAlignement.Left, bool isBold = false) {
+        public TextCell(string text, int width, int borderWidth = 10, TextAlignement horizontalAlignement = TextAlignement.Left, bool isBold = false) {
             Text = text;
             TextAlignement = horizontalAlignement;
             IsBold = isBold;
@@ -157,8 +157,16 @@ namespace CoreSampleAnnotation.Reports.RTF
                     default:
                         throw new NotSupportedException("Unexpected alignment");
                 }
-                node.AddKeyword("intbl");
-                node.AddText(cell.Text);
+
+                var grp = new RtfTreeNode(RtfNodeType.Group);
+
+                if (cell.IsBold)
+                {
+                    grp.AddCommand("b");
+                }
+                node.AddKeyword("intbl");                
+                grp.AddText(cell.Text);
+                node.AppendChild(grp);
                 node.AddKeyword("cell");
             }
             node.AddKeyword("row");
@@ -166,14 +174,12 @@ namespace CoreSampleAnnotation.Reports.RTF
     }
 
     
-    public static class Report
-    {        
-        
-
+    public static class TableDocument
+    {
         public static void FormRTFDocument(ReportTable table) {
             RtfTree tree = new RtfTree();
 
-            string rtfBase = @"{\rtf1\ansi\deff0 {\fonttbl {\f0  Times New Roman;}}\fs32";
+            string rtfBase = @"{\rtf1\ansi\deff0 {\fonttbl {\f0  Times New Roman;}}\fs24";
             tree.LoadRtfText(rtfBase);
 
             //Load an RTF document from a file

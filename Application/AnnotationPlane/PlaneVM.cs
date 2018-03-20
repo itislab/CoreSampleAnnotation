@@ -131,7 +131,8 @@ namespace CoreSampleAnnotation.AnnotationPlane
 
         private SamplesColumnVM samplesColumnVM;
 
-        public SamplesColumnVM SamplesColumnVM {
+        public SamplesColumnVM SamplesColumnVM
+        {
             get { return samplesColumnVM; }
         }
 
@@ -290,7 +291,8 @@ namespace CoreSampleAnnotation.AnnotationPlane
                 result.Description = cl.Description;
             if (cl.ShortName != null)
                 result.ShortName = cl.ShortName;
-            if (!double.IsNaN(cl.WidthRatio) && !double.IsInfinity(cl.WidthRatio)) {
+            if (!double.IsNaN(cl.WidthRatio) && !double.IsInfinity(cl.WidthRatio))
+            {
                 result.WidthRatio = cl.WidthRatio;
             }
             result.RightSideForm = cl.RightSideForm;
@@ -379,8 +381,9 @@ namespace CoreSampleAnnotation.AnnotationPlane
 
         /// <param name="upper">in meters (positive values)</param>
         /// <param name="lower">in meters (positive values)</param>
-        public void SetDepthBoundaries(double upper, double lower) {
-            
+        public void SetDepthBoundaries(double upper, double lower)
+        {
+
         }
 
         /// <summary>
@@ -603,7 +606,7 @@ namespace CoreSampleAnnotation.AnnotationPlane
             samplesColumnVM.DragStart = layerBoundaryEditorVM.DragStart;
 
             double colHeight = LayerSyncController.DepthToWPF(lowerDepth) - LayerSyncController.DepthToWPF(upperDepth);
-            
+
             //filling up classification columns (not UI column, logical columns. One column for each property)
             foreach (var property in layersTemplateSource.Template)
             {
@@ -612,7 +615,7 @@ namespace CoreSampleAnnotation.AnnotationPlane
                 {
                     double layerUp = boundaries[i];
                     double layerBottom = boundaries[i + 1];
-                   
+
                     ClassificationLayerVM layerVM;
                     if (property.IsMulticlass)
                     {
@@ -672,7 +675,7 @@ namespace CoreSampleAnnotation.AnnotationPlane
                 LayerProps.Add(columnVM);
             }
 
-            
+
             samplesColumnVM.ColumnHeight = colHeight;
             RegisterForScaleSync(samplesColumnVM, false);
 
@@ -680,6 +683,27 @@ namespace CoreSampleAnnotation.AnnotationPlane
 
             //            LayerSyncController.RegisterColumn(syncAdapter);
             ColScaleController.AttachToColumn(syncAdapter);
+        }
+
+        /// <summary>
+        /// Including outer boundaries (the level of first layer start and the level of last layer end)
+        /// </summary>
+        public LayerBoundary[] LayerBoundaries
+        {
+            get
+            {
+                LayerBoundary[] result = new LayerBoundary[layerBoundaryEditorVM.Boundaries.Length + 2];
+                int maxRank = 0;
+                for (int i = 0; i < layerBoundaryEditorVM.Boundaries.Length; i++)
+                {
+                    result[i + 1] = layerBoundaryEditorVM.Boundaries[i];
+                    if (result[i + 1].Rank > maxRank)
+                        maxRank = result[i + 1].Rank;
+                }
+                result[0] = new LayerBoundary(LayerSyncController.DepthToWPF(ColScaleController.UpperDepth), maxRank) {Number = 1 };
+                result[layerBoundaryEditorVM.Boundaries.Length+1] = new LayerBoundary(LayerSyncController.DepthToWPF(ColScaleController.LowerDepth), maxRank) { Number = result[layerBoundaryEditorVM.Boundaries.Length].Number+1} ;
+                return result;
+            }
         }
 
         public void SetPresentationColumns(ColumnSettingsVM columnDefinitions, Intervals.PhotoRegion[] photos)
@@ -722,9 +746,9 @@ namespace CoreSampleAnnotation.AnnotationPlane
                 }
                 else if (columnDefinition is PhotoColumnDefinitionVM)
                 {
-                    ImageColumnVM imColVM = new ImageColumnVM("Фото керна");                    
+                    ImageColumnVM imColVM = new ImageColumnVM("Фото керна");
 
-                    RankMoreOrEqualBoundaryCollection filter = new RankMoreOrEqualBoundaryCollection(layerBoundaryEditorVM, 0);                    
+                    RankMoreOrEqualBoundaryCollection filter = new RankMoreOrEqualBoundaryCollection(layerBoundaryEditorVM, 0);
                     BoundaryLineColumnVM blVM = new BoundaryLineColumnVM(imColVM, filter, Colors.Lime);
 
                     blVM.ColumnHeight = colHeight;
@@ -782,7 +806,7 @@ namespace CoreSampleAnnotation.AnnotationPlane
                     BlankColumnVM blankColumnVM = new BlankColumnVM(heading);
                     RankMoreOrEqualBoundaryCollection filteredForLines = new RankMoreOrEqualBoundaryCollection(layerBoundaryEditorVM, rank);
                     ZeroBoundaryDecoratorLBVM zeroBoundaryAdded = new ZeroBoundaryDecoratorLBVM(filteredForLines);
-                    NumberResettingDecorator renumberedForLabels = new NumberResettingDecorator(zeroBoundaryAdded, rank,1);                    
+                    NumberResettingDecorator renumberedForLabels = new NumberResettingDecorator(zeroBoundaryAdded, rank, 1);
                     RankMatchingBoundaryCollection filteredForDraggables = new RankMatchingBoundaryCollection(layerBoundaryEditorVM, rank);
 
                     BoundaryLabelColumnVM blaVM = new BoundaryLabelColumnVM(blankColumnVM, renumberedForLabels);
@@ -851,8 +875,10 @@ namespace CoreSampleAnnotation.AnnotationPlane
             Initialize(layersAnnotation);
         }
 
-        public LayersAnnotation AsLayersAnnotation {
-            get {
+        public LayersAnnotation AsLayersAnnotation
+        {
+            get
+            {
                 //Dumping layer prop VMs to LayersAnnotation
                 LayersAnnotation layersAnnotation = new LayersAnnotation();
                 layersAnnotation.LayerBoundaries = LayerSyncController.DepthBoundaries;
@@ -896,7 +922,7 @@ namespace CoreSampleAnnotation.AnnotationPlane
 
         public void GetObjectData(SerializationInfo info, StreamingContext context)
         {
-            
+
             info.AddValue("Samples", samplesColumnVM);
             info.AddValue("LayersAnnotation", AsLayersAnnotation);
             info.AddValue("LayersTemplate", layersTemplateSource);
