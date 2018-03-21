@@ -86,7 +86,10 @@ namespace CoreSampleAnnotation.Reports.RTF
             foreach (char c in text)
             {
                 uint cCode = (uint)c;
-                if (cCode <= 225)
+                if (c == '\n') {
+                    node.AddKeyword("line");
+                }
+                else if (cCode <= 225)
                 {
                     node.AddKeyword(String.Format("\'{0:X}", cCode));
                 }

@@ -80,17 +80,24 @@ namespace CoreSampleAnnotation.Reports.RTF
         /// <returns></returns>
         public static ReportRow GetLayerDescrRow(int orderNum, double length, LayerDescrition description) {
             StringBuilder sb = new StringBuilder();
-            sb.AppendFormat("{0} слой ({1:0.##} м)", orderNum, length);
+            sb.AppendFormat("{0} слой ({1:0.##} м).\n", orderNum, length);
+            List<string> propStrings = new List<string>();
             foreach (PropertyDescription property in description.Properties)
             {
                 if (property.Values == null)
                     continue;
-                sb.AppendFormat(". {0} - {1}", property.Name, string.Join(", ", property.Values.Select( v => v.ToLower())));
+                StringBuilder sb2 = new StringBuilder();
+                sb2.AppendFormat("{0} - {1}", property.Name, string.Join(", ", property.Values.Select( v => v.ToLower())));
                 if (!string.IsNullOrEmpty(property.Comment)) {
-                    sb.AppendFormat(". {0}", property.Comment);
-                }                
+                    sb2.AppendFormat(". {0}", property.Comment);
+                }
+                propStrings.Add(sb2.ToString());
             }
-            sb.Append(".");
+
+            sb.Append(string.Join(". ", propStrings.ToArray()));
+
+            if(propStrings.Count>0)
+                sb.Append(".");
 
             return new ReportRow(new TextCell[] {
                         new TextCell(sb.ToString(),LeftColWidth),
@@ -154,7 +161,7 @@ namespace CoreSampleAnnotation.Reports.RTF
 
             ReportRow header = new ReportRow(
                 new TextCell[] {
-                new TextCell("Описание керна сверху вниз. Интервал / выход керна в м", LeftColWidth, horizontalAlignement:TextAlignement.Centered, isBold:true),
+                new TextCell("Описание керна сверху вниз.\nИнтервал / выход керна в м.", LeftColWidth, horizontalAlignement:TextAlignement.Centered, isBold:true),
                 new TextCell("№ образца/место отбора от начала керна, м", RightcolWidth, horizontalAlignement: TextAlignement.Centered, isBold: true)
                 });
 
