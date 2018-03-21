@@ -179,7 +179,7 @@ namespace CoreSampleAnnotation.Reports.RTF
     
     public static class TableDocument
     {
-        public static void FormRTFDocument(ReportTable table) {
+        public static void FormRTFDocument(string filename, ReportTable table) {
             RtfTree tree = new RtfTree();
 
             string rtfBase = @"{\rtf1\ansi\deff0 {\fonttbl {\f0  Times New Roman;}}\fs24";
@@ -195,7 +195,7 @@ namespace CoreSampleAnnotation.Reports.RTF
             
             tree.RootNode.FirstChild.AppendChild(grp);
 
-            tree.SaveRtf("test.rtf");
+            tree.SaveRtf(filename);
             
             //Get and print RTF code
             //Console.Write(tree.ToStringEx());

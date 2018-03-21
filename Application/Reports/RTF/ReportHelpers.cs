@@ -27,6 +27,21 @@ namespace CoreSampleAnnotation.Reports.RTF
         }
     }
 
+    public class Sample {
+        public string ID { get; private set; }
+        /// <summary>
+        /// In meters (positive value)
+        /// </summary>
+        public double Depth { get; private set;}
+        public string Purpose { get; private set; }
+
+        public Sample(string id, double depth, string purpose) {
+            ID = id;
+            Depth = depth;
+            Purpose = purpose;
+        }
+    }
+
 
     public class LayerBoundary {
         public int OrderNumber { get; private set; }
@@ -78,7 +93,7 @@ namespace CoreSampleAnnotation.Reports.RTF
         /// </summary>        
         /// <param name="length">in meters</param>        
         /// <returns></returns>
-        public static ReportRow GetLayerDescrRow(int orderNum, double length, LayerDescrition description) {
+        public static ReportRow GetLayerDescrRow(int orderNum, double length, LayerDescrition description, Sample[] samples) {
             StringBuilder sb = new StringBuilder();
             sb.AppendFormat("{0} слой ({1:0.##} м).\n", orderNum, length);
             List<string> propStrings = new List<string>();
@@ -99,9 +114,14 @@ namespace CoreSampleAnnotation.Reports.RTF
             if(propStrings.Count>0)
                 sb.Append(".");
 
+            StringBuilder samplesSb = new StringBuilder();
+            List<string> sampleStrings = new List<string>();
+            foreach (var sample in samples)
+                sampleStrings.Add(string.Format("{0}/{1:0.##} м; {2}",sample.ID,sample.Depth, sample.Purpose));
+
             return new ReportRow(new TextCell[] {
                         new TextCell(sb.ToString(),LeftColWidth),
-                        new TextCell("",RightcolWidth)
+                        new TextCell(string.Join("\n",sampleStrings),RightcolWidth)
                     }
                 );
 
@@ -114,12 +134,14 @@ namespace CoreSampleAnnotation.Reports.RTF
         /// <param name="boundaries">including the "outer boundaries" of bounding layer</param>    
         /// <param name="layers"></param>
         /// <param name="isDepthIncreases">true if depth increases (other paarameter arrays are sorted so the depth increases)</param>
+        /// <param name="samples">All samples in the project</param>
         /// <returns></returns>
         public static ReportTable GenerateTableContents(
         Intervals.BoreIntervalVM[] intervals,
         LayerBoundary[] boundaries,
         LayerDescrition[] layers,
         string[] rankNames,
+        Sample[] samples,
         bool isDepthIncreases)
         {
             //asserting intervals
@@ -248,7 +270,8 @@ namespace CoreSampleAnnotation.Reports.RTF
                             }
                             layerOrderNum = 1; //ranks higher than 0 reset the numbering of layers
                         }
-                        rows.Add(GetLayerDescrRow(layerOrderNum++, curLaLower - curLaUpper, layers[laIndex]));
+                        var layerSamples = samples.Where(s => (s.Depth > curLaUpper) && (s.Depth < curLaLower)).ToArray();
+                        rows.Add(GetLayerDescrRow(layerOrderNum++, curLaLower - curLaUpper, layers[laIndex], layerSamples));
                     }
                     if(doLaInc)
                         laIndex++;

@@ -8,10 +8,10 @@
              d:DesignHeight="300" d:DesignWidth="300">
     <Grid>
         <StackPanel Orientation="Vertical" VerticalAlignment="Center" HorizontalAlignment="Center">
-            <TextBlock Text="Отчёты" MinWidth="400"/>
+            <!--<TextBlock Text="Отчёты" MinWidth="400"/>-->
             <Button Style="{StaticResource MetroButton}" Command="{Binding OpenSamplesCSVDialogCommand}">Таблица образцов</Button>
             <Button Style="{StaticResource MetroButton}">Таблица слоёв</Button>
-            <Button Style="{StaticResource MetroButton}" Command="{Binding OpenTextReportDialogCommand}">Текстовый отчёт</Button>
+            <Button Style="{StaticResource MetroButton}" Command="{Binding OpenTextReportDialogCommand}">Заготовка текстового отчёта</Button>
         </StackPanel>
     </Grid>
 </UserControl>

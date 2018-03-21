@@ -79,85 +79,95 @@ namespace CoreSampleAnnotation
                     bool? result = dlg.ShowDialog();
                     if (result == true)
                         Reports.SamplesCSV.Report.Generate(dlg.FileName, sampleColVM);
+                    MessageBox.Show("Файл с образцами успешно сохранен","Успешно",MessageBoxButton.OK,MessageBoxImage.Information);
                 });
 
                 reportsMenuVM.OpenTextReportDialogCommand = new DelegateCommand(() =>
                 {
-                    //Reports.RTF.TextCell[] testCells = new Reports.RTF.TextCell[] {
-                    //    new Reports.RTF.TextCell("столбец 1",4000),
-                    //    new Reports.RTF.TextCell("столбец 2",2000,horizontalAlignement: Reports.RTF.TextAlignement.Centered),
-                    //    new Reports.RTF.TextCell("столбец 3",4000, isBold:true),
-                    //};
-
-                    string[] rankNames = vm.CurrentProjectVM.LayerRankNameSource.NominativeNames;
-
-                    //transforming boundaryVMs to report specific boundaries
-                    Reports.RTF.LayerBoundary[] boundaries =
-                        vm.CurrentProjectVM.PlaneVM.LayerBoundaries
-                            .Select(b =>
-                                new Reports.RTF.LayerBoundary(
-                                    b.Number,
-                                    vm.CurrentProjectVM.PlaneVM.LayerSyncController.WpfToDepth(b.Level),
-                                    b.Rank
-                                    )).ToArray();
-
-                    //preparing RTF specific layer data
-                    Reports.RTF.LayerDescrition[] layers = new Reports.RTF.LayerDescrition[boundaries.Length - 1];
-                    var layersAnnotation = vm.CurrentProjectVM.PlaneVM.AsLayersAnnotation;
-
-                    Dictionary<string, AnnotationPlane.Template.Property> propHelper = new Dictionary<string, AnnotationPlane.Template.Property>();
-                    foreach (var prop in vm.CurrentProjectVM.LayersTemplateSource.Template)
+                    SaveFileDialog dlg = new SaveFileDialog();
+                    dlg.FileName = "Заготовка текстового отчета";
+                    dlg.DefaultExt = ".rtf";
+                    dlg.Filter = "Rich Text Format|*.rtf";
+                    bool? result = dlg.ShowDialog();
+                    if (result == true)
                     {
-                        propHelper.Add(prop.ID, prop);
-                    }
+                        string[] rankNames = vm.CurrentProjectVM.LayerRankNameSource.NominativeNames;
 
-                    Func<AnnotationPlane.Template.Class, string> texturalRepresentation =
-                                classValue => {
-                                    if (!string.IsNullOrEmpty(classValue.ShortName))
-                                        return classValue.ShortName;
-                                    if (!string.IsNullOrEmpty(classValue.Acronym))
-                                        return classValue.Acronym;
-                                    return classValue.ID;
-                                };
+                        //transforming boundaryVMs to report specific boundaries
+                        Reports.RTF.LayerBoundary[] boundaries =
+                            vm.CurrentProjectVM.PlaneVM.LayerBoundaries
+                                .Select(b =>
+                                    new Reports.RTF.LayerBoundary(
+                                        b.Number,
+                                        vm.CurrentProjectVM.PlaneVM.LayerSyncController.WpfToDepth(b.Level),
+                                        b.Rank
+                                        )).ToArray();
 
-                    for (int i = 0; i < layers.Length; i++)
-                    {
-                        List<Reports.RTF.PropertyDescription> props = new List<Reports.RTF.PropertyDescription>();
+                        //preparing RTF specific layer data
+                        Reports.RTF.LayerDescrition[] layers = new Reports.RTF.LayerDescrition[boundaries.Length - 1];
+                        var layersAnnotation = vm.CurrentProjectVM.PlaneVM.AsLayersAnnotation;
 
-                        for (int j = 0; j < layersAnnotation.Columns.Length; j++)
+                        Dictionary<string, AnnotationPlane.Template.Property> propHelper = new Dictionary<string, AnnotationPlane.Template.Property>();
+                        foreach (var prop in vm.CurrentProjectVM.LayersTemplateSource.Template)
                         {
-                            var col = layersAnnotation.Columns[j];
-                            var value = col.LayerValues;
-                            var prop1 = propHelper[col.PropID];
-
-                            string[] values = null;
-                            if (value[i].Value != null)
-                                values = value[i].Value.Select(v => texturalRepresentation(prop1.Classes.Single(c => c.ID == v))).ToArray();
-
-                            Reports.RTF.PropertyDescription prop =
-                            new Reports.RTF.PropertyDescription(
-                                prop1.Name,
-                                values,                                
-                                value[i].Remarks);
-                            props.Add(prop);
+                            propHelper.Add(prop.ID, prop);
                         }
-                        layers[i] = new Reports.RTF.LayerDescrition(props.ToArray());
+
+                        Func<AnnotationPlane.Template.Class, string> texturalRepresentation =
+                                    classValue =>
+                                    {
+                                        if (!string.IsNullOrEmpty(classValue.ShortName))
+                                            return classValue.ShortName;
+                                        if (!string.IsNullOrEmpty(classValue.Acronym))
+                                            return classValue.Acronym;
+                                        return classValue.ID;
+                                    };
+
+                        for (int i = 0; i < layers.Length; i++)
+                        {
+                            List<Reports.RTF.PropertyDescription> props = new List<Reports.RTF.PropertyDescription>();
+
+                            for (int j = 0; j < layersAnnotation.Columns.Length; j++)
+                            {
+                                var col = layersAnnotation.Columns[j];
+                                var value = col.LayerValues;
+                                var prop1 = propHelper[col.PropID];
+
+                                string[] values = null;
+                                if (value[i].Value != null)
+                                    values = value[i].Value.Select(v => texturalRepresentation(prop1.Classes.Single(c => c.ID == v))).ToArray();
+
+                                Reports.RTF.PropertyDescription prop =
+                                new Reports.RTF.PropertyDescription(
+                                    prop1.Name,
+                                    values,
+                                    value[i].Remarks);
+                                props.Add(prop);
+                            }
+                            layers[i] = new Reports.RTF.LayerDescrition(props.ToArray());
+                        }
+
+                        var samples = vm.CurrentProjectVM.PlaneVM.SamplesColumnVM.Samples
+                            .Select(s => new Reports.RTF.Sample(
+                                s.Number.ToString(),
+                                vm.CurrentProjectVM.PlaneVM.LayerSyncController.WpfToDepth(s.Level),
+                                "")).ToArray();
+
+                        Reports.RTF.ReportTable table =
+                            Reports.RTF.ReportHelpers.GenerateTableContents(
+                                vm.CurrentProjectVM.BoreIntervalsVM.Intervals
+                                    .Where(i => !double.IsNaN(i.UpperDepth) && !double.IsNaN(i.LowerDepth))
+                                    .ToArray(),
+                                boundaries,
+                                layers,
+                                rankNames,
+                                samples,
+                                true
+                                );
+
+                        Reports.RTF.TableDocument.FormRTFDocument(dlg.FileName,table);
+                        MessageBox.Show("Файл с заготовкой текстового отчета успешно сохранен", "Успешно", MessageBoxButton.OK, MessageBoxImage.Information);
                     }
-
-
-
-                    Reports.RTF.ReportTable table =
-                        Reports.RTF.ReportHelpers.GenerateTableContents(
-                            vm.CurrentProjectVM.BoreIntervalsVM.Intervals
-                                .Where(i => !double.IsNaN(i.UpperDepth) && !double.IsNaN(i.LowerDepth))
-                                .ToArray(),
-                            boundaries,
-                            layers,
-                            rankNames,
-                            true
-                            );
-
-                    Reports.RTF.TableDocument.FormRTFDocument(table);
                 });
 
                 vm.ActiveSectionVM = reportsMenuVM;
@@ -268,16 +278,16 @@ namespace CoreSampleAnnotation
                 }
                 else
                 {
-                //check whether the intervals boundaries change
-                LayersAnnotation layersAnnotation = vm.CurrentProjectVM.PlaneVM.AsLayersAnnotation;
+                    //check whether the intervals boundaries change
+                    LayersAnnotation layersAnnotation = vm.CurrentProjectVM.PlaneVM.AsLayersAnnotation;
                     double[] boundaries = layersAnnotation.LayerBoundaries;
                     bool boundariesChanged = false;
                     int upperLayersRemovedCount = 0;
-                //dealing with upper bound
-                if (upperBoundary < boundaries[0])
+                    //dealing with upper bound
+                    if (upperBoundary < boundaries[0])
                     {
-                    //the depth interval growed
-                    boundaries[0] = upperBoundary;
+                        //the depth interval growed
+                        boundaries[0] = upperBoundary;
                         boundariesChanged = true;
                     }
                     else if (upperBoundary > boundaries[0])
@@ -307,11 +317,11 @@ namespace CoreSampleAnnotation
                         MessageBox.Show(string.Format("{0} верхних слоев были удалены, так как соответствующие им глубины больше не входят в указанные интервалы отбора. Если это не то, что Вы ожидали, не сохраняйте проект на диск.", upperLayersRemovedCount), "Потеря информации о слоях", MessageBoxButton.OK, MessageBoxImage.Warning);
 
                     int lowerLayersRemovedCount = 0;
-                //dealing with lower bound
-                if (lowerBoundary > boundaries[boundaries.Length - 1])
+                    //dealing with lower bound
+                    if (lowerBoundary > boundaries[boundaries.Length - 1])
                     {
-                    //the depth interval growed to the bottom
-                    boundaries[boundaries.Length - 1] = lowerBoundary;
+                        //the depth interval growed to the bottom
+                        boundaries[boundaries.Length - 1] = lowerBoundary;
                         boundariesChanged = true;
                     }
                     else if (lowerBoundary < boundaries[boundaries.Length - 1])
@@ -346,8 +356,8 @@ namespace CoreSampleAnnotation
 
                     if (boundariesChanged)
                     {
-                    //recreating VM with new corrected depth bounds
-                    layersAnnotation.LayerBoundaries = boundaries;
+                        //recreating VM with new corrected depth bounds
+                        layersAnnotation.LayerBoundaries = boundaries;
                         vm.CurrentProjectVM.PlaneVM = new PlaneVM(layersAnnotation, vm.CurrentProjectVM.LayersTemplateSource);
                         vm.CurrentProjectVM.PlaneVM.SamplesColumnVM.Samples = validSamples.Select(s => new SampleVM(s)).ToArray();
                     }
