@@ -27,7 +27,8 @@ namespace CoreSampleAnnotation.AnnotationPlane
             double col_up_d = (double)values[2];
             double col_lo_d = (double)values[3];
             double col_wpf_height = (double)values[4];
-            return (i_up_d - col_up_d) / (col_lo_d - col_up_d) * col_wpf_height;
+            double top = (i_up_d - col_up_d) / (col_lo_d - col_up_d) * col_wpf_height;
+            return top;
         }
 
         public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)
@@ -47,7 +48,9 @@ namespace CoreSampleAnnotation.AnnotationPlane
             double col_up_d = (double)values[2];
             double col_lo_d = (double)values[3];
             double col_wpf_height = (double)values[4];
-            return (i_lo_d - i_up_d) / (col_lo_d - col_up_d) * col_wpf_height;
+
+            double height = (i_lo_d - i_up_d) / (col_lo_d - col_up_d) * col_wpf_height;
+            return height;
         }
 
         public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)

@@ -243,11 +243,10 @@ namespace CoreSampleAnnotation.Intervals
 
         public PhotoRegion[] GetRegionImages()
         {
-            List<PhotoRegion> result = new List<PhotoRegion>();
-            int N = ImagesCount;
+            List<PhotoRegion> gatheredRegions = new List<PhotoRegion>();
+            int N = ImagesCount;            
             for (int i = 0; i < N; i++)
-            {
-                List<PhotoRegion> subResult = new List<PhotoRegion>();
+            {                
                 var regions = imageRegions[i];
                 var transform = imageTransforms[i];
                 var backTransform = transform.Inverse;
@@ -320,18 +319,20 @@ namespace CoreSampleAnnotation.Intervals
                         bitmap.Freeze();
                     }
 
-                    subResult.Add(new PhotoRegion(bitmap, new Size(width, height), regVM.Order, regVM.Length * 0.01)); //for now upper and lower are just placeholders holding order and length
+                    gatheredRegions.Add(new PhotoRegion(bitmap, new Size(width, height), regVM.Order, regVM.Length * 0.01)); //for now upper and lower are just placeholders holding order and length
                 }
+            }
 
-                //transforming order into real depth
-                var reorderedRegions = subResult.OrderBy(r => r.ImageUpperDepth).ToList();
-                double prevBound = UpperDepth;
-                for (int j = 0; j < reorderedRegions.Count; j++)
-                {
-                    PhotoRegion curReg = reorderedRegions[j];
-                    result.Add(new PhotoRegion(curReg.BitmapImage, curReg.ImageSize, prevBound, prevBound + curReg.ImageLowerDepth));
-                    prevBound = prevBound + curReg.ImageLowerDepth;
-                }
+            List<PhotoRegion> result = new List<PhotoRegion>();
+
+            //transforming order into real depth
+            var reorderedRegions = gatheredRegions.OrderBy(r => r.ImageUpperDepth).ToArray(); //ordering by order
+            double prevBound = UpperDepth;            
+            for (int j = 0; j < reorderedRegions.Length; j++)
+            {
+                PhotoRegion curReg = reorderedRegions[j];
+                result.Add(new PhotoRegion(curReg.BitmapImage, curReg.ImageSize, prevBound, prevBound + curReg.ImageLowerDepth));
+                prevBound = prevBound + curReg.ImageLowerDepth;
             }
             return result.ToArray();
         }
