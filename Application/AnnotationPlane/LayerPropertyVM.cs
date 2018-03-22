@@ -71,6 +71,9 @@ namespace CoreSampleAnnotation.AnnotationPlane
         }
     }
 
+    /// <summary>
+    /// A layer with string remark
+    /// </summary>
     public class RemarkLayerVM : LayerVM
     {
         private string remark;
@@ -89,12 +92,13 @@ namespace CoreSampleAnnotation.AnnotationPlane
         }
     }
 
+    /// <summary>
+    /// Holds a set of possible variant classes
+    /// </summary>
     public abstract class ClassificationLayerVM : RemarkLayerVM
-    {
-
-
-        private IEnumerable<LayerClassVM> possibleClasses;
-        public IEnumerable<LayerClassVM> PossibleClasses
+    {        
+        private LayerClassVM[] possibleClasses;
+        public LayerClassVM[] PossibleClasses
         {
             get { return possibleClasses; }
             set
@@ -105,6 +109,14 @@ namespace CoreSampleAnnotation.AnnotationPlane
                     RaisePropertyChanged(nameof(PossibleClasses));
                 }
             }
+        }
+
+        /// <summary>
+        /// Associated property name
+        /// </summary>
+        public string PropertyName { get; private set; }
+        public ClassificationLayerVM(string associatedPropertyName) {
+            PropertyName = associatedPropertyName;
         }
     }
 
@@ -127,12 +139,14 @@ namespace CoreSampleAnnotation.AnnotationPlane
 
         public override LayerVM DeepClone()
         {
-            SingleClassificationLayerVM result = new SingleClassificationLayerVM();
+            SingleClassificationLayerVM result = new SingleClassificationLayerVM(PropertyName);
             result.Remark = Remark;
-            result.PossibleClasses = new ObservableCollection<LayerClassVM>(PossibleClasses);
+            result.PossibleClasses = PossibleClasses.ToArray();
             result.CurrentClass = CurrentClass;
             return result;
         }
+
+        public SingleClassificationLayerVM(string associatedProperty) : base(associatedProperty) { }
     }
 
     public class MultiClassificationLayerVM : ClassificationLayerVM
@@ -152,10 +166,12 @@ namespace CoreSampleAnnotation.AnnotationPlane
             }
         }
 
+        public MultiClassificationLayerVM(string associatedProperty):base(associatedProperty) { }
+
         public override LayerVM DeepClone()
         {
-            MultiClassificationLayerVM result = new MultiClassificationLayerVM();
-            result.PossibleClasses = new ObservableCollection<LayerClassVM>(PossibleClasses);
+            MultiClassificationLayerVM result = new MultiClassificationLayerVM(PropertyName);
+            result.PossibleClasses = PossibleClasses.ToArray();
             result.Remark = Remark;
             if (CurrentClasses == null)
                 result.CurrentClasses = new List<LayerClassVM>();

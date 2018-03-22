@@ -27,7 +27,11 @@ namespace CoreSampleAnnotation.AnnotationPlane
 
             Binding b = new Binding("DataContext.ClassSelectedCommand");
             b.Source = this;            
-            SetBinding(ClassificationView.ClassSelectedCommandProperty, b);
+            SetBinding(ClassSelectedCommandProperty, b);
+
+            Binding b2 = new Binding("DataContext.GroupSelectedCommand");
+            b2.Source = this;
+            SetBinding(GroupSelectedCommandProperty, b2);
         }
 
 
@@ -42,11 +46,30 @@ namespace CoreSampleAnnotation.AnnotationPlane
         public static readonly DependencyProperty ClassSelectedCommandProperty =
             DependencyProperty.Register("ClassSelectedCommand", typeof(ICommand), typeof(ClassificationView), new PropertyMetadata(null));
 
-        private void Border_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+
+
+        public ICommand GroupSelectedCommand
+        {
+            get { return (ICommand)GetValue(GroupSelectedCommandProperty); }
+            set { SetValue(GroupSelectedCommandProperty, value); }
+        }
+
+        public static readonly DependencyProperty GroupSelectedCommandProperty =
+            DependencyProperty.Register("GroupSelectedCommand", typeof(ICommand), typeof(ClassificationView), new PropertyMetadata(null));
+
+
+
+        private void LeafNode_MouseDown(object sender, MouseButtonEventArgs e)
         {
             if (ClassSelectedCommand != null) {
                 ClassSelectedCommand.Execute(sender);
             }
+        }        
+
+        private void NonLeaf_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            if (GroupSelectedCommand != null)
+                GroupSelectedCommand.Execute(sender);
         }
     }
 

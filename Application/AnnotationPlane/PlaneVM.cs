@@ -127,7 +127,7 @@ namespace CoreSampleAnnotation.AnnotationPlane
         private Dictionary<ColumnVM, ColumnScale.IColumn> scaleAdapters = new Dictionary<ColumnVM, ColumnScale.IColumn>();
 
         private Dictionary<FullClassID, LayerClassVM> classVMs = new Dictionary<FullClassID, LayerClassVM>();
-        private readonly Dictionary<string, IEnumerable<LayerClassVM>> availableClasses = new Dictionary<string, IEnumerable<LayerClassVM>>();
+        private readonly Dictionary<string, LayerClassVM[]> availableClasses = new Dictionary<string, LayerClassVM[]>();
 
         private SamplesColumnVM samplesColumnVM;
 
@@ -402,12 +402,12 @@ namespace CoreSampleAnnotation.AnnotationPlane
                     availableClassesOfP.Add(lcVM);
                     classVMs.Add(new FullClassID(p.ID, lcVM.ID), lcVM); //global dict of classVMs
                 }
-                availableClasses.Add(p.ID, availableClassesOfP); //global dict of available choices
+                availableClasses.Add(p.ID, availableClassesOfP.ToArray()); //global dict of available choices
             }
 
 
             AnnoGridVM = new AnnotationGridVM();
-            classificationVM = new ClassificationVM();
+            classificationVM = new ClassificationVM(new IDEncodedTreeBuilder('@'));
 
             ElementDropped = new DelegateCommand(obj =>
             {
@@ -548,12 +548,13 @@ namespace CoreSampleAnnotation.AnnotationPlane
 
             ColScaleController.ScaleFactor = 3000.0;
 
-            classificationVM = new ClassificationVM();
+            classificationVM = new ClassificationVM(new IDEncodedTreeBuilder('@'));
             classificationVM.CloseCommand = new DelegateCommand(() => classificationVM.IsVisible = false);
             classificationVM.ClassSelectedCommand = new DelegateCommand(sender =>
             {
                 FrameworkElement fe = sender as FrameworkElement;
-                LayerClassVM lc = (LayerClassVM)fe.DataContext;
+                LeafTreeNode ltn = (LeafTreeNode)fe.DataContext;
+                LayerClassVM lc = ltn.AssociatedClass;
                 if (classificationVM.LayerVM is SingleClassificationLayerVM)
                 {
                     SingleClassificationLayerVM sclVM = (SingleClassificationLayerVM)classificationVM.LayerVM;
@@ -574,7 +575,11 @@ namespace CoreSampleAnnotation.AnnotationPlane
                     mclVM.CurrentClasses = curClasses;
                 }
             });
-
+            classificationVM.GroupSelectedCommand = new DelegateCommand(sender => {
+                FrameworkElement fe = sender as FrameworkElement;
+                NonLeafTreeNodeVM nltn = (NonLeafTreeNodeVM)fe.DataContext;
+                classificationVM.CurrentlyObservedNode = nltn;
+            });
             classificationVM.IsVisible = false;
 
             double[] boundaries = annotation.LayerBoundaries;
@@ -619,11 +624,11 @@ namespace CoreSampleAnnotation.AnnotationPlane
                     ClassificationLayerVM layerVM;
                     if (property.IsMulticlass)
                     {
-                        layerVM = new MultiClassificationLayerVM();
+                        layerVM = new MultiClassificationLayerVM(property.Name);
                     }
                     else
                     {
-                        layerVM = new SingleClassificationLayerVM();
+                        layerVM = new SingleClassificationLayerVM(property.Name);
                     }
                     layerVM.PossibleClasses = availableClasses[property.ID];
                     ColumnValues column = annotation.Columns.FirstOrDefault(c => c.PropID == property.ID);

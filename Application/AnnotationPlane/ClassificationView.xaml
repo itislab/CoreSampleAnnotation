@@ -12,6 +12,58 @@
         <local:BackgroundColorConverter x:Key="bgColConv"/>
         <local:FontColorConverter x:Key="ftColConv"/>
         <app:CollapsedConverter x:Key="collapsedVisConv"/>
+        <DataTemplate DataType="{x:Type local:NonLeafTreeNodeVM}">
+            <Border Margin="10" Padding="5" Width="150" MinHeight="70" MouseDown="NonLeaf_MouseDown" Background="{StaticResource ColorPrimary}">
+                <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" Text="{Binding GroupName}" Foreground="{StaticResource ColorTextOnPrimary}">
+                    <TextBlock.Effect>
+                        <DropShadowEffect ShadowDepth="2" RenderingBias="Performance"/>
+                    </TextBlock.Effect>
+                </TextBlock>
+            </Border>
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type local:LeafTreeNode}">
+            <Border Margin="10" Padding="5" MouseDown="LeafNode_MouseDown" Width="150" MinHeight="70">
+                <Border.Background>
+                    <MultiBinding Converter="{StaticResource bgColConv}" >
+                        <Binding Path="AssociatedClass"/>
+                        <Binding RelativeSource="{RelativeSource AncestorType=ItemsControl}" Path="DataContext.LayerVM.CurrentClass"/>
+                        <Binding RelativeSource="{RelativeSource AncestorType=ItemsControl}" Path="DataContext.LayerVM.CurrentClasses"/>
+                    </MultiBinding>
+                </Border.Background>
+                <Grid >
+                    <Grid.RowDefinitions>
+                        <RowDefinition />
+                        <RowDefinition />
+                        <RowDefinition />
+                    </Grid.RowDefinitions>
+                    <Image Source="{Binding AssociatedClass.ExampleImage}" Grid.Row="1" Stretch="Uniform" MaxWidth="150" MaxHeight="100" />
+                    <TextBlock Margin="0,8,0,2" Text="{Binding AssociatedClass.VisibleShortTextID}" Grid.Row="0" HorizontalAlignment="Center" TextAlignment="Justify" VerticalAlignment="Center">
+                        <TextBlock.Foreground>
+                            <MultiBinding Converter="{StaticResource ftColConv}" >
+                                <Binding Path="AssociatedClass"/>
+                                <Binding RelativeSource="{RelativeSource AncestorType=ItemsControl}" Path="DataContext.LayerVM.CurrentClass"/>
+                                <Binding RelativeSource="{RelativeSource AncestorType=ItemsControl}" Path="DataContext.LayerVM.CurrentClasses"/>
+                            </MultiBinding>
+                        </TextBlock.Foreground>
+                        <TextBlock.Effect>
+                            <DropShadowEffect ShadowDepth="2" RenderingBias="Performance"/>
+                        </TextBlock.Effect>
+                    </TextBlock>
+                    <TextBlock Margin="0,2,0,8" Text="{Binding AssociatedClass.VisibleLongTextID}" TextWrapping="Wrap" Grid.Row="2" HorizontalAlignment="Center"  TextAlignment="Justify" VerticalAlignment="Center">
+                        <TextBlock.Foreground>
+                            <MultiBinding Converter="{StaticResource ftColConv}" >
+                                <Binding Path="AssociatedClass"/>
+                                <Binding RelativeSource="{RelativeSource AncestorType=ItemsControl}" Path="DataContext.LayerVM.CurrentClass"/>
+                                <Binding RelativeSource="{RelativeSource AncestorType=ItemsControl}" Path="DataContext.LayerVM.CurrentClasses"/>
+                            </MultiBinding>
+                        </TextBlock.Foreground>
+                        <TextBlock.Effect>
+                            <DropShadowEffect ShadowDepth="2" RenderingBias="Performance"/>
+                        </TextBlock.Effect>
+                    </TextBlock>
+                </Grid>
+            </Border>
+        </DataTemplate>
     </UserControl.Resources>
     <Border Opacity="0.98" BorderThickness="0" CornerRadius="15" Background="#E1E2E1" Padding="25" Visibility="{Binding IsVisible, Converter={StaticResource collapsedVisConv}}">
         <Grid>
@@ -20,60 +72,37 @@
                 <RowDefinition/>
                 <RowDefinition Height="auto"/>
             </Grid.RowDefinitions>
-            <TextBlock Grid.Row="0" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="20" Padding="0,0,80,0">Выберите значение для слоя</TextBlock>
+            <!--<TextBlock Grid.Row="0" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="20" Padding="0,0,80,0">Выберите значение для слоя</TextBlock>-->            
+            <StackPanel Name="TreeNodeView" Grid.Row="1" Orientation="Vertical">
+                <StackPanel Orientation="Horizontal">
+                <ItemsControl ItemsSource="{Binding CurrentlyObservedNode.ChainToTop}">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <WrapPanel Orientation="Horizontal" />
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <TextBlock MouseDown="NonLeaf_MouseDown" Foreground="{StaticResource ColorPrimary}" FontSize="24" Margin="0,0,15,10" Text="{Binding GroupName, StringFormat={}{0} > }"></TextBlock>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+                    <TextBlock Foreground="{StaticResource ColorPrimary}" FontSize="24" Margin="0,0,15,10" Text="{Binding CurrentlyObservedNode.GroupName}"></TextBlock>
+                </StackPanel>
+                <ItemsControl ItemsSource="{Binding CurrentlyObservedNode.Children}">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <WrapPanel />
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <!--<ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <ContentPresenter Content="{Binding}" />
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>-->
+                </ItemsControl>
+            </StackPanel>
             <Button Grid.Row="0" HorizontalAlignment="Right" Padding="10" Margin="15" BorderThickness="0"  Command="{Binding CloseCommand}" Background="#ff3d00">закрыть</Button>
-            <ItemsControl Grid.Row="1" ItemsSource="{Binding LayerVM.PossibleClasses}">
-                <ItemsControl.ItemsPanel>
-                    <ItemsPanelTemplate>
-                        <WrapPanel />
-                    </ItemsPanelTemplate>
-                </ItemsControl.ItemsPanel>
-                <ItemsControl.ItemTemplate>
-                    <DataTemplate>
-                        <Border Margin="10" Padding="5" MouseLeftButtonDown="Border_MouseLeftButtonDown" Width="150" MinHeight="70">
-                            <Border.Background>
-                                <MultiBinding Converter="{StaticResource bgColConv}" >
-                                    <Binding Path="."/>
-                                    <Binding RelativeSource="{RelativeSource AncestorType=ItemsControl}" Path="DataContext.LayerVM.CurrentClass"/>
-                                    <Binding RelativeSource="{RelativeSource AncestorType=ItemsControl}" Path="DataContext.LayerVM.CurrentClasses"/>
-                                </MultiBinding>
-                            </Border.Background>
-                            <Grid >
-                                <Grid.RowDefinitions>
-                                    <RowDefinition />
-                                    <RowDefinition />
-                                    <RowDefinition />
-                                </Grid.RowDefinitions>
-                                <Image Source="{Binding ExampleImage}" Grid.Row="1" Stretch="Uniform" MaxWidth="150" MaxHeight="100" />
-                                <TextBlock Margin="0,8,0,2" Text="{Binding VisibleShortTextID}" Grid.Row="0" HorizontalAlignment="Center" TextAlignment="Justify" VerticalAlignment="Center">
-                                    <TextBlock.Foreground>
-                                        <MultiBinding Converter="{StaticResource ftColConv}" >
-                                            <Binding Path="."/>
-                                            <Binding RelativeSource="{RelativeSource AncestorType=ItemsControl}" Path="DataContext.LayerVM.CurrentClass"/>
-                                            <Binding RelativeSource="{RelativeSource AncestorType=ItemsControl}" Path="DataContext.LayerVM.CurrentClasses"/>
-                                        </MultiBinding>
-                                    </TextBlock.Foreground>
-                                    <TextBlock.Effect>
-                                        <DropShadowEffect ShadowDepth="2" RenderingBias="Performance"/>
-                                    </TextBlock.Effect>
-                                </TextBlock>
-                                <TextBlock Margin="0,2,0,8" Text="{Binding VisibleLongTextID}" TextWrapping="Wrap" Grid.Row="2" HorizontalAlignment="Center"  TextAlignment="Justify" VerticalAlignment="Center">
-                                    <TextBlock.Foreground>
-                                        <MultiBinding Converter="{StaticResource ftColConv}" >
-                                            <Binding Path="."/>
-                                            <Binding RelativeSource="{RelativeSource AncestorType=ItemsControl}" Path="DataContext.LayerVM.CurrentClass"/>
-                                            <Binding RelativeSource="{RelativeSource AncestorType=ItemsControl}" Path="DataContext.LayerVM.CurrentClasses"/>
-                                        </MultiBinding>
-                                    </TextBlock.Foreground>
-                                    <TextBlock.Effect>
-                                        <DropShadowEffect ShadowDepth="2" RenderingBias="Performance"/>
-                                    </TextBlock.Effect>
-                                </TextBlock>
-                            </Grid>
-                        </Border>
-                    </DataTemplate>
-                </ItemsControl.ItemTemplate>
-            </ItemsControl>
             <app:TextInput Grid.Row="2" HintFontSize="14" HintText="Введите примечание" InputFontSize="14" Text="{Binding LayerVM.Remark, Mode=TwoWay}"/>
         </Grid>
     </Border>
