@@ -28,7 +28,7 @@ namespace CoreSampleAnnotation
             b1.Source = this;
             HintBlock.SetBinding(TextBlock.TextProperty, b1);
 
-            Binding b2 = new Binding(nameof(Text));
+            Binding b2 = new Binding(nameof(Proposal));
             b2.Mode = BindingMode.TwoWay;
             b2.Source = this;
             b2.UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged;
@@ -57,6 +57,18 @@ namespace CoreSampleAnnotation
 
 
 
+        public Brush BorderBrush
+        {
+            get { return (Brush)GetValue(BorderBrushProperty); }
+            set { SetValue(BorderBrushProperty, value); }
+        }
+
+        // Using a DependencyProperty as the backing store for BorderThickness.  This enables animation, styling, binding, etc...
+        public static readonly DependencyProperty BorderBrushProperty =
+            DependencyProperty.Register("BorderBrush", typeof(Brush), typeof(TextInput), new PropertyMetadata(new SolidColorBrush(Colors.Transparent)));
+
+
+
         public string Text
         {
             get { return (string)GetValue(TextProperty); }
@@ -65,7 +77,28 @@ namespace CoreSampleAnnotation
 
         // Using a DependencyProperty as the backing store for Text.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty TextProperty =
-            DependencyProperty.Register("Text", typeof(string), typeof(TextInput), new PropertyMetadata(""));
+            DependencyProperty.Register("Text", typeof(string), typeof(TextInput), new PropertyMetadata("", (depobj,dpca) => {
+                //external asignment of text.
+                //Propagating it to proposal
+                TextInput ti = depobj as TextInput;
+                string newValString = dpca.NewValue as string;
+                if (newValString != ti.Proposal) {
+                    ti.Proposal = newValString;
+                }
+            }));
+
+
+
+        public string Proposal
+        {
+            get { return (string)GetValue(ProposalProperty); }
+            set { SetValue(ProposalProperty, value); }
+        }
+
+        // Using a DependencyProperty as the backing store for Proposal.  This enables animation, styling, binding, etc...
+        public static readonly DependencyProperty ProposalProperty =
+            DependencyProperty.Register("Proposal", typeof(string), typeof(TextInput), new PropertyMetadata(""));
+
 
 
 
@@ -93,8 +126,68 @@ namespace CoreSampleAnnotation
 
 
 
+        public Visibility InputConfirmVisibility
+        {
+            get { return (Visibility)GetValue(InputConfirmVisibilityProperty); }
+            set { SetValue(InputConfirmVisibilityProperty, value); }
+        }
+
+        public static readonly DependencyProperty InputConfirmVisibilityProperty =
+            DependencyProperty.Register("InputConfirmVisibility", typeof(Visibility), typeof(TextInput), new PropertyMetadata(Visibility.Hidden));
 
 
 
+        private void InputBox_GotKeyboardFocus(object sender, KeyboardFocusChangedEventArgs e)
+        {
+            InputConfirmVisibility = Visibility.Visible;
+            BorderBrush = (Brush)FindResource("ColorPrimary");
+        }
+
+        private void InputBox_LostKeyboardFocus(object sender, KeyboardFocusChangedEventArgs e)
+        {
+            //discarding proposal
+            Proposal = Text;
+            InputConfirmVisibility = Visibility.Hidden;
+            BorderBrush = new SolidColorBrush(Colors.Transparent);
+        }
+
+        private void FocusToNext() {
+            var request = new TraversalRequest(FocusNavigationDirection.Next);
+            request.Wrapped = true;
+            InputBox.MoveFocus(request);
+        }
+
+
+
+        private void InputBox_KeyDown(object sender, KeyEventArgs e)
+        {
+            switch (e.Key) {
+                case Key.Escape:
+                    //descarding proposal
+                    Proposal = Text;
+                    e.Handled = true;
+                    break;
+                case Key.Enter:
+                    //saving proposal
+                    Text = Proposal;
+                    e.Handled = true;
+                    FocusToNext();
+                    break;
+                case Key.Tab:
+                    //descarding proposal
+                    Proposal = Text;
+                    e.Handled = true;
+                    FocusToNext();
+                    break;
+            }
+        }
+
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+            //saving proposal
+            Text = Proposal;
+            e.Handled = true;
+            FocusToNext();
+        }
     }
 }
