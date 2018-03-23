@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace CoreSampleAnnotation.Persistence
 {
-    [DelimitedRecord("|")]
+    [DelimitedRecord(";")]
     [IgnoreFirst]
     public class RankFileRow
     {
