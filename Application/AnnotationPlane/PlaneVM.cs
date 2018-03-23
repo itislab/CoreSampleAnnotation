@@ -310,8 +310,13 @@ namespace CoreSampleAnnotation.AnnotationPlane
                 pa.ID = string.Format("pattern-{0}", Guid.NewGuid().ToString());
                 paOrig.ID = pa.ID;
                 pa.PatternUnits = Svg.SvgCoordinateUnits.Inherit;
-                pa.Width = new Svg.SvgUnit(0.25f);
-                pa.Height = new Svg.SvgUnit(0.25f);
+
+                double maxSize = Math.Max(pa.Width.Value,pa.Height.Value);
+                double scale = 0.25 / maxSize;
+
+                pa.Width = new Svg.SvgUnit((float)(pa.Width.Value * scale));
+                pa.Height = new Svg.SvgUnit((float)(pa.Height.Value * scale));
+
                 defs.Children.Add(pa);
                 doc.Children.Add(defs);
 
@@ -806,23 +811,26 @@ namespace CoreSampleAnnotation.AnnotationPlane
                 else if (columnDefinition is LayerEditColumnDefinitionVM)
                 {
                     LayerEditColumnDefinitionVM colDef = (LayerEditColumnDefinitionVM)columnDefinition;
-                    int rank = colDef.SelectedIndex;
-                    string heading = string.Format("Границы между {0}", colDef.Selected.ToLowerInvariant());
-                    BlankColumnVM blankColumnVM = new BlankColumnVM(heading);
-                    RankMoreOrEqualBoundaryCollection filteredForLines = new RankMoreOrEqualBoundaryCollection(layerBoundaryEditorVM, rank);
-                    ZeroBoundaryDecoratorLBVM zeroBoundaryAdded = new ZeroBoundaryDecoratorLBVM(filteredForLines);
-                    NumberResettingDecorator renumberedForLabels = new NumberResettingDecorator(zeroBoundaryAdded, rank, 1);
-                    RankMatchingBoundaryCollection filteredForDraggables = new RankMatchingBoundaryCollection(layerBoundaryEditorVM, rank);
+                    if (colDef.Selected != null)
+                    {
+                        int rank = colDef.SelectedIndex;
+                        string heading = string.Format("Границы между {0}", colDef.Selected.ToLowerInvariant());
+                        BlankColumnVM blankColumnVM = new BlankColumnVM(heading);
+                        RankMoreOrEqualBoundaryCollection filteredForLines = new RankMoreOrEqualBoundaryCollection(layerBoundaryEditorVM, rank);
+                        ZeroBoundaryDecoratorLBVM zeroBoundaryAdded = new ZeroBoundaryDecoratorLBVM(filteredForLines);
+                        NumberResettingDecorator renumberedForLabels = new NumberResettingDecorator(zeroBoundaryAdded, rank, 1);
+                        RankMatchingBoundaryCollection filteredForDraggables = new RankMatchingBoundaryCollection(layerBoundaryEditorVM, rank);
 
-                    BoundaryLabelColumnVM blaVM = new BoundaryLabelColumnVM(blankColumnVM, renumberedForLabels);
-                    BoundaryLineColumnVM blVM = new BoundaryLineColumnVM(blaVM, filteredForLines, Colors.Black);
-                    BoundaryEditorColumnVM beVM = new BoundaryEditorColumnVM(blVM, filteredForDraggables);
+                        BoundaryLabelColumnVM blaVM = new BoundaryLabelColumnVM(blankColumnVM, renumberedForLabels);
+                        BoundaryLineColumnVM blVM = new BoundaryLineColumnVM(blaVM, filteredForLines, Colors.Black);
+                        BoundaryEditorColumnVM beVM = new BoundaryEditorColumnVM(blVM, filteredForDraggables);
 
 
-                    blankColumnVM.ColumnHeight = colHeight;
-                    blankColumnVM.ColumnWidth = 100;
-                    AnnoGridVM.Columns.Add(beVM);
-                    RegisterForScaleSync(beVM, true);
+                        blankColumnVM.ColumnHeight = colHeight;
+                        blankColumnVM.ColumnWidth = 100;
+                        AnnoGridVM.Columns.Add(beVM);
+                        RegisterForScaleSync(beVM, true);
+                    }
                 }
                 else if (columnDefinition is LayerSamplesDefinitionVM)
                 {
