@@ -187,6 +187,18 @@ namespace CoreSampleAnnotation.AnnotationPlane
             }
         }
 
+        private ICommand saveProjectCommand;
+
+        public ICommand SaveProjectCommand {
+            get { return saveProjectCommand; }
+            set {
+                if (saveProjectCommand != value) {
+                    saveProjectCommand = value;
+                    RaisePropertyChanged(nameof(SaveProjectCommand));
+                }
+            }
+        }
+
 
         public ICommand PointSelected { private set; get; }
 

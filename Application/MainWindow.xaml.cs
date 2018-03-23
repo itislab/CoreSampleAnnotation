@@ -371,6 +371,8 @@ namespace CoreSampleAnnotation
                     vm.ActiveSectionVM = vm.CurrentProjectVM.PlaneColumnSettingsVM;
                 });
 
+                vm.CurrentProjectVM.PlaneVM.SaveProjectCommand = menuVM.SaveCommand;
+
                 vm.ActiveSectionVM = vm.CurrentProjectVM.PlaneVM;
             }, (obj) =>
             {
