@@ -270,6 +270,7 @@
     <Compile Include="Persistence\FolderLayersTemplateSource.cs" />
     <Compile Include="Persistence\FolderPersisterFactory.cs" />
     <Compile Include="Persistence\HardcodedLayerTemplate.cs" />
+    <Compile Include="Persistence\JsonFileColumnSettings.cs" />
     <Compile Include="Persistence\PathUtils.cs" />
     <Compile Include="Persistence\StaticLayerRankNamesSource.cs" />
     <Compile Include="PhotoMarkup\AnnotatedPolygon.xaml.cs">

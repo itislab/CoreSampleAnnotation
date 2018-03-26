@@ -8,11 +8,18 @@ using System.Windows.Input;
 
 namespace CoreSampleAnnotation.AnnotationPlane.ColumnSettings
 {
+    public interface IColumnSettingsPersistence {
+        void Persist(ColumnDefinitionVM[] definitions);
+        bool Load(out ColumnDefinitionVM[] definitions);
+        bool LoadDefaults(out ColumnDefinitionVM[] definitions);
+    }
+
     [Serializable]
     public class ColumnSettingsVM : ViewModel, ISerializable
     {
         private ILayersTemplateSource layersTemplateSource;
         private ILayerRankNamesSource layerRankNameSource;
+        private IColumnSettingsPersistence colSettingPersistence;
         private ColumnDefinitionVM[] columnDefinitions;
         public ColumnDefinitionVM[] ColumnDefinitions
         {
@@ -57,6 +64,28 @@ namespace CoreSampleAnnotation.AnnotationPlane.ColumnSettings
             }
         }
 
+        private ICommand importFromFileCommand;
+        public ICommand ImportFromFileCommnad {
+            get { return importFromFileCommand; }
+            private set {
+                if (importFromFileCommand != value) {
+                    importFromFileCommand = value;
+                    RaisePropertyChanged(nameof(ImportFromFileCommnad));
+                }
+            }
+        }
+
+        private ICommand exportToFileCommand;
+        public ICommand ExportToFileCommand {
+            get { return exportToFileCommand; }
+            private set {
+                if (exportToFileCommand != value) {
+                    exportToFileCommand = value;
+                    RaisePropertyChanged(nameof(ExportToFileCommand));
+                }
+            }
+        }        
+
         private DelegateCommand MoveColumnLeft;
         private DelegateCommand MoveColumnRight;
 
@@ -91,11 +120,20 @@ namespace CoreSampleAnnotation.AnnotationPlane.ColumnSettings
             MoveColumnRight.RaiseCanExecuteChanged();
         }        
 
-        public ColumnSettingsVM(ILayersTemplateSource layersTemplateSource, ILayerRankNamesSource layerRankNameSource)
+        public ColumnSettingsVM(
+            ILayersTemplateSource layersTemplateSource,
+            ILayerRankNamesSource layerRankNameSource,
+            IColumnSettingsPersistence settingsPersister)
         {
             this.layersTemplateSource = layersTemplateSource;
             this.layerRankNameSource = layerRankNameSource;
+            this.colSettingPersistence = settingsPersister;
             ColumnDefinitions = new ColumnDefinitionVM[0];
+            ColumnDefinitionVM[] settings = null;
+            if (settingsPersister.LoadDefaults(out settings)) {
+                ColumnDefinitions = settings;
+            }
+
             Initialize();
 
             //default column set
@@ -236,6 +274,15 @@ namespace CoreSampleAnnotation.AnnotationPlane.ColumnSettings
                 else
                     return false;
             });
+            ImportFromFileCommnad = new DelegateCommand(() =>
+            {
+                ColumnDefinitionVM[] settings;
+                if (colSettingPersistence.Load(out settings))
+                    ColumnDefinitions = settings;
+            });
+            ExportToFileCommand = new DelegateCommand(() => {
+                colSettingPersistence.Persist(OrderedColumnDefinitions);
+            });
 
            
         }
@@ -243,7 +290,8 @@ namespace CoreSampleAnnotation.AnnotationPlane.ColumnSettings
         #region Serialization
         protected ColumnSettingsVM(SerializationInfo info, StreamingContext context) {
             layersTemplateSource = (ILayersTemplateSource)info.GetValue("LayersTemplateSource", typeof(ILayersTemplateSource));
-            layerRankNameSource = (ILayerRankNamesSource)info.GetValue("LayerRankNameSource", typeof(ILayerRankNamesSource));            
+            layerRankNameSource = (ILayerRankNamesSource)info.GetValue("LayerRankNameSource", typeof(ILayerRankNamesSource));
+            colSettingPersistence = (IColumnSettingsPersistence)info.GetValue("SettingsPersister",typeof(IColumnSettingsPersistence));
             columnDefinitions = (ColumnDefinitionVM[])info.GetValue("Columns",typeof(ColumnDefinitionVM[]));            
             Initialize();
             foreach (var col in columnDefinitions)
@@ -254,7 +302,8 @@ namespace CoreSampleAnnotation.AnnotationPlane.ColumnSettings
         {
             info.AddValue("LayersTemplateSource", layersTemplateSource);
             info.AddValue("LayerRankNameSource", layerRankNameSource);
-            info.AddValue("Columns", OrderedColumnDefinitions);            
+            info.AddValue("Columns", OrderedColumnDefinitions);
+            info.AddValue("SettingsPersister",colSettingPersistence);
         }
         #endregion
 

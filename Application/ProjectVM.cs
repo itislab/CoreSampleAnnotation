@@ -28,6 +28,19 @@ namespace CoreSampleAnnotation
             }
         }
 
+        private IColumnSettingsPersistence columnSettingsPersistence;
+        public IColumnSettingsPersistence ColumnSettingsPersistence {
+            get {
+                return columnSettingsPersistence;
+            }
+            set {
+                if (columnSettingsPersistence != value) {
+                    columnSettingsPersistence = value;
+                    RaisePropertyChanged(nameof(ColumnSettingsPersistence));
+                }
+            }
+        }
+
         /// <summary>
         /// The name og the bore hole from where the core samples are extracted
         /// </summary>
@@ -97,13 +110,18 @@ namespace CoreSampleAnnotation
 
         public void Initialize() {            
             if(planeColumnSettingsVM == null)
-                planeColumnSettingsVM = new ColumnSettingsVM(LayersTemplateSource,LayerRankNameSource);            
+                planeColumnSettingsVM = new ColumnSettingsVM(LayersTemplateSource,LayerRankNameSource,ColumnSettingsPersistence);            
         }
 
-        public ProjectVM(IImageStorage imageStorage,ILayersTemplateSource layersTemplateSource, ILayerRankNamesSource layerRankSource) {            
+        public ProjectVM(
+            IImageStorage imageStorage,
+            ILayersTemplateSource layersTemplateSource,
+            ILayerRankNamesSource layerRankSource,
+            IColumnSettingsPersistence columnSettingsPersister) {            
             boreIntervalsVM = new BoreIntervalsVM(imageStorage);
             this.layerRankNameSource = layerRankSource;
-            this.layersTemplateSource = layersTemplateSource;            
+            this.layersTemplateSource = layersTemplateSource;
+            columnSettingsPersistence = columnSettingsPersister;           
             Initialize();
         }
 
@@ -115,6 +133,7 @@ namespace CoreSampleAnnotation
             PlaneVM = (AnnotationPlane.PlaneVM)info.GetValue("Annotation", typeof(AnnotationPlane.PlaneVM));
             layersTemplateSource = (ILayersTemplateSource)info.GetValue("LayersTemplateSource",typeof(ILayersTemplateSource));
             layerRankNameSource = (ILayerRankNamesSource)info.GetValue("LayersRankSource", typeof(ILayerRankNamesSource));
+            columnSettingsPersistence = (IColumnSettingsPersistence)info.GetValue("ColumnValuePersistence",typeof(IColumnSettingsPersistence));
             planeColumnSettingsVM = (ColumnSettingsVM)info.GetValue("ColumnsSettings", typeof(ColumnSettingsVM));
             Initialize();
         }
@@ -126,6 +145,7 @@ namespace CoreSampleAnnotation
             info.AddValue("Annotation",PlaneVM);
             info.AddValue("LayersTemplateSource", LayersTemplateSource);
             info.AddValue("LayersRankSource", LayerRankNameSource);
+            info.AddValue("ColumnValuePersistence",ColumnSettingsPersistence);
             info.AddValue("ColumnsSettings", PlaneColumnSettingsVM);
         }
         #endregion

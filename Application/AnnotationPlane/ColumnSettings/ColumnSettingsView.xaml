@@ -13,8 +13,13 @@
         </DataTemplate>
     </UserControl.Resources>
     <Grid>
-        <Button Style="{StaticResource MetroButton}" Width="50" Height="50" VerticalAlignment="Center" HorizontalAlignment="Right" Command="{Binding ActivateAnnotationPlaneCommand}">
-            <media:TableIcon></media:TableIcon></Button>
+        <StackPanel VerticalAlignment="Center" HorizontalAlignment="Right">
+            <Button Style="{StaticResource MetroButton}" HorizontalAlignment="Right" Width="50" Height="50" Command="{Binding ActivateAnnotationPlaneCommand}">
+                <media:TableIcon></media:TableIcon>
+            </Button>
+            <Button Style="{StaticResource MetroButton}" Command="{Binding ImportFromFileCommnad}" Content="Импорт столбцов"/>
+            <Button Style="{StaticResource MetroButton}" Command="{Binding ExportToFileCommand}" Content="Экспорт столбцов"/>
+        </StackPanel>
         <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
             <ItemsControl ItemsSource="{Binding OrderedColumnDefinitions}" Grid.Row="0" VerticalAlignment="Top"  Grid.IsSharedSizeScope="True">
         </ItemsControl>

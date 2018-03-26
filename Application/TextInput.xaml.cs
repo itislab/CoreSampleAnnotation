@@ -41,9 +41,15 @@ namespace CoreSampleAnnotation
             Binding b4 = new Binding(nameof(InputFontSize));
             b4.Source = this;
             InputBox.SetBinding(TextBox.FontSizeProperty, b4);
+
+            this.MouseDown += TextInput_MouseDown;
         }
 
-
+        private void TextInput_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            TextInput ti = (TextInput)sender;
+            ti.InputBox.Focus();
+        }
 
         public string HintText
         {

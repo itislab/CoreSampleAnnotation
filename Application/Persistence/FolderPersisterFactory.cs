@@ -53,10 +53,11 @@ namespace CoreSampleAnnotation.Persistence
                         var layersTemplate = new FolderLayersTemplateSource(Path.Combine(path, layersTemplateDirectory));
                         File.Copy(Path.Combine(exeLocation, "DefaultLayerRanks.csv"), Path.Combine(path, layersRankFile));
                         var layerRanks = new CsvFileLayerRankSource(Path.Combine(path, layersRankFile));
-
+                        var colSettingsPersister = new JsonFileColumnSettings();
                         Directory.SetCurrentDirectory(path); //after this the paths in project will be relative
 
-                        persister.SaveProject(new ProjectVM(imageStorage, layersTemplate, layerRanks)); //new clean project is dumped to disk
+                        persister.SaveProject(
+                            new ProjectVM(imageStorage, layersTemplate, layerRanks, colSettingsPersister)); //new clean project is dumped to disk
                         
                         return true;
                     default:
