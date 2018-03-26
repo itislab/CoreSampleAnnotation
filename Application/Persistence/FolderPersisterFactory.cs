@@ -51,8 +51,17 @@ namespace CoreSampleAnnotation.Persistence
                         string defaultTemplatePath = Path.Combine(exeLocation, "DefaultLayersTemplate");
                         PathUtils.DeepCopy(defaultTemplatePath, Path.Combine(path, layersTemplateDirectory));
                         var layersTemplate = new FolderLayersTemplateSource(Path.Combine(path, layersTemplateDirectory));
+
+                        //copying layer ranks
                         File.Copy(Path.Combine(exeLocation, "DefaultLayerRanks.csv"), Path.Combine(path, layersRankFile));
                         var layerRanks = new CsvFileLayerRankSource(Path.Combine(path, layersRankFile));
+
+                        //copying default clumn settings
+                        Directory.CreateDirectory(Path.Combine(path,JsonFileColumnSettings.TamplatesDir));
+                        File.Copy(
+                            Path.Combine(exeLocation, "DefaultColumnSettings.json"),
+                            Path.Combine(path, JsonFileColumnSettings.TamplatesDir,JsonFileColumnSettings.DefaultSettingsFile));
+
                         var colSettingsPersister = new JsonFileColumnSettings();
                         Directory.SetCurrentDirectory(path); //after this the paths in project will be relative
 

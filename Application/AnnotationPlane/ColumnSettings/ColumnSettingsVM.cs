@@ -129,27 +129,31 @@ namespace CoreSampleAnnotation.AnnotationPlane.ColumnSettings
             this.layerRankNameSource = layerRankNameSource;
             this.colSettingPersistence = settingsPersister;
             ColumnDefinitions = new ColumnDefinitionVM[0];
-            ColumnDefinitionVM[] settings = null;
-            if (settingsPersister.LoadDefaults(out settings)) {
-                ColumnDefinitions = settings;
-            }
-
-            Initialize();
-
-            //default column set
-            List<ColumnDefinitionVM> result = new List<ColumnDefinitionVM>();
-            var ranks = layerRankNameSource.InstrumentalMultipleNames.Reverse().ToArray();
-            foreach (string rank in ranks)
+            ColumnDefinitionVM[] settings = null;            
+            if (settingsPersister.LoadDefaults(out settings))
             {
-                LayerEditColumnDefinitionVM column = new LayerEditColumnDefinitionVM(layerRankNameSource);
-                column.Selected = rank;
-                result.Add(column);
-                ColumnDefinitions = result.ToArray(); // As InitializeColumn uses ColumnDefinitions
-                InitializeColumn(column);                
+                ColumnDefinitions = settings;
+                Initialize();
+                foreach (var col in columnDefinitions)
+                    InitializeColumn(col);
             }
-            
-            AddDepthCommand.Execute(null);
-            AddPhotoCommand.Execute(null);            
+            else {
+                //default column set
+                Initialize();
+                List<ColumnDefinitionVM> result = new List<ColumnDefinitionVM>();
+                var ranks = layerRankNameSource.InstrumentalMultipleNames.Reverse().ToArray();
+                foreach (string rank in ranks)
+                {
+                    LayerEditColumnDefinitionVM column = new LayerEditColumnDefinitionVM(layerRankNameSource);
+                    column.Selected = rank;
+                    result.Add(column);
+                    ColumnDefinitions = result.ToArray(); // As InitializeColumn uses ColumnDefinitions
+                    InitializeColumn(column);
+                }
+
+                AddDepthCommand.Execute(null);
+                AddPhotoCommand.Execute(null);
+            }            
         }
 
         protected virtual void Initialize() {

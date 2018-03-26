@@ -17,7 +17,8 @@ namespace CoreSampleAnnotation.Persistence
     [Serializable]
     public class JsonFileColumnSettings : IColumnSettingsPersistence, ISerializable
     {
-        private const string TamplatesDir = "ColumnSettingTemplates";
+        public const string TamplatesDir = "ColumnSettingTemplates";
+        public const string DefaultSettingsFile = "default.json";
 
         private JsonSerializerSettings newtonJsonSettings = new JsonSerializerSettings
         {
@@ -62,12 +63,11 @@ namespace CoreSampleAnnotation.Persistence
 
         public bool LoadDefaults(out ColumnDefinitionVM[] definitions)
         {
-            string templateFile = Path.Combine(Directory.GetCurrentDirectory(), TamplatesDir,"default.json");
+            string templateFile = Path.Combine(Directory.GetCurrentDirectory(), TamplatesDir, DefaultSettingsFile);
             if (File.Exists(templateFile))
             {
                 string serialized = File.ReadAllText(templateFile);
                 definitions = JsonConvert.DeserializeObject<ColumnDefinitionVM[]>(serialized, newtonJsonSettings);
-                System.Windows.MessageBox.Show("Настройки колонок успешно загружены", "Успешно", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Information);
                 return true;
             }
             else
