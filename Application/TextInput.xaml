@@ -26,7 +26,7 @@
                 <ColumnDefinition Width="1*"/>
                 <ColumnDefinition Width="auto"/>
             </Grid.ColumnDefinitions>
-            <TextBlock Name="HintBlock" FontSize="{Binding}" TextAlignment="Left" VerticalAlignment="Center" HorizontalAlignment="Left"
+            <TextBlock Margin="15,0,0,0" Name="HintBlock" FontSize="{Binding}" TextAlignment="Left" VerticalAlignment="Center" HorizontalAlignment="Left"
                    Foreground="DimGray" Visibility="{Binding ElementName=InputBox, Path=Text.IsEmpty, Converter={StaticResource VisibilityCollapsedConverter}}" />
             <TextBox TextAlignment="Left" Margin="15,0,0,0" BorderThickness="0" VerticalAlignment="Center" HorizontalAlignment="Left" FontSize="25" Focusable="True" Name="InputBox" Background="Transparent" GotKeyboardFocus="InputBox_GotKeyboardFocus" LostKeyboardFocus="InputBox_LostKeyboardFocus" KeyDown="InputBox_KeyDown"/>
             <Button Focusable="False" Grid.Column="1" Content="ok" Click="Button_Click" VerticalAlignment="Center" Style="{StaticResource MetroButton}" Visibility="{Binding Path=InputConfirmVisibility, RelativeSource={RelativeSource AncestorType=local:TextInput}}"/>

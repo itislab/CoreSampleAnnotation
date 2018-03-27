@@ -10,7 +10,12 @@ using System.Threading.Tasks;
 using System.Windows.Media;
 
 namespace CoreSampleAnnotation
-{    
+{
+    public enum AnnotationDirection {
+        UpToBottom,
+        BottomToUp
+    }
+
     [Serializable]
     public class ProjectVM : ViewModel, ISerializable
     {

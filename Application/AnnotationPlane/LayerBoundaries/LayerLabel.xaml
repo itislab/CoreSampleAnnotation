@@ -3,11 +3,22 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:ap="clr-namespace:CoreSampleAnnotation.AnnotationPlane"
              xmlns:local="clr-namespace:CoreSampleAnnotation.AnnotationPlane.LayerBoundaries"
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300" HorizontalAlignment="Stretch">
+    <UserControl.Resources>
+        <ap:NumberSelectorConverter x:Key="NumberSelectorConverter"/>
+    </UserControl.Resources>
     <Grid Height="40" Width="100">
         <Rectangle HorizontalAlignment="Stretch" Height="40" Fill="LightCoral" Name="Rect"/>
-        <TextBlock VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="16" Text="{Binding Number, FallbackValue=NA}"></TextBlock>
+        <TextBlock VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="16">
+            <TextBlock.Text>
+                <MultiBinding Converter="{StaticResource NumberSelectorConverter}">
+                    <Binding Path="Numbers" />
+                    <Binding Path="DataContext.RankNumberToShow" RelativeSource="{RelativeSource AncestorType={x:Type ItemsControl}}" />
+                </MultiBinding>
+            </TextBlock.Text>
+        </TextBlock>
     </Grid>
 </UserControl>

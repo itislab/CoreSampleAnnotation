@@ -7,13 +7,13 @@ using System.Threading.Tasks;
 namespace CoreSampleAnnotation.AnnotationPlane.LayerBoundaries
 {
     /// <summary>
-    /// Adds boundary at 0 level
+    /// Removes the last boundary in the array
     /// </summary>
-    public class ZeroBoundaryDecoratorLBVM : ViewModel, ILayerBoundariesVM
+    public class RemoveLastDecoratorLBVM : ViewModel, ILayerBoundariesVM
     {
         ILayerBoundariesVM target;
 
-        public ZeroBoundaryDecoratorLBVM(ILayerBoundariesVM target) {
+        public RemoveLastDecoratorLBVM(ILayerBoundariesVM target) {
             this.target = target;
             target.PropertyChanged += Target_PropertyChanged;
         }
@@ -25,33 +25,28 @@ namespace CoreSampleAnnotation.AnnotationPlane.LayerBoundaries
                     RaisePropertyChanged(nameof(Boundaries));
                     break;
             }
-        }
-
-        LayerBoundary zero = new LayerBoundary(0, 0);
+        }        
 
         public LayerBoundary[] Boundaries
         {
             get
             {
-                LayerBoundary[] boundaries = Enumerable.Repeat(zero, 1).Concat(target.Boundaries).ToArray();
+                LayerBoundary[] boundaries = target.Boundaries.Take(target.Boundaries.Length - 1).ToArray();
                 return boundaries;
             }
         }
     }
 
-
-    public class NumberResettingDecorator : ViewModel, ILayerBoundariesVM
+    /// <summary>
+    /// Removes the first boundary in the array
+    /// </summary>
+    public class RemoveFirstDecoratorLBVM : ViewModel, ILayerBoundariesVM
     {
         ILayerBoundariesVM target;
 
-        int thresholdRank, numberingBase;
-
-        /// <param name="thresholdRank">Rank higher than this resets the numbering to numbering base</param>
-        public NumberResettingDecorator(ILayerBoundariesVM target, int thresholdRank, int numberingBase)
+        public RemoveFirstDecoratorLBVM(ILayerBoundariesVM target)
         {
             this.target = target;
-            this.thresholdRank = thresholdRank;
-            this.numberingBase = numberingBase;
             target.PropertyChanged += Target_PropertyChanged;
         }
 
@@ -69,17 +64,7 @@ namespace CoreSampleAnnotation.AnnotationPlane.LayerBoundaries
         {
             get
             {
-                LayerBoundary[] boundaries = target.Boundaries.Select( lb => new LayerBoundary(lb.Level,lb.Rank)).ToArray(); //deep copy
-                int n = boundaries.Length;
-                int curNumber = numberingBase;
-                for (int i = 0; i < n; i++)
-                {
-                    LayerBoundary lb = boundaries[i];
-                    if (lb.Rank > thresholdRank)
-                        //reset
-                        curNumber = numberingBase;                    
-                    lb.Number = curNumber++;
-                }
+                LayerBoundary[] boundaries = target.Boundaries.Skip(1).ToArray();
                 return boundaries;
             }
         }
@@ -90,7 +75,15 @@ namespace CoreSampleAnnotation.AnnotationPlane.LayerBoundaries
     /// </summary>
     public class BoundaryLabelColumnVM: BoundaryColumnVM
     {
-        public BoundaryLabelColumnVM(ColumnVM targetColumn, ILayerBoundariesVM boundariesVM)
-            : base(targetColumn, boundariesVM) { }
+        /// <summary>
+        /// Number of which rank will be shown on labels
+        /// </summary>
+        public int RankNumberToShow { get; private set; }
+
+        /// <param name="rankNumberToShow">Number of which rank will be shown on labels</param>
+        public BoundaryLabelColumnVM(ColumnVM targetColumn, ILayerBoundariesVM boundariesVM, int rankNumberToShow)
+            : base(targetColumn, boundariesVM) {
+            RankNumberToShow = rankNumberToShow;
+        }
     }
 }
