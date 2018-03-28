@@ -48,8 +48,25 @@ namespace UnitTestsCS
             AssertNumbers(data[8], new int[] { 1, 1, 3 });
             AssertNumbers(data[9], new int[] { 2 });
             AssertNumbers(data[10], new int[] { 1, 1, 4 });
+        }
 
+        [TestMethod]
+        public void BottomToUpNumberingTest()
+        {
+            var data = GetTestInputData();
+            Utils.RecalcBoundaryNumbers(data, CoreSampleAnnotation.AnnotationDirection.BottomToUp);
 
+            AssertNumbers(data[0], new int[] { 2, 3, 3 });
+            AssertNumbers(data[1], new int[] { 1 });
+            AssertNumbers(data[2], new int[] { 1, 2 });
+            AssertNumbers(data[3], new int[] { 3, 1 });
+            AssertNumbers(data[4], new int[] { 2 });
+            AssertNumbers(data[5], new int[] { 1 });
+            AssertNumbers(data[6], new int[] { 2, 1, 2 });
+            AssertNumbers(data[7], new int[] { 1 });
+            AssertNumbers(data[8], new int[] { 2, 1, 1 });
+            AssertNumbers(data[9], new int[] { 1 });
+            AssertNumbers(data[10], new int[] { 0, 0, 0 });
         }
     }
 }

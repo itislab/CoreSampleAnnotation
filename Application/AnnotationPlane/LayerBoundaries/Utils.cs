@@ -27,17 +27,16 @@ namespace CoreSampleAnnotation.AnnotationPlane.LayerBoundaries
 
             int N = boundaries.Length;
 
+            int[] recentNumbers = Enumerable.Repeat(0, maxRank + 1).ToArray();
+
             switch (direction)
             {
-                case AnnotationDirection.UpToBottom:
-                    int[] recentNumbers = Enumerable.Repeat(0, maxRank + 1).ToArray();
-                    recentNumbers[maxRank] = 0; //as the firest boundary increments the the highest rank number                    
-
+                case AnnotationDirection.UpToBottom:                     
                     for (int i = 0; i < N; i++)
                     {
                         LayerBoundary lb = boundaries[i];
                         int maxIdxToAccount = lb.Rank;
-                        int[] boundNumbers = new int[maxRank + 1];
+                        
                         //updating recent numbers
                         recentNumbers[maxIdxToAccount]++; //highest rank number increases
                         for (int j = 0; j < maxIdxToAccount; j++)
@@ -46,6 +45,33 @@ namespace CoreSampleAnnotation.AnnotationPlane.LayerBoundaries
                         //now copying the part of the recentNumbers to the lb.Number
                         lb.Numbers = recentNumbers.Take(maxIdxToAccount + 1).ToArray();
                     }
+                    break;
+                case AnnotationDirection.BottomToUp:
+
+                    for (int i = N-1; i >= 0; i--) 
+                    {
+                        LayerBoundary lb = boundaries[i];
+
+                        if (i == N - 1) {
+                            //lower boundary always contains all zeros, thus skipping it
+                            lb.Numbers = recentNumbers.ToArray();
+                            continue;
+                        }
+
+                        int maxIdxToAccount = lb.Rank;
+
+                        //updating recent numbers
+                        for (int j = 0; j <= maxIdxToAccount; j++)
+                            recentNumbers[j]++;
+
+                        //coping updated recent to the boundary
+                        lb.Numbers = recentNumbers.Take(maxIdxToAccount + 1).ToArray();
+
+                        //reseting lower rank recent numbers
+                        for (int j = 0; j < maxIdxToAccount; j++)
+                            recentNumbers[j] = 0;
+                    }
+
                     break;
                 default:
                     throw new NotSupportedException();
