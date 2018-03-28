@@ -63,7 +63,19 @@ namespace CoreSampleAnnotation.AnnotationPlane.LayerBoundaries
     {
         private LayerBoundary[] boundaries;
 
-        
+        private AnnotationDirection annotationDirection;
+
+        public AnnotationDirection AnnotationDirection {
+            get { return annotationDirection; }
+            set {
+                if (annotationDirection != value) {
+                    annotationDirection = value;
+                    RaisePropertyChanged(nameof(AnnotationDirection));
+                    Boundaries = Boundaries.ToArray(); //applies another order
+                }
+            }
+        }
+
 
         /// <summary>
         /// boundaries
@@ -81,7 +93,7 @@ namespace CoreSampleAnnotation.AnnotationPlane.LayerBoundaries
                         }
                     }
                     var orderedBoundaries = value.OrderBy(b => b.Level).ToArray();
-                    Utils.RecalcBoundaryNumbers(orderedBoundaries, AnnotationDirection.UpToBottom);
+                    Utils.RecalcBoundaryNumbers(orderedBoundaries, AnnotationDirection);
                     boundaries = orderedBoundaries;
                     if (value != null) {
                         foreach (LayerBoundary vm in value) {
@@ -116,11 +128,12 @@ namespace CoreSampleAnnotation.AnnotationPlane.LayerBoundaries
         }
         
         /// <param name="wpfHeight">The column height in WPF units</param>
-        public LayerBoundaryEditorVM(double wpfHeight, int maxRank) {
+        public LayerBoundaryEditorVM(double wpfHeight, int maxRank, AnnotationDirection annotationDirection) {
             Boundaries = new LayerBoundary[] {
                 new LayerBoundary(0.0,maxRank),
                 new LayerBoundary(wpfHeight,maxRank)
             };
+            AnnotationDirection = annotationDirection;
         }
 
         public void ChangeRank(Guid boundaryID, int rank) {

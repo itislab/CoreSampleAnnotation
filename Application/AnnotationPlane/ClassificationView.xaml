@@ -102,7 +102,7 @@
                     </ItemsControl.ItemTemplate>-->
                 </ItemsControl>
             </StackPanel>
-            <Button Grid.Row="0" HorizontalAlignment="Right" Padding="10" Margin="15" BorderThickness="0"  Command="{Binding CloseCommand}" Background="#ff3d00">закрыть</Button>
+            <Button Grid.Row="0" HorizontalAlignment="Right" Padding="10" Margin="15" BorderThickness="0"  Command="{Binding CloseCommand}" Background="{StaticResource ColorAccent}">закрыть</Button>
             <app:TextInput Grid.Row="2" HintFontSize="14" HintText="Введите примечание" InputFontSize="14" Text="{Binding LayerVM.Remark, Mode=TwoWay}"/>
         </Grid>
     </Border>

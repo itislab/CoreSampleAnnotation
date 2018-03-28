@@ -6,6 +6,8 @@
     <Application.Resources>
         <SolidColorBrush Color="#5d4037" x:Key="ColorPrimary" />
         <SolidColorBrush Color="#ffffff" x:Key="ColorTextOnPrimary"/>
+        <SolidColorBrush Color="#ff3d00" x:Key="ColorAccent" />
+        <SolidColorBrush Color="#000000" x:Key="ColorTextOnAccent"/>
         <Style x:Key="MetroButton" TargetType="Button">
             <Setter Property="Background" Value="{StaticResource ColorPrimary}"/>
             <Setter Property="Foreground" Value="{StaticResource ColorTextOnPrimary}"/>

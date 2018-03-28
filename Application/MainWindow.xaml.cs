@@ -62,9 +62,7 @@ namespace CoreSampleAnnotation
 
             menuVM.ActivateAnnotationPlaneCommand = this.ActivateAnnotationPlaneDelegateCommand;
 
-            vm.CurrentProjectVM.PlaneColumnSettingsVM.ActivateAnnotationPlaneCommand = menuVM.ActivateAnnotationPlaneCommand;
-
-            menuVM.ActivateTemplateEditorCommand = new DelegateCommand(obj => { }, obj => false);
+            vm.CurrentProjectVM.PlaneColumnSettingsVM.ActivateAnnotationPlaneCommand = menuVM.ActivateAnnotationPlaneCommand;            
 
             menuVM.ActivateReportGenerationCommand = new DelegateCommand(obj =>
             {
@@ -94,12 +92,12 @@ namespace CoreSampleAnnotation
                         string[] rankNames = vm.CurrentProjectVM.LayerRankNameSource.NominativeNames;
 
                         //transforming boundaryVMs to report specific boundaries
-                        throw new NotImplementedException();
+                        
                         Reports.RTF.LayerBoundary[] boundaries =
                             vm.CurrentProjectVM.PlaneVM.LayerBoundaries
                                 .Select(b =>
                                     new Reports.RTF.LayerBoundary(
-                                        b.Numbers[0], //TODO: pass corect object here
+                                        b.Numbers,
                                         vm.CurrentProjectVM.PlaneVM.LayerSyncController.WpfToDepth(b.Level),
                                         b.Rank
                                         )).ToArray();

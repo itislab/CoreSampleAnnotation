@@ -44,14 +44,14 @@ namespace CoreSampleAnnotation.Reports.RTF
 
 
     public class LayerBoundary {
-        public int OrderNumber { get; private set; }
+        public int[] OrderNumbers { get; private set; }
 
         public double Depth { get; private set; }
 
         public int Rank { get; private set; }
         
-        public LayerBoundary(int orderNumber, double depth, int rank) {
-            OrderNumber = orderNumber;
+        public LayerBoundary(int[] orderNumbers, double depth, int rank) {
+            OrderNumbers = orderNumbers;
             Depth = depth;
             Rank = rank;
         }
@@ -262,11 +262,9 @@ namespace CoreSampleAnnotation.Reports.RTF
                                     if (curRank >= rank)
                                         break;
                                 }
-                                int curOrder = 1;
-                                if (rank == upperLabound.Rank) //the outer (highest) rank is kept. All smaller ranks reset to 1
-                                    curOrder = upperLabound.OrderNumber;
+                                                                
                                 length = Math.Min(length, curIntLower - upperLabound.Depth);
-                                rows.Add(GetRankDescrRow(curOrder, rankNames[rank], length));
+                                rows.Add(GetRankDescrRow(upperLabound.OrderNumbers[rank], rankNames[rank], length));
                             }
                             layerOrderNum = 1; //ranks higher than 0 reset the numbering of layers
                         }

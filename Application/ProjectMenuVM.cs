@@ -11,8 +11,7 @@ namespace CoreSampleAnnotation
     {
         private ProjectVM projectVM;
         private ICommand activateBoreIntervalsCommand = null;
-        private ICommand activateAnnotationPlane = null;
-        private ICommand activateTemplateEditor = null;
+        private ICommand activateAnnotationPlane = null;        
         private ICommand activateReportGeneration = null;
         private ICommand save = null;
         private ICommand exit = null;
@@ -55,21 +54,7 @@ namespace CoreSampleAnnotation
                 }
             }
         }
-        public ICommand ActivateTemplateEditorCommand
-        {
-            get
-            {
-                return activateTemplateEditor;
-            }
-            set
-            {
-                if (activateTemplateEditor != value)
-                {
-                    activateTemplateEditor = value;
-                    RaisePropertyChanged(nameof(ActivateTemplateEditorCommand));
-                }
-            }
-        }
+        
         public ICommand ActivateReportGenerationCommand
         {
             get

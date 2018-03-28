@@ -6,13 +6,26 @@
              xmlns:local="clr-namespace:CoreSampleAnnotation"
              xmlns:media="clr-namespace:CoreSampleAnnotation.Media"
              mc:Ignorable="d" 
-             d:DesignHeight="300" d:DesignWidth="300">
+             d:DesignHeight="400" d:DesignWidth="400">
+    <UserControl.Resources>
+        <local:BoolToBrushConverter x:Key="IsSelectedBackgroundConverter" TrueBrush="{StaticResource ColorPrimary}" FalseBrush="Transparent"/>
+        <local:BoolToBrushConverter x:Key="IsSelectedTextForegroundConverter" TrueBrush="{StaticResource ColorTextOnPrimary}" FalseBrush="DarkGray"/>
+    </UserControl.Resources>
     <Grid>
         <StackPanel Orientation="Vertical" VerticalAlignment="Center" HorizontalAlignment="Center">
             <local:TextInput MinWidth="400" HintText="Введите название скважины" Text="{Binding ProjectVM.BoreName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
             <Button Style="{StaticResource MetroButton}" Command="{Binding ActivateBoreIntervalsCommand}">Интервалы отбора</Button>
             <Button Style="{StaticResource MetroButton}" Command="{Binding ActivateAnnotationPlaneCommand}">Разметка слоев</Button>
             <Button Style="{StaticResource MetroButton}" Command="{Binding ActivateReportGenerationCommand}">Отчеты</Button>
+            <TextBlock Margin="10" FontSize="20">Направление нумерации слоев:</TextBlock>
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition />
+                    <ColumnDefinition />
+                </Grid.ColumnDefinitions>
+                <Button BorderThickness="5"  Grid.Column="0" Foreground="{StaticResource ColorPrimary}" BorderBrush="{Binding ProjectVM.IsUpToBottomLayerNumbering, Converter={StaticResource IsSelectedBackgroundConverter}}" Style="{StaticResource MetroButton}" Background="Transparent" Command="{Binding ProjectVM.ActivateUpToBottomNumberingCommand}">Сверху Вниз</Button>
+                <Button BorderThickness="5" Grid.Column="1" Foreground="{StaticResource ColorPrimary}" BorderBrush="{Binding ProjectVM.IsBottomToUpLayerNumbering, Converter={StaticResource IsSelectedBackgroundConverter}}" Style="{StaticResource MetroButton}" Background="Transparent" Command="{Binding ProjectVM.ActivateBottomToUpNumberingCommand}">Снизу Вверх</Button>
+            </Grid>
         </StackPanel>
         <StackPanel HorizontalAlignment="Left" VerticalAlignment="Bottom" Orientation="Horizontal">
         <Button Style="{StaticResource MetroButton}" Command="{Binding ExitAppCommand}">

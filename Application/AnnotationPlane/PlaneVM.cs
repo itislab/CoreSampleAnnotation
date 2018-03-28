@@ -33,6 +33,24 @@ namespace CoreSampleAnnotation.AnnotationPlane
     [Serializable]
     public class PlaneVM : ViewModel, ISerializable
     {
+        private AnnotationDirection annotationDirection;
+        /// <summary>
+        /// The direction in which the layers are numbered.        
+        /// </summary>
+        public AnnotationDirection AnnotationDirection
+        {
+            get { return annotationDirection; }
+            set
+            {
+                if (annotationDirection != value)
+                {
+                    annotationDirection = value;
+                    RaisePropertyChanged(nameof(AnnotationDirection));
+                    allLayersBoundaryEditorVM.AnnotationDirection = value;
+                }
+            }
+        }
+
         private ColumnScale.Controller colScaleController = new ColumnScale.Controller();
         public ColumnScale.Controller ColScaleController
         {
@@ -64,7 +82,7 @@ namespace CoreSampleAnnotation.AnnotationPlane
             }
         }
 
-        private LayerBoundaryEditorVM layerBoundaryEditorVM;
+        private LayerBoundaryEditorVM allLayersBoundaryEditorVM;
         private FrameworkElement dragReferenceElem;
         /// <summary>
         /// Coordinates dragging elements are calculated related to this element
@@ -85,7 +103,7 @@ namespace CoreSampleAnnotation.AnnotationPlane
         /// <param name="boundIdx">Index of the bound to remove</param>
         private void RemoveLayerBoundary(int boundIdx, LayerSyncronization.FreeSpaceAccepter freeSpaceAccepter)
         {
-            layerBoundaryEditorVM.RemoveBoundary(boundIdx);
+            allLayersBoundaryEditorVM.RemoveBoundary(boundIdx);
             switch (freeSpaceAccepter)
             {
                 case LayerSyncronization.FreeSpaceAccepter.LowerLayer:
@@ -101,7 +119,7 @@ namespace CoreSampleAnnotation.AnnotationPlane
         /// <param name="level">in WPF units</param>
         private void MoveLayerBoundary(int boundIdx, double level)
         {
-            layerBoundaryEditorVM.MoveBoundary(boundIdx, level);
+            allLayersBoundaryEditorVM.MoveBoundary(boundIdx, level);
             double up = 0.0;
             if (boundIdx > 0)
                 up = LayerSyncController.GetLayerWPFTop(boundIdx -1);
@@ -110,7 +128,7 @@ namespace CoreSampleAnnotation.AnnotationPlane
 
         private void AddBoundary(double level)
         {
-            layerBoundaryEditorVM.AddBoundary(0, level);
+            allLayersBoundaryEditorVM.AddBoundary(0, level);
             LayerSyncController.SplitLayer(level);
         }
 
@@ -258,7 +276,7 @@ namespace CoreSampleAnnotation.AnnotationPlane
         public PlaneVM(LayersAnnotation annotation, ILayersTemplateSource layersTemplateSource, ILayerRankNamesSource rankNames)
         {
             this.layersTemplateSource = layersTemplateSource;            
-            MaxRank = rankNames.GeneritiveNames.Length;
+            MaxRank = rankNames.GeneritiveNames.Length - 1;
             
             double upperDepth = annotation.LayerBoundaries[0];
             double lowerDepth = annotation.LayerBoundaries[annotation.LayerBoundaries.Length - 1];
@@ -271,7 +289,7 @@ namespace CoreSampleAnnotation.AnnotationPlane
 
             double wpfHeight = LayerSyncController.LengthToWPF(lowerDepth-upperDepth);
 
-            this.layerBoundaryEditorVM = new LayerBoundaryEditorVM(wpfHeight, MaxRank);
+            this.allLayersBoundaryEditorVM = new LayerBoundaryEditorVM(wpfHeight, MaxRank, AnnotationDirection);
             samplesColumnVM = new SamplesColumnVM();
 
             Initialize(annotation);            
@@ -441,7 +459,7 @@ namespace CoreSampleAnnotation.AnnotationPlane
                 if (boundary != null)
                 {
                     System.Diagnostics.Debug.WriteLine("dropped boundary {0} with offset {1} in {2} column", boundary.ID, edea.WpfTopOffset, edea.ColumnIdx);
-                    int boundIdx = Array.FindIndex(layerBoundaryEditorVM.Boundaries, b => b.ID == boundary.ID);
+                    int boundIdx = Array.FindIndex(allLayersBoundaryEditorVM.Boundaries, b => b.ID == boundary.ID);
                     double prevTop = layerSyncController.GetLayerWPFTop(boundIdx-1);
                     double prevBottom = layerSyncController.GetLayerWPFBottom(boundIdx-1);
                     double nextBottom = layerSyncController.GetLayerWPFBottom(boundIdx);
@@ -457,7 +475,7 @@ namespace CoreSampleAnnotation.AnnotationPlane
                                 RemoveLayerBoundary(boundIdx, LayerSyncronization.FreeSpaceAccepter.LowerLayer);
                                 break;
                             case MessageBoxResult.Cancel:
-                                layerBoundaryEditorVM.Boundaries = layerBoundaryEditorVM.Boundaries.ToArray(); // this recreates all views, after the boundary label dragging
+                                allLayersBoundaryEditorVM.Boundaries = allLayersBoundaryEditorVM.Boundaries.ToArray(); // this recreates all views, after the boundary label dragging
                                 break;
                             default: throw new NotImplementedException();
                         }
@@ -474,7 +492,7 @@ namespace CoreSampleAnnotation.AnnotationPlane
                                 RemoveLayerBoundary(boundIdx, LayerSyncronization.FreeSpaceAccepter.UpperLayer);
                                 break;
                             case MessageBoxResult.Cancel:
-                                layerBoundaryEditorVM.Boundaries = layerBoundaryEditorVM.Boundaries.ToArray(); // this recreates all views, after the boundary label dragging
+                                allLayersBoundaryEditorVM.Boundaries = allLayersBoundaryEditorVM.Boundaries.ToArray(); // this recreates all views, after the boundary label dragging
                                 break;
                             default: throw new NotImplementedException();
                         }
@@ -494,7 +512,7 @@ namespace CoreSampleAnnotation.AnnotationPlane
                                 if (rfbc != null)
                                 {
                                     //this column is attached to rank filtering VM
-                                    layerBoundaryEditorVM.ChangeRank(boundary.ID, rfbc.Rank);
+                                    allLayersBoundaryEditorVM.ChangeRank(boundary.ID, rfbc.Rank);
                                 }
                             }
                         }
@@ -569,9 +587,7 @@ namespace CoreSampleAnnotation.AnnotationPlane
 
             LayerSyncController.PropertyChanged += LayerSyncController_PropertyChanged;
             ColScaleController.PropertyChanged += ColScaleController_PropertyChanged;
-
             
-
             classificationVM = new ClassificationVM(new IDEncodedTreeBuilder('@'));
             classificationVM.CloseCommand = new DelegateCommand(() => classificationVM.IsVisible = false);
             classificationVM.ClassSelectedCommand = new DelegateCommand(sender =>
@@ -612,7 +628,7 @@ namespace CoreSampleAnnotation.AnnotationPlane
             double upperDepth = LayerSyncController.LowerDepth;
             double lowerDepth = LayerSyncController.UpperDepth;
                 
-            layerBoundaryEditorVM.DragStart = new DelegateCommand(args =>
+            allLayersBoundaryEditorVM.DragStart = new DelegateCommand(args =>
             {
                 if (DragReferenceElem != null)
                 {
@@ -627,7 +643,7 @@ namespace CoreSampleAnnotation.AnnotationPlane
                 }
             });
 
-            samplesColumnVM.DragStart = layerBoundaryEditorVM.DragStart;
+            samplesColumnVM.DragStart = allLayersBoundaryEditorVM.DragStart;
 
             double colHeight = LayerSyncController.DepthToWPF(lowerDepth) - LayerSyncController.DepthToWPF(upperDepth);
 
@@ -703,7 +719,7 @@ namespace CoreSampleAnnotation.AnnotationPlane
             samplesColumnVM.ColumnHeight = colHeight;
             RegisterForScaleSync(samplesColumnVM, false);
 
-            var syncAdapter = new SyncronizerBoundaryAdapter(layerBoundaryEditorVM);
+            var syncAdapter = new SyncronizerBoundaryAdapter(allLayersBoundaryEditorVM);
 
             //            LayerSyncController.RegisterColumn(syncAdapter);
             ColScaleController.AttachToColumn(syncAdapter);
@@ -716,7 +732,7 @@ namespace CoreSampleAnnotation.AnnotationPlane
         {
             get
             {
-                return layerBoundaryEditorVM.Boundaries;
+                return allLayersBoundaryEditorVM.Boundaries;
             }
         }
 
@@ -736,7 +752,7 @@ namespace CoreSampleAnnotation.AnnotationPlane
                 {
                     DepthAxisColumnVM colVM = new DepthAxisColumnVM("Шкала глубин");
 
-                    ILayerBoundariesVM firstLastOmited = new RemoveFirstDecoratorLBVM(new RemoveLastDecoratorLBVM(layerBoundaryEditorVM));                    
+                    ILayerBoundariesVM firstLastOmited = new RemoveFirstDecoratorLBVM(new RemoveLastDecoratorLBVM(allLayersBoundaryEditorVM));                    
                     BoundaryLineColumnVM blVM = new BoundaryLineColumnVM(colVM, firstLastOmited, Colors.Green);
 
                     blVM.ColumnHeight = colHeight;
@@ -762,7 +778,7 @@ namespace CoreSampleAnnotation.AnnotationPlane
                 {
                     ImageColumnVM imColVM = new ImageColumnVM("Фото керна");
 
-                    ILayerBoundariesVM firstLastOmited = new RemoveFirstDecoratorLBVM(new RemoveLastDecoratorLBVM(layerBoundaryEditorVM));                    
+                    ILayerBoundariesVM firstLastOmited = new RemoveFirstDecoratorLBVM(new RemoveLastDecoratorLBVM(allLayersBoundaryEditorVM));                    
                     BoundaryLineColumnVM blVM = new BoundaryLineColumnVM(imColVM, firstLastOmited, Colors.Lime);
 
                     blVM.ColumnHeight = colHeight;
@@ -820,7 +836,7 @@ namespace CoreSampleAnnotation.AnnotationPlane
                         int rank = colDef.SelectedIndex;
                         string heading = string.Format("Границы между {0}", colDef.Selected.ToLowerInvariant());
                         BlankColumnVM blankColumnVM = new BlankColumnVM(heading);                        
-                        ILayerBoundariesVM lastBoundaryRemoved = new RemoveLastDecoratorLBVM(layerBoundaryEditorVM);
+                        ILayerBoundariesVM lastBoundaryRemoved = new RemoveLastDecoratorLBVM(allLayersBoundaryEditorVM);
                         ILayerBoundariesVM firstAndLastBoundaryRemoved = new RemoveFirstDecoratorLBVM(lastBoundaryRemoved); 
                                                
                         RankMoreOrEqualBoundaryCollection filteredForLabels = new RankMoreOrEqualBoundaryCollection(lastBoundaryRemoved, rank);
@@ -890,7 +906,7 @@ namespace CoreSampleAnnotation.AnnotationPlane
             layersTemplateSource = (ILayersTemplateSource)info.GetValue("LayersTemplate", typeof(ILayersTemplateSource));
 
             MaxRank = info.GetInt32("MaxRank");
-double scale = info.GetDouble("Scale");
+            double scale = info.GetDouble("Scale");
             double lowerDepth = info.GetDouble("LowerDepth");
             double upperDepth = info.GetDouble("UpperDepth");
 
@@ -900,8 +916,10 @@ double scale = info.GetDouble("Scale");
             LayerSyncController.LowerDepth = lowerDepth;
             ColScaleController.LowerDepth = lowerDepth;
 
-            layerBoundaryEditorVM = (LayerBoundaryEditorVM)info.GetValue("LayerBoundaries", typeof(LayerBoundaryEditorVM));
+            annotationDirection = (AnnotationDirection)info.GetValue("AnnotationDirection", typeof(AnnotationDirection));
+            allLayersBoundaryEditorVM = (LayerBoundaryEditorVM)info.GetValue("LayerBoundaries", typeof(LayerBoundaryEditorVM));
             samplesColumnVM = (SamplesColumnVM)info.GetValue("Samples", typeof(SamplesColumnVM));
+            
             Initialize(layersAnnotation);
         }
 
@@ -954,9 +972,10 @@ double scale = info.GetDouble("Scale");
         {
 
             info.AddValue("Samples", samplesColumnVM);
+            info.AddValue("AnnotationDirection", AnnotationDirection);
             info.AddValue("LayersAnnotation", AsLayersAnnotation);
             info.AddValue("LayersTemplate", layersTemplateSource);
-            info.AddValue("LayerBoundaries", layerBoundaryEditorVM);
+            info.AddValue("LayerBoundaries", allLayersBoundaryEditorVM);
             info.AddValue("MaxRank", MaxRank);
             info.AddValue("Scale",ScaleFactor);
             info.AddValue("LowerDepth", LayerSyncController.LowerDepth);
