@@ -178,12 +178,13 @@ namespace CoreSampleAnnotation.AnnotationPlane.LayerBoundaries
         #region Serialization
         protected LayerBoundaryEditorVM(SerializationInfo info, StreamingContext context) {
             Boundaries = (LayerBoundary[])info.GetValue("Boundaries",typeof(LayerBoundary[]));
-
+            AnnotationDirection = (AnnotationDirection)info.GetValue("AnnotationDirection", typeof(AnnotationDirection));
         }
 
         public virtual void GetObjectData(SerializationInfo info, StreamingContext context)
         {
             info.AddValue("Boundaries",boundaries);
+            info.AddValue("AnnotationDirection", AnnotationDirection);
         }
 
         #endregion

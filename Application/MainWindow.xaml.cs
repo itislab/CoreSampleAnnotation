@@ -161,7 +161,7 @@ namespace CoreSampleAnnotation
                                 layers,
                                 rankNames,
                                 samples,
-                                true
+                                vm.CurrentProjectVM.AnnotationDirection
                                 );
 
                         Reports.RTF.TableDocument.FormRTFDocument(dlg.FileName,table);

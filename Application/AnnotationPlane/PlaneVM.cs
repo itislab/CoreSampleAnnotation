@@ -898,30 +898,6 @@ namespace CoreSampleAnnotation.AnnotationPlane
             }
         }
 
-        #region Persistence
-
-        protected PlaneVM(SerializationInfo info, StreamingContext context)
-        {
-            LayersAnnotation layersAnnotation = (LayersAnnotation)info.GetValue("LayersAnnotation", typeof(LayersAnnotation));
-            layersTemplateSource = (ILayersTemplateSource)info.GetValue("LayersTemplate", typeof(ILayersTemplateSource));
-
-            MaxRank = info.GetInt32("MaxRank");
-            double scale = info.GetDouble("Scale");
-            double lowerDepth = info.GetDouble("LowerDepth");
-            double upperDepth = info.GetDouble("UpperDepth");
-
-            ScaleFactor = scale;
-            LayerSyncController.UpperDepth = upperDepth;
-            ColScaleController.UpperDepth = upperDepth;
-            LayerSyncController.LowerDepth = lowerDepth;
-            ColScaleController.LowerDepth = lowerDepth;
-
-            annotationDirection = (AnnotationDirection)info.GetValue("AnnotationDirection", typeof(AnnotationDirection));
-            allLayersBoundaryEditorVM = (LayerBoundaryEditorVM)info.GetValue("LayerBoundaries", typeof(LayerBoundaryEditorVM));
-            samplesColumnVM = (SamplesColumnVM)info.GetValue("Samples", typeof(SamplesColumnVM));
-            
-            Initialize(layersAnnotation);
-        }
 
         public LayersAnnotation AsLayersAnnotation
         {
@@ -966,6 +942,32 @@ namespace CoreSampleAnnotation.AnnotationPlane
                 }).ToArray();
                 return layersAnnotation;
             }
+        }
+
+
+        #region Persistence
+
+        protected PlaneVM(SerializationInfo info, StreamingContext context)
+        {
+            LayersAnnotation layersAnnotation = (LayersAnnotation)info.GetValue("LayersAnnotation", typeof(LayersAnnotation));
+            layersTemplateSource = (ILayersTemplateSource)info.GetValue("LayersTemplate", typeof(ILayersTemplateSource));
+
+            MaxRank = info.GetInt32("MaxRank");
+            double scale = info.GetDouble("Scale");
+            double lowerDepth = info.GetDouble("LowerDepth");
+            double upperDepth = info.GetDouble("UpperDepth");
+
+            ScaleFactor = scale;
+            LayerSyncController.UpperDepth = upperDepth;
+            ColScaleController.UpperDepth = upperDepth;
+            LayerSyncController.LowerDepth = lowerDepth;
+            ColScaleController.LowerDepth = lowerDepth;
+
+            annotationDirection = (AnnotationDirection)info.GetValue("AnnotationDirection", typeof(AnnotationDirection));
+            allLayersBoundaryEditorVM = (LayerBoundaryEditorVM)info.GetValue("LayerBoundaries", typeof(LayerBoundaryEditorVM));
+            samplesColumnVM = (SamplesColumnVM)info.GetValue("Samples", typeof(SamplesColumnVM));
+            
+            Initialize(layersAnnotation);
         }
 
         public void GetObjectData(SerializationInfo info, StreamingContext context)
