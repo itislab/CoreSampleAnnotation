@@ -331,6 +331,12 @@ namespace CoreSampleAnnotation.AnnotationPlane
     {
         private new MultiClassificationLayerVM target;
 
+        public new MultiClassificationLayerVM ClassificationVM {
+            get {
+                return target;
+            }
+        }
+
         public MultiClassificationLayerIconPresentingVM(MultiClassificationLayerVM target) : base(target)
         {
             this.target = target;

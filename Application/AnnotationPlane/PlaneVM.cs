@@ -1,6 +1,7 @@
 ﻿using CoreSampleAnnotation.AnnotationPlane.ColumnSettings;
 using CoreSampleAnnotation.AnnotationPlane.LayerBoundaries;
 using CoreSampleAnnotation.AnnotationPlane.Template;
+using CoreSampleAnnotation.Reports.SVG;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -398,7 +399,7 @@ namespace CoreSampleAnnotation.AnnotationPlane
             }
             if (cl.IconSVG != null)
             {
-                Svg.SvgDocument doc = Svg.SvgDocument.FromSvg<Svg.SvgDocument>(cl.IconSVG);
+                Svg.SvgDocument doc = Helpers.SvgFromString(cl.IconSVG);
                 Svg.SvgFragment docCopy = (Svg.SvgFragment)doc.DeepCopy();
                 doc.Fill = new Svg.SvgColourServer(System.Drawing.Color.White);
 

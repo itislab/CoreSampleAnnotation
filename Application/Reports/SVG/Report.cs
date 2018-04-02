@@ -9,27 +9,64 @@ using System.Windows;
 
 namespace CoreSampleAnnotation.Reports.SVG
 {
-    public struct RenderedSvg {
+    public enum PropertyRepresentation { SvgIcon, BackgroundPattern }
+
+    /// <summary>
+    /// Uniqely identifies a pair: particular class of particular property
+    /// </summary>
+    public struct LegendItemKey
+    {
+        public readonly string PropID;
+        public readonly string ClassID;
+        public readonly PropertyRepresentation Representation;
+
+        public LegendItemKey(string propID, string classID, PropertyRepresentation representation) {
+            PropID = propID;
+            ClassID = classID;
+            Representation = representation;
+        }
+    }
+
+    public struct RenderedSvg
+    {
         public SvgElement SVG;
         public Size RenderedSize;
+    }
+
+    public interface ILegendItem
+    {
+        SvgElement GetPresentation(double width, double height);
+        string Description { get; }
     }
 
     /// <summary>
     /// Draw the report column as SVG
     /// </summary>
-    public interface ISvgRenderableColumn {
+    public interface ISvgRenderableColumn
+    {
         RenderedSvg RenderHeader();
         RenderedSvg RenderColumn();
         SvgDefinitionList Definitions { get; }
     }
 
-    public static class Report
-    {        
+    /// <summary>
+    /// Represents a legend for single representation
+    /// </summary>
+    public interface ILegendGroup
+    {
+        string GroupName { get; }
+        ILegendItem[] Items { get; }
 
-        public static SvgDocument Generate(ISvgRenderableColumn[] columns) {
+    }
+
+    public static class Report
+    {
+
+        public static SvgDocument Generate(ISvgRenderableColumn[] columns, ILegendGroup[] legend)
+        {
             //generating headers
             SvgGroup headerGroup = new SvgGroup();
-            SvgPaintServer blackPaint = new SvgColourServer(System.Drawing.Color.Black);            
+            SvgPaintServer blackPaint = new SvgColourServer(System.Drawing.Color.Black);
             double horizontalOffset = 0.0;
             double headerHeight = 0;
             for (int i = 0; i < columns.Length; i++)
@@ -43,10 +80,10 @@ namespace CoreSampleAnnotation.Reports.SVG
                 rect.Y = Helpers.dtos(0.0);
                 rect.Stroke = blackPaint;
 
-                heading.SVG.Transforms.Add(new SvgTranslate((float)(horizontalOffset + heading.RenderedSize.Width*0.5), (float)heading.RenderedSize.Height*0.9f));
+                heading.SVG.Transforms.Add(new SvgTranslate((float)(horizontalOffset + heading.RenderedSize.Width * 0.5), (float)heading.RenderedSize.Height * 0.9f));
                 heading.SVG.Transforms.Add(new SvgRotate((float)-90.0));
 
-                headerGroup.Children.Add(rect);                                
+                headerGroup.Children.Add(rect);
                 headerGroup.Children.Add(heading.SVG);
                 horizontalOffset += heading.RenderedSize.Width;
 
@@ -76,6 +113,77 @@ namespace CoreSampleAnnotation.Reports.SVG
                 horizontalOffset += column.RenderedSize.Width;
             }
 
+            //generating legend group
+            SvgGroup legendGroup = new SvgGroup();
+
+            const float legendYGap = 30.0f;
+            const float legendXOffset = 10.0f;
+
+            
+            legendGroup.Transforms.Add(new SvgTranslate(legendXOffset, Helpers.dtos(headerHeight + columnHeight + legendYGap)));
+            
+            const float titleYoffset = 60.0f;
+            const float itemsYoffset = 20.0f;
+            const float itemYgap = 20.0f;
+            const float interGroupYgap = 15.0f;
+            const float itemImageWidth = 64.0f;
+            const float itemImageHeight = 32.0f;
+            const float descrXoffset = 150.0f;
+
+            SvgText legendTitle = new SvgText("Условные обозначения");
+            legendTitle.FontSize = 22;
+            legendTitle.Fill = new SvgColourServer(System.Drawing.Color.Black);
+            legendTitle.Transforms.Add(new SvgTranslate(30.0f, Helpers.dtos(titleYoffset * 0.25f)));
+            legendGroup.Children.Add(legendTitle);
+
+            float currGroupOffset = 0.0f;
+            int k = 0;
+            foreach (ILegendGroup group in legend)
+            {
+                //title
+                SvgText groupTitle = new SvgText(group.GroupName);
+                groupTitle.FontSize = new SvgUnit((float)18);
+                groupTitle.Fill = new SvgColourServer(System.Drawing.Color.Black);
+                groupTitle.Transforms.Add(new SvgTranslate(0.0f, currGroupOffset + titleYoffset));
+                legendGroup.Children.Add(groupTitle);
+
+                //items
+                var items = group.Items;
+
+                int j = 0;
+
+                SvgElement[] fragments = items.Select(item => item.GetPresentation(itemImageWidth, itemImageHeight)).ToArray();
+
+                foreach (var item in items)
+                {                    
+                    if (fragments[j] == null)
+                        continue;
+
+                    float yOffset = currGroupOffset + titleYoffset + itemsYoffset + j * (itemYgap+ itemImageHeight);
+
+                    if (fragments[j] is SvgFragment)
+                    {
+                        SvgFragment fragment = (SvgFragment)fragments[j];
+                        fragment.X = 0;
+                        fragment.Y = yOffset;
+                    }
+                    else
+                        fragments[j].Transforms.Add(new SvgTranslate(0, yOffset));
+
+                    legendGroup.Children.Add(fragments[j]);
+
+                    SvgText text = new SvgText(item.Description);
+                    text.FontSize = new SvgUnit((float)14);
+                    text.Fill = new SvgColourServer(System.Drawing.Color.Black);
+                    text.Transforms.Add(new SvgTranslate(descrXoffset, yOffset+ itemImageHeight * 0.5f));
+                    legendGroup.Children.Add(text);
+                    j++;
+                }
+                currGroupOffset += titleYoffset + itemsYoffset + (itemYgap + itemImageHeight) * items.Length + interGroupYgap;
+                k++;
+            }
+
+
             //gathering definitions
             SvgDefinitionList allDefs = new SvgDefinitionList();
             for (int i = 0; i < columns.Length; i++)
@@ -91,11 +199,12 @@ namespace CoreSampleAnnotation.Reports.SVG
             SvgDocument result = new SvgDocument();
             result.Children.Add(allDefs);
             result.Width = Helpers.dtos(horizontalOffset);
-            result.Height = Helpers.dtos((headerHeight+columnHeight));
+            result.Height = Helpers.dtos((headerHeight + columnHeight + legendYGap + currGroupOffset));
             result.Fill = new SvgColourServer(System.Drawing.Color.White);
             result.Children.Add(headerGroup);
             result.Children.Add(columnsGroup);
-            
+            result.Children.Add(legendGroup);
+
             return result;
         }
     }

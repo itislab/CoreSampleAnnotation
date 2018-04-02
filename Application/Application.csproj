@@ -315,6 +315,8 @@
     <Compile Include="Reports\SVG\Helpers.cs" />
     <Compile Include="Reports\SVG\ImageColumnPainter.cs" />
     <Compile Include="Reports\SVG\LayerPainter.cs" />
+    <Compile Include="Reports\SVG\LegendAdapters.cs" />
+    <Compile Include="Reports\SVG\LegendFactory.cs" />
     <Compile Include="Reports\SVG\Report.cs" />
     <Compile Include="Reports\SVG\SamplesColumnPainter.cs" />
     <Compile Include="Reports\SVG\VisualColumnPainter.cs" />
