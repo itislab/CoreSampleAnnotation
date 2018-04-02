@@ -107,7 +107,7 @@ namespace CoreSampleAnnotation.Intervals
 
         private Predicate<object> canMoveUp;
         private Predicate<object> canMoveDown;
-        private DelegateCommand delComUp, delComDown;
+        private DelegateCommand delComUp, delComDown, focusToNext;
 
         public IEnumerable<CalibratedRegionVM> CalibratedRegions
         {
@@ -199,11 +199,12 @@ namespace CoreSampleAnnotation.Intervals
 
 
             });
-
+            
             crCM.PropertyChanged += CalibratedRegion_PropertyChanged;
 
             crCM.MoveUp = delComUp;
             crCM.MoveDown = delComDown;
+            crCM.FocusToNextCommand = focusToNext;
         }
 
         private Dictionary<int, List<Action>> canMoveRegionChangedActivations = new Dictionary<int, List<Action>>();
@@ -236,8 +237,8 @@ namespace CoreSampleAnnotation.Intervals
             toSwapWith.Order = regionToMove;
             System.Diagnostics.Debug.WriteLine("swapped {0} and {1}", toSwapWithIdx, regionToMove);
             RaiseCanOrderMoveChanged();
-            target.RecalcMoveRelatedProps();
-            toSwapWith.RecalcMoveRelatedProps();
+            target.RaiseCanMoveChanged();
+            toSwapWith.RaiseCanMoveChanged();
 
         }
 
@@ -349,8 +350,7 @@ namespace CoreSampleAnnotation.Intervals
                         RaisePropertyChanged(nameof(AnnotatedPercentage));
                         break;
                     case nameof(vm.Order):
-                        RaiseCanOrderMoveChanged();
-                        vm.RecalcMoveRelatedProps();
+                        RaiseCanOrderMoveChanged();                        
                         break;
                 }
             }
@@ -446,6 +446,20 @@ namespace CoreSampleAnnotation.Intervals
 
         public ICommand NextImageCommand { private set; get; }
 
+        private CalibratedRegionVM focusedRegion = null;
+        public CalibratedRegionVM FocusedRegion {
+            get {
+                return focusedRegion;
+            }
+            set {
+                if (focusedRegion != value)
+                {
+                    focusedRegion = value;
+                    RaisePropertyChanged(nameof(FocusedRegion));
+                }
+            }
+        }
+        
         public ICommand RotateCurrentImageCommand
         {
             get; private set;
@@ -481,6 +495,23 @@ namespace CoreSampleAnnotation.Intervals
 
             delComUp = new DelegateCommand(obj1 => MoveRegionOrder((int)obj1, OrderMoveDirection.Up), canMoveUp);
             delComDown = new DelegateCommand(obj1 => MoveRegionOrder((int)obj1, OrderMoveDirection.Down), canMoveDown);
+            focusToNext = new DelegateCommand((obj1) => {
+                if (FocusedRegion != null) {
+                    var array = CalibratedRegions.ToArray();
+                    int idx = -1;
+                    for (int i = 0; i < array.Length; i++)
+                    {
+                        if (array[i] == FocusedRegion) {
+                            idx = i;
+                            break;
+                        }
+                    }
+                    if (idx != -1) {
+                        idx = (idx + 1) % array.Length;
+                        FocusedRegion = array[idx];
+                    }
+                }
+            });
 
             addNewImageCommand = new DelegateCommand(() =>
             {
@@ -510,6 +541,8 @@ namespace CoreSampleAnnotation.Intervals
                 if (imageIDs.Count > 0)
                 {
                     CurImageIdx = (curImageIdx + 1) % imageIDs.Count;
+
+                    FocusedRegion = null;
                 }
             });
 

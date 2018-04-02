@@ -7,13 +7,19 @@
              xmlns:media="clr-namespace:CoreSampleAnnotation.Media"
              xmlns:app="clr-namespace:CoreSampleAnnotation"
              mc:Ignorable="d" 
-             d:DesignHeight="100" d:DesignWidth="900">
+             d:DesignHeight="150" d:DesignWidth="900">
     <UserControl.Resources>
         <app:VisibilityHiddenConverter x:Key="visibilityHiddenConverter"/>
         <app:NanToEmptyStringDoubleConverter x:Key="nanToEmptyStringDoubleConverter"/>
     </UserControl.Resources>
     <Border CornerRadius="0" Background="White" Padding="15" Margin="15" Opacity="0.95">
         <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+            <Button Margin="2,10" FontSize="20" Command="{Binding FocusToNextCommand}" Style="{StaticResource MetroButton}" Width="50">
+                <Button.LayoutTransform>
+                    <RotateTransform Angle="90"/>
+                </Button.LayoutTransform>
+                <media:Arrow_In_circle/>
+            </Button>
             <TextBlock FontSize="30" Grid.Column="0" Margin="10">
                 <Run Text="Участок №"/>
                 <Run Text="{Binding Order, FallbackValue=1}"/>

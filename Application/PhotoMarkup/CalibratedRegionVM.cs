@@ -57,15 +57,15 @@ namespace CoreSampleAnnotation.PhotoMarkup
             }
         }
 
-        private bool isFocused = false;
-        public bool IsFocused {
+        private bool areMarkersVisible = false;
+        public bool AreMarkersVisible {
             get {
-                return isFocused;
+                return areMarkersVisible;
             }
             set {
-                if (isFocused != value) {
-                    isFocused = value;
-                    RaisePropertyChanged(nameof(IsFocused));
+                if (areMarkersVisible != value) {
+                    areMarkersVisible = value;
+                    RaisePropertyChanged(nameof(AreMarkersVisible));
                 }
             }
         }
@@ -145,7 +145,18 @@ namespace CoreSampleAnnotation.PhotoMarkup
             }
         }
 
-        public void RecalcMoveRelatedProps() {
+        private ICommand focusToNext;
+        public ICommand FocusToNextCommand {
+            get { return focusToNext; }
+            set {
+                if (focusToNext != value) {
+                    focusToNext = value;
+                    RaisePropertyChanged(nameof(FocusToNextCommand));
+                }
+            }
+        }
+
+        public void RaiseCanMoveChanged() {
             DelegateCommand dc = MoveDown as DelegateCommand;
             if(dc != null)
                 dc.RaiseCanExecuteChanged();
