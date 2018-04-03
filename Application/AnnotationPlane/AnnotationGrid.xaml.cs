@@ -45,23 +45,6 @@ namespace CoreSampleAnnotation.AnnotationPlane
             LowerGrid.PreviewMouseUp += LowerGrid_PreviewMouseUp;
             LowerGrid.PreviewTouchMove += LowerGrid_PreviewTouchMove;
             LowerGrid.PreviewTouchUp += LowerGrid_PreviewTouchUp;
-            LowerGrid.MouseWheel += LowerGrid_MouseWheel;
-        }
-
-        private void LowerGrid_MouseWheel(object sender, MouseWheelEventArgs e)
-        {
-            if (Keyboard.IsKeyDown(Key.LeftCtrl) || Keyboard.IsKeyDown(Key.RightCtrl))
-            {                
-                double change = 1.1;
-                if (e.Delta > 0)
-                    InternalScaleFactor *= change;
-                else
-                    InternalScaleFactor /= change;
-
-                System.Diagnostics.Trace.WriteLine(string.Format("InternalScale is {0}", InternalScaleFactor));
-
-                e.Handled = true;
-            }
         }
 
         private void LowerGrid_PreviewTouchUp(object sender, TouchEventArgs e)

@@ -238,6 +238,33 @@ namespace CoreSampleAnnotation.AnnotationPlane
             }
         }
 
+        private ICommand zoomInCommand;
+        public ICommand ZoomInCommand {
+            get {
+                return zoomInCommand;
+            }
+            set {
+                if (zoomInCommand != value) {
+                    zoomInCommand = value;
+                    RaisePropertyChanged(nameof(ZoomInCommand));
+                }
+            }
+        }
+
+        private ICommand zoomOutCommand;
+        public ICommand ZoomOutCommand
+        {
+            get {
+                return zoomOutCommand;
+            }
+            set {
+                if (zoomOutCommand != value) {
+                    zoomOutCommand = value;
+                    RaisePropertyChanged(nameof(ZoomOutCommand));
+                }
+            }
+        }
+
         private ICommand activateSettingsCommand;
         public ICommand ActivateSettingsCommand
         {
@@ -263,11 +290,31 @@ namespace CoreSampleAnnotation.AnnotationPlane
             }
             set
             {
+                RecalcAllBoundaries(ColScaleController.UpperDepth, ColScaleController.UpperDepth, ColScaleController.ScaleFactor,value);
                 if (value != ColScaleController.ScaleFactor)
                 {
                     ColScaleController.ScaleFactor = value;
                     layerSyncController.ScaleFactor = value;
                 }
+            }
+        }
+
+        /// <param name="oldUpDepth">in meters</param>
+        /// <param name="newUpDepth">in meters</param>        
+        /// <param name="oldScaleFactor">How much is 1 real meter in WPF coordinates</param>
+        /// <param name="newScaleFactor">How much is 1 real meter in WPF coordinates></param>
+        private void RecalcAllBoundaries(double oldUpDepth, double newUpDepth, double oldScaleFactor, double newScaleFactor) {
+            if (allLayersBoundaryEditorVM != null)
+            {
+                var boundaries = allLayersBoundaryEditorVM.Boundaries;
+                double[] depths = boundaries.Select(b => b.Level / oldScaleFactor + oldUpDepth).ToArray();
+                double[] newLevels = depths.Select(d => (d - newUpDepth) * newScaleFactor).ToArray();
+                LayerBoundary[] newBoundaries = new LayerBoundary[boundaries.Length];
+                for (int i = 0; i < boundaries.Length; i++)
+                {
+                    newBoundaries[i] = new LayerBoundary(newLevels[i], boundaries[i].Rank);
+                }
+                allLayersBoundaryEditorVM.Boundaries = newBoundaries;
             }
         }
 
@@ -588,6 +635,15 @@ namespace CoreSampleAnnotation.AnnotationPlane
 
             LayerSyncController.PropertyChanged += LayerSyncController_PropertyChanged;
             ColScaleController.PropertyChanged += ColScaleController_PropertyChanged;
+
+            zoomInCommand = new DelegateCommand(() => {
+                ScaleFactor *= 1.1;
+            });
+
+            zoomOutCommand = new DelegateCommand(() =>
+            {
+                ScaleFactor /= 1.1;
+            });
             
             classificationVM = new ClassificationVM(new IDEncodedTreeBuilder('@'));
             classificationVM.CloseCommand = new DelegateCommand(() => classificationVM.IsVisible = false);

@@ -79,6 +79,19 @@ namespace CoreSampleAnnotation
         }
     }
 
+    public class DebugDoubleConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            System.Diagnostics.Trace.WriteLine(string.Format("{0}: {1}",parameter.ToString(),value.ToString()));
+            return value;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
 
     /// <summary>
     /// Uses default culture (not invariant culture!)

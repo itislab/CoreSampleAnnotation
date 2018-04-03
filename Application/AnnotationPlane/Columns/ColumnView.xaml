@@ -12,6 +12,7 @@
     <UserControl.Resources>
         <local:SampleOffsetConverter x:Key="sampleOffsetConverter"/>
         <local:NumberSelectorConverter x:Key="NumberSelectorConverter"/>
+        <app:DebugDoubleConverter x:Key="DebugDoubleConverter" />
         <DataTemplate DataType="{x:Type local:DepthAxisColumnVM}">
             <local:DepthAxisView />
         </DataTemplate>
@@ -110,7 +111,7 @@
                         <Style TargetType="ContentPresenter">
                             <Setter Property="Canvas.Top">
                                 <Setter.Value>
-                                    <Binding Path="Level" />
+                                    <Binding Path="Level" Converter="{StaticResource DebugDoubleConverter}" ConverterParameter="Line top" />
                                 </Setter.Value>
                             </Setter>
                         </Style>

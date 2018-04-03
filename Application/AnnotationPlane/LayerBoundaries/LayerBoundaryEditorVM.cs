@@ -191,7 +191,7 @@ namespace CoreSampleAnnotation.AnnotationPlane.LayerBoundaries
     }
 
 
-    public class BoundaryEditorColumnVM: ColumnVM {
+    public class BoundaryEditorColumnVM: BoundaryColumnVM {
 
         /// <summary>
         /// Number of which rank will be shown on labels
@@ -199,15 +199,9 @@ namespace CoreSampleAnnotation.AnnotationPlane.LayerBoundaries
         public int RankNumberToShow { get; private set; }
 
         /// <param name="rankNumberToShow">Number of which rank will be shown on labels</param>
-        public BoundaryEditorColumnVM(ColumnVM targetColumn, ILayerBoundariesVM boundariesVM, int rankNumberToShow) :base(targetColumn.Heading) {
-            ColumnVM = targetColumn;
-            BoundariesVM = boundariesVM;
+        public BoundaryEditorColumnVM(ColumnVM targetColumn, ILayerBoundariesVM boundariesVM, int rankNumberToShow) :base(targetColumn,boundariesVM) {
             RankNumberToShow = rankNumberToShow;
-        }
-               
-
-        public ILayerBoundariesVM BoundariesVM { get; private set; }
-        public ColumnVM ColumnVM { get; private set; }
+        }                      
     }
 }
 
