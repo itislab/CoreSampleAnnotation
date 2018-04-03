@@ -88,9 +88,41 @@ namespace CoreSampleAnnotation.PhotoMarkup
             }
         }
 
+        private double upperDepth;
+        /// <summary>
+        /// In meters. Positive value.
+        /// </summary>
+        public double UpperDepth {
+            get {
+                return upperDepth;
+            }
+            set {
+                if (upperDepth != value) {
+                    upperDepth = value;
+                    RaisePropertyChanged(nameof(UpperDepth));
+                }
+            }
+        }
+
+        private double lowerDepth;
+        /// <summary>
+        /// In meters. Positive value.
+        /// </summary>
+        public double LowerDepth {
+            get {
+                return lowerDepth;
+            }
+            set {
+                if (lowerDepth != value) {
+                    lowerDepth = value;
+                    RaisePropertyChanged(nameof(LowerDepth));
+                }
+            }
+        }
+
         private double length;
         /// <summary>
-        /// The real (measured with ruller) length (in cm) of current core sample part
+        /// The real (measured with ruller) length (in m) of current core sample part
         /// </summary>
         public double Length {
             get {

@@ -277,7 +277,6 @@
     <Compile Include="PhotoMarkup\AnnotatedPolygon.xaml.cs">
       <DependentUpon>AnnotatedPolygon.xaml</DependentUpon>
     </Compile>
-    <Compile Include="PhotoMarkup\CalibratedRegion.cs" />
     <Compile Include="PhotoMarkup\CalibratedRegionInfoView.xaml.cs">
       <DependentUpon>CalibratedRegionInfoView.xaml</DependentUpon>
     </Compile>

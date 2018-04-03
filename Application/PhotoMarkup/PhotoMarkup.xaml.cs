@@ -99,7 +99,7 @@ namespace CoreSampleAnnotation.PhotoMarkup
                 PhotoMarkup pm = obj as PhotoMarkup;
 
                 //reseting the control
-                pm.UnfocusAllRegions();                
+                pm.HideAllPolygonMarkers();                
                 pm.regionDraft.Clear();
                 pm.polygonDict.Clear();
                 pm.CurrentState = MarkupState.SettingUp;
@@ -193,7 +193,7 @@ namespace CoreSampleAnnotation.PhotoMarkup
             holdTimer.Elapsed += HoldTimer_Elapsed;
             holdTimer.Start();
             System.Diagnostics.Debug.WriteLine("touch-hold timer activated");
-            UnfocusAllRegions();
+            HideAllPolygonMarkers();
         }
 
         private void Image_MouseWheel(object sender, MouseWheelEventArgs e)
@@ -323,7 +323,7 @@ namespace CoreSampleAnnotation.PhotoMarkup
             else
             {
                 FocusedRegion = null;
-                UnfocusAllRegions();
+                HideAllPolygonMarkers();
             }
         }        
 
@@ -352,7 +352,7 @@ namespace CoreSampleAnnotation.PhotoMarkup
                 {
                     PhotoMarkup pm = depobj as PhotoMarkup;
                     pm.CleanDraftMarkers();
-                    pm.UnfocusAllRegions();
+                    pm.HideAllPolygonMarkers();
                     vm.AreMarkersVisible = true;                    
                     vm.RaiseCanMoveChanged();
                 }                
@@ -361,7 +361,7 @@ namespace CoreSampleAnnotation.PhotoMarkup
 
 
 
-        private void UnfocusAllRegions()
+        private void HideAllPolygonMarkers()
         {
             foreach (var pair in polygonDict)
             {

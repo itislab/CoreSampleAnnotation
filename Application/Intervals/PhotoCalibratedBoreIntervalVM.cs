@@ -44,7 +44,7 @@ namespace CoreSampleAnnotation.Intervals
         /// </summary>
         public double AnnotatedLength
         {
-            get { return imageRegions.Sum(arr => arr.Select(r => r.Length).Where(l => !double.IsNaN(l)).Sum()) * 0.01; }
+            get { return imageRegions.Sum(arr => arr.Select(r => r.Length).Where(l => !double.IsNaN(l)).Sum()); }
         }
 
         /// <summary>
@@ -154,7 +154,7 @@ namespace CoreSampleAnnotation.Intervals
                         }
                     }
 
-                    RaiseCanOrderMoveChanged();
+                    RecalculateRegionProperties();
                     RaisePropertyChanged(nameof(CalibratedRegions));
                     RaisePropertyChanged(nameof(ImagesButtonText));
                     RaisePropertyChanged(nameof(AnnotatedLength));
@@ -209,8 +209,23 @@ namespace CoreSampleAnnotation.Intervals
 
         private Dictionary<int, List<Action>> canMoveRegionChangedActivations = new Dictionary<int, List<Action>>();
 
-        private void RaiseCanOrderMoveChanged()
+        private void RecalculateRegionProperties()
         {
+            //recalculating depths
+            double depth = UpperDepth;
+            var regions = imageRegions.SelectMany(ir => ir).OrderBy(r => r.Order).ToArray();
+            for (int i = 0; i < regions.Length; i++)
+            {
+                var region = regions[i];
+                region.UpperDepth = depth;
+                double len = region.Length;
+                if (double.IsNaN(len))
+                    len = 0.0;
+                depth += len;
+                region.LowerDepth = depth;
+            }
+            
+            //firing that as the order could change, the can move up/down must be recalulated
             foreach (var pair in canMoveRegionChangedActivations)
                 foreach (Action act in pair.Value)
                     act();
@@ -236,7 +251,7 @@ namespace CoreSampleAnnotation.Intervals
             target.Order = toSwapWithIdx;
             toSwapWith.Order = regionToMove;
             System.Diagnostics.Debug.WriteLine("swapped {0} and {1}", toSwapWithIdx, regionToMove);
-            RaiseCanOrderMoveChanged();
+            RecalculateRegionProperties();
             target.RaiseCanMoveChanged();
             toSwapWith.RaiseCanMoveChanged();
 
@@ -320,7 +335,7 @@ namespace CoreSampleAnnotation.Intervals
                         bitmap.Freeze();
                     }
 
-                    gatheredRegions.Add(new PhotoRegion(bitmap, new Size(width, height), regVM.Order, regVM.Length * 0.01)); //for now upper and lower are just placeholders holding order and length
+                    gatheredRegions.Add(new PhotoRegion(bitmap, new Size(width, height), regVM.Order, regVM.Length )); //for now upper and lower are just placeholders holding order and length
                 }
             }
 
@@ -350,7 +365,7 @@ namespace CoreSampleAnnotation.Intervals
                         RaisePropertyChanged(nameof(AnnotatedPercentage));
                         break;
                     case nameof(vm.Order):
-                        RaiseCanOrderMoveChanged();                        
+                        RecalculateRegionProperties();                        
                         break;
                 }
             }
@@ -597,6 +612,7 @@ namespace CoreSampleAnnotation.Intervals
                 }
 
             });
+            RecalculateRegionProperties();
         }
 
         public PhotoCalibratedBoreIntervalVM(IImageStorage imageStorage) : base()
@@ -609,8 +625,11 @@ namespace CoreSampleAnnotation.Intervals
         {
             switch (e.PropertyName)
             {
-                case nameof(base.LowerDepth):
                 case nameof(base.UpperDepth):
+                    RecalculateRegionProperties();
+                    RaisePropertyChanged(nameof(AnnotatedPercentage));
+                    break;
+                case nameof(base.LowerDepth):
                     RaisePropertyChanged(nameof(AnnotatedPercentage));
                     break;
                 case nameof(ExtractedLength):
