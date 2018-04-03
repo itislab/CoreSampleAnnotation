@@ -111,7 +111,7 @@
                         <Style TargetType="ContentPresenter">
                             <Setter Property="Canvas.Top">
                                 <Setter.Value>
-                                    <Binding Path="Level" Converter="{StaticResource DebugDoubleConverter}" ConverterParameter="Line top" />
+                                    <Binding Path="Level" />
                                 </Setter.Value>
                             </Setter>
                         </Style>

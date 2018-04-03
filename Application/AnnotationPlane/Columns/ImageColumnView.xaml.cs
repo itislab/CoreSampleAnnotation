@@ -28,6 +28,7 @@ namespace CoreSampleAnnotation.AnnotationPlane
             double col_lo_d = (double)values[3];
             double col_wpf_height = (double)values[4];
             double top = (i_up_d - col_up_d) / (col_lo_d - col_up_d) * col_wpf_height;
+            //System.Diagnostics.Trace.WriteLine(string.Format("image top is {0}", top));
             return top;
         }
 
@@ -50,6 +51,7 @@ namespace CoreSampleAnnotation.AnnotationPlane
             double col_wpf_height = (double)values[4];
 
             double height = (i_lo_d - i_up_d) / (col_lo_d - col_up_d) * col_wpf_height;
+            //System.Diagnostics.Trace.WriteLine(string.Format("image height is {0}", height));
             return height;
         }
 
@@ -57,22 +59,7 @@ namespace CoreSampleAnnotation.AnnotationPlane
         {
             throw new NotImplementedException();
         }
-    }
-
-    public class IdentityConverter : IValueConverter
-    {
-        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
-        {
-            System.Diagnostics.Debug.WriteLine("source to target: {0}",(value!=null)?value.ToString():"null");
-            return value;
-        }
-
-        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
-        {
-            System.Diagnostics.Debug.WriteLine("target to source: {0}", (value != null) ? value.ToString() : "null");
-            return value;
-        }
-    }
+    }    
 
     /// <summary>
     /// Interaction logic for ImageColumnView.xaml
@@ -83,14 +70,7 @@ namespace CoreSampleAnnotation.AnnotationPlane
 
         public ImageColumnView()
         {
-            InitializeComponent();
-
-            this.MouseRightButtonDown += ImageColumnView_MouseRightButtonDown;
-        }
-
-        private void ImageColumnView_MouseRightButtonDown(object sender, MouseButtonEventArgs e)
-        {
-            
-        }
+            InitializeComponent();            
+        }        
     }
 }
