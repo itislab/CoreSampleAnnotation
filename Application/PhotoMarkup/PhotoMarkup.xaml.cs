@@ -69,10 +69,7 @@ namespace CoreSampleAnnotation.PhotoMarkup
             
             //temp: for emulating long touch
             this.CommonCanvas.MouseRightButtonUp += CommonCanvas_MouseRightButtonUp;
-            this.Image.MouseWheel += Image_MouseWheel;
-
-            RegionInfoView.Visibility = Visibility.Collapsed;
-
+            this.Image.MouseWheel += Image_MouseWheel;            
         }
 
         private void CommonCanvas_MouseLeave(object sender, MouseEventArgs e)
@@ -102,7 +99,7 @@ namespace CoreSampleAnnotation.PhotoMarkup
                 PhotoMarkup pm = obj as PhotoMarkup;
 
                 //reseting the control
-                pm.UnfocusAllRegions();                
+                pm.HideAllPolygonMarkers();                
                 pm.regionDraft.Clear();
                 pm.polygonDict.Clear();
                 pm.CurrentState = MarkupState.SettingUp;
@@ -138,9 +135,7 @@ namespace CoreSampleAnnotation.PhotoMarkup
                     }
                 }
             }));
-
-
-        
+             
         private void Image_TouchMove(object sender, TouchEventArgs e)
         {
             var curTouchPoint = e.GetTouchPoint(CommonCanvas);
@@ -198,7 +193,7 @@ namespace CoreSampleAnnotation.PhotoMarkup
             holdTimer.Elapsed += HoldTimer_Elapsed;
             holdTimer.Start();
             System.Diagnostics.Debug.WriteLine("touch-hold timer activated");
-            UnfocusAllRegions();
+            HideAllPolygonMarkers();
         }
 
         private void Image_MouseWheel(object sender, MouseWheelEventArgs e)
@@ -260,28 +255,21 @@ namespace CoreSampleAnnotation.PhotoMarkup
 
             var visConverter = new CollapsedConverter();
 
-            var b4 = new Binding(nameof(vm.IsFocused));
+            var b4 = new Binding(nameof(vm.AreMarkersVisible));
             b4.Source = vm;
             b4.Converter = visConverter;
             up.SetBinding(UIElement.VisibilityProperty, b4);
 
-            var b5 = new Binding(nameof(vm.IsFocused));
+            var b5 = new Binding(nameof(vm.AreMarkersVisible));
             b5.Source = vm;
             b5.Converter = visConverter;
             bottom.SetBinding(UIElement.VisibilityProperty, b5);
 
-            var b6 = new Binding(nameof(vm.IsFocused));
+            var b6 = new Binding(nameof(vm.AreMarkersVisible));
             b6.Source = vm;
             b6.Converter = visConverter;
             side.SetBinding(UIElement.VisibilityProperty, b6);
-        }
-
-        private void AttachRegionViewToRegion(CalibratedRegionVM vm)
-        {
-            RegionInfoView.Visibility = Visibility.Visible;
-            RegionInfoView.DataContext = vm;
-            vm.RecalcMoveRelatedProps();
-        }
+        }        
 
         private void CommonCanvas_MouseRightButtonUp(object sender, MouseButtonEventArgs e)
         {
@@ -328,31 +316,57 @@ namespace CoreSampleAnnotation.PhotoMarkup
 
                 newCalRegions.Add(vm);                
                 CalibratedRegions = newCalRegions;                
-                
-                AttachRegionViewToRegion(vm);
-                vm.IsFocused = true;
+                                
+                vm.AreMarkersVisible = true;
+                FocusedRegion = vm;
             }
             else
             {
-                UnfocusAllRegions();
+                FocusedRegion = null;
+                HideAllPolygonMarkers();
             }
         }        
 
         private void Poly_PreviewTouchUp(object sender, TouchEventArgs e)
         {
-            var vm = polygonDict[(AnnotatedPolygon)sender];
-            ActivatePolyFocus(vm);
+            FocusedRegion = polygonDict[(AnnotatedPolygon)sender];            
             e.Handled = true;
         }
 
-        private void UnfocusAllRegions()
+
+
+
+        public CalibratedRegionVM FocusedRegion
+        {
+            get { return (CalibratedRegionVM)GetValue(FocusedRegionProperty); }
+            set { SetValue(FocusedRegionProperty, value); }
+        }
+
+        // Using a DependencyProperty as the backing store for FocusedRegion.  This enables animation, styling, binding, etc...
+        public static readonly DependencyProperty FocusedRegionProperty =
+            DependencyProperty.Register("FocusedRegion", typeof(CalibratedRegionVM), typeof(PhotoMarkup), new PropertyMetadata(new PropertyChangedCallback((depobj,dpcea) => {
+                DependencyPropertyChangedEventArgs dpcea1 = (DependencyPropertyChangedEventArgs)dpcea;
+                CalibratedRegionVM vm = dpcea1.NewValue as CalibratedRegionVM;
+                CalibratedRegionVM oldVM = dpcea1.OldValue as CalibratedRegionVM;
+                if (vm != null)
+                {
+                    PhotoMarkup pm = depobj as PhotoMarkup;
+                    pm.CleanDraftMarkers();
+                    pm.HideAllPolygonMarkers();
+                    vm.AreMarkersVisible = true;                    
+                    vm.RaiseCanMoveChanged();
+                }                
+            })));
+
+
+
+
+        private void HideAllPolygonMarkers()
         {
             foreach (var pair in polygonDict)
             {
-                pair.Value.IsFocused = false;
-            }
-
-            RegionInfoView.Visibility = Visibility.Collapsed;
+                pair.Value.AreMarkersVisible = false;
+            }            
         }
 
         private void CleanDraftMarkers()
@@ -366,18 +380,13 @@ namespace CoreSampleAnnotation.PhotoMarkup
         }
 
         private void ActivatePolyFocus(CalibratedRegionVM vm) {
-            CleanDraftMarkers();
-            UnfocusAllRegions();
-            
-            vm.IsFocused = true;
-
-            AttachRegionViewToRegion(vm);
+           
         }
 
         private void Poly_MouseRightButtonUp(object sender, MouseButtonEventArgs e)
         {
-            var vm = polygonDict[(AnnotatedPolygon)sender];
-            ActivatePolyFocus(vm);
+            FocusedRegion = polygonDict[(AnnotatedPolygon)sender];
+            
             e.Handled = true;
         }
 

@@ -4,10 +4,12 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:CoreSampleAnnotation.PhotoMarkup"
+             xmlns:app="clr-namespace:CoreSampleAnnotation"
              mc:Ignorable="d" 
              d:DesignHeight="400" d:DesignWidth="600" Background="CornflowerBlue">
     <UserControl.Resources>
         <local:SwitchibleTransformBinding x:Key="switchibleTransformBinding" />
+        <app:NullToCollapsedConverter x:Key="nullToCollapsed" />
     </UserControl.Resources>
     <local:CoordTransformedCanvas HorizontalAlignment="Stretch" VerticalAlignment="Stretch" x:Name="CommonCanvas" ClipToBounds="True" Background="Transparent">
         <local:CoordTransformedCanvas.CoordsTransform>
@@ -17,6 +19,6 @@
             </MultiBinding>
         </local:CoordTransformedCanvas.CoordsTransform>
         <Image Source="{Binding ImageSource, FallbackValue='pack://application:,,,/CoreSampleAnnotation;component/Media/checkerboard.jpg'}" RenderTransform="{Binding ImageTransform, Mode=TwoWay}" IsManipulationEnabled="True" HorizontalAlignment="Left" VerticalAlignment="Top" Name="Image"/>
-        <local:CalibratedRegionInfoView Panel.ZIndex="20" x:Name="RegionInfoView"></local:CalibratedRegionInfoView>
+        <local:CalibratedRegionInfoView Panel.ZIndex="20" Visibility="{Binding Converter={StaticResource nullToCollapsed}, Path=FocusedRegion, RelativeSource={RelativeSource AncestorType={x:Type local:PhotoMarkup}}}" DataContext="{Binding Path=FocusedRegion}"></local:CalibratedRegionInfoView>
     </local:CoordTransformedCanvas>
 </UserControl>

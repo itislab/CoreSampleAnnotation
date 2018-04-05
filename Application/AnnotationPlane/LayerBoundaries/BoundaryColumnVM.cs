@@ -21,12 +21,15 @@ namespace CoreSampleAnnotation.AnnotationPlane.LayerBoundaries
             {
                 case nameof(ColumnHeight):
                     ColumnVM.ColumnHeight = ColumnHeight;
+                    RaisePropertyChanged(nameof(BoundariesVM)); //to trigger recalulation of boundaries visual representation
                     break;
                 case nameof(UpperBound):
                     ColumnVM.UpperBound = UpperBound;
+                    RaisePropertyChanged(nameof(BoundariesVM)); //to trigger recalulation of boundaries visual representation
                     break;
                 case nameof(LowerBound):
                     ColumnVM.LowerBound = LowerBound;
+                    RaisePropertyChanged(nameof(BoundariesVM)); //to trigger recalulation of boundaries visual representation
                     break;
             }
         }

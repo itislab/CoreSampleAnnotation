@@ -12,11 +12,11 @@ namespace CoreSampleAnnotation.Reports.SVG
 {
     public class ImageColumnPainter : ColumnPainter
     {
-        protected new ImageColumnVM vm;
+        protected new ImageColumnVM vm;        
 
         public ImageColumnPainter(UIElement headerView, ColumnView view, ImageColumnVM vm) : base(headerView, view, vm)
         {
-            this.vm = vm as ImageColumnVM;            
+            this.vm = vm as ImageColumnVM;
         }
 
         public override RenderedSvg RenderColumn()
@@ -48,13 +48,19 @@ namespace CoreSampleAnnotation.Reports.SVG
                 Size imSize = region.ImageSize;
 
                 //how many WPF units in one image unit
-                double wpfScaleFactor = region.WpfWidth / imSize.Width;
-                image.Height = Helpers.dtos(imSize.Height * wpfScaleFactor);
+                //double wpfScaleFactor = region.WpfWidth / imSize.Width;                
+
+                double h = (region.ImageLowerDepth - region.ImageUpperDepth) * vm.CurrentScaleFactor;
+
+                image.Height = Helpers.dtos(h);
+                //System.Diagnostics.Trace.WriteLine(string.Format("svg image height is {0}({1})", image.Height, h));
 
                 //home many real meters in one image unit
                 double depthScaleFactor = (region.ImageLowerDepth - region.ImageUpperDepth) / imSize.Height;
 
-                image.Y = Helpers.dtos((region.ImageUpperDepth - vm.UpperBound) / depthScaleFactor * wpfScaleFactor);
+                image.Y = Helpers.dtos((region.ImageUpperDepth - vm.UpperBound) * vm.CurrentScaleFactor);
+                //Helpers.dtos((region.ImageUpperDepth - vm.UpperBound) / depthScaleFactor * wpfScaleFactor);
+                //System.Diagnostics.Trace.WriteLine(string.Format("svg image top is {0}({1})", image.Y, (region.ImageUpperDepth - vm.UpperBound) * vm.CurrentScaleFactor));
                 group.Children.Add(image);
             }
             result.SVG = group;

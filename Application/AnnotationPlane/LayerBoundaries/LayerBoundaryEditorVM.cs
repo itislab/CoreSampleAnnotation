@@ -9,9 +9,6 @@ using System.Windows.Input;
 namespace CoreSampleAnnotation.AnnotationPlane.LayerBoundaries
 {
     [Serializable]
-    /// <summary>
-    /// correspond to enternal boundary (not the two side boundaris of the column)
-    /// </summary>    
     public class LayerBoundary: ISerializable {
     
         /// <summary>
@@ -27,9 +24,10 @@ namespace CoreSampleAnnotation.AnnotationPlane.LayerBoundaries
         public int Rank { get; private set; }
 
         /// <summary>
-        /// Order nuber
+        /// Order nuber. Array size if Rank+1.
+        /// Number[0] is rank 0 number, Number[1] is rank 1 number, etc
         /// </summary>
-        public int Number { get; set; }
+        public int[] Numbers { get; set; }        
 
         private Guid id;
 
@@ -65,39 +63,22 @@ namespace CoreSampleAnnotation.AnnotationPlane.LayerBoundaries
     {
         private LayerBoundary[] boundaries;
 
-        /// <summary>
-        /// Puts the ascending numeration of Number field in the objects with the same Rank field value
-        /// </summary>
-        /// <param name="boundaries"></param>
-        /// <returns></returns>
-        private static LayerBoundary[] RecalcBoundaryNumbers(LayerBoundary[] boundaries) {
-            if (boundaries.Length == 0)
-                return boundaries;
-            int minRank = boundaries.Select(b => b.Rank).Min();
-            int maxRank = boundaries.Select(b => b.Rank).Max();
-            int[] numbers = Enumerable.Repeat(2,maxRank-minRank+1).ToArray();
+        private AnnotationDirection annotationDirection;
 
-            int N = boundaries.Length;
-
-            LayerBoundary[] result = new LayerBoundary[N];
-
-            
-            for (int i = 0; i < N; i++)
-            {
-                LayerBoundary lb = boundaries[i];
-                int idx = lb.Rank - minRank;
-                int num = numbers[idx]++;
-                lb.Number = num;
-                for (int j = 0; j < idx; j++)                
-                    numbers[j] = 2;                
-                result[i] = lb;
+        public AnnotationDirection AnnotationDirection {
+            get { return annotationDirection; }
+            set {
+                if (annotationDirection != value) {
+                    annotationDirection = value;
+                    RaisePropertyChanged(nameof(AnnotationDirection));
+                    Boundaries = Boundaries.ToArray(); //applies another order
+                }
             }
-
-            return result;
         }
 
+
         /// <summary>
-        /// Inner (inter layer) boundaries
+        /// boundaries
         /// </summary>
         public LayerBoundary[] Boundaries {
             get {
@@ -111,7 +92,9 @@ namespace CoreSampleAnnotation.AnnotationPlane.LayerBoundaries
                             vm.DragStarted = null;
                         }
                     }
-                    boundaries = RecalcBoundaryNumbers(value.OrderBy(b => b.Level).ToArray());
+                    var orderedBoundaries = value.OrderBy(b => b.Level).ToArray();
+                    Utils.RecalcBoundaryNumbers(orderedBoundaries, AnnotationDirection);
+                    boundaries = orderedBoundaries;
                     if (value != null) {
                         foreach (LayerBoundary vm in value) {
                             vm.DragStarted = dragStart;
@@ -143,9 +126,14 @@ namespace CoreSampleAnnotation.AnnotationPlane.LayerBoundaries
                 }
             }
         }
-
-        public LayerBoundaryEditorVM() {
-            boundaries = new LayerBoundary[0];            
+        
+        /// <param name="wpfHeight">The column height in WPF units</param>
+        public LayerBoundaryEditorVM(double wpfHeight, int maxRank, AnnotationDirection annotationDirection) {
+            Boundaries = new LayerBoundary[] {
+                new LayerBoundary(0.0,maxRank),
+                new LayerBoundary(wpfHeight,maxRank)
+            };
+            AnnotationDirection = annotationDirection;
         }
 
         public void ChangeRank(Guid boundaryID, int rank) {
@@ -159,7 +147,7 @@ namespace CoreSampleAnnotation.AnnotationPlane.LayerBoundaries
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="idx">internal (inter layer) boundary index</param>
+        /// <param name="idx">boundary index</param>
         public void RemoveBoundary(int idx) {
             Boundaries = Boundaries.Take(idx).Concat(Boundaries.Skip(idx + 1)).ToArray();
         }
@@ -167,7 +155,7 @@ namespace CoreSampleAnnotation.AnnotationPlane.LayerBoundaries
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="idx">internal (inter layer) boundary index</param>
+        /// <param name="idx">boundary index</param>
         /// <param name="level"></param>
         public void MoveBoundary(int idx, double level) {
             var copy = Boundaries.ToArray();
@@ -190,28 +178,30 @@ namespace CoreSampleAnnotation.AnnotationPlane.LayerBoundaries
         #region Serialization
         protected LayerBoundaryEditorVM(SerializationInfo info, StreamingContext context) {
             Boundaries = (LayerBoundary[])info.GetValue("Boundaries",typeof(LayerBoundary[]));
-
+            AnnotationDirection = (AnnotationDirection)info.GetValue("AnnotationDirection", typeof(AnnotationDirection));
         }
 
         public virtual void GetObjectData(SerializationInfo info, StreamingContext context)
         {
             info.AddValue("Boundaries",boundaries);
+            info.AddValue("AnnotationDirection", AnnotationDirection);
         }
 
         #endregion
     }
 
 
-    public class BoundaryEditorColumnVM: ColumnVM {
+    public class BoundaryEditorColumnVM: BoundaryColumnVM {
 
-        public BoundaryEditorColumnVM(ColumnVM targetColumn, ILayerBoundariesVM boundariesVM) :base(targetColumn.Heading) {
-            ColumnVM = targetColumn;
-            BoundariesVM = boundariesVM;            
-        }
-               
+        /// <summary>
+        /// Number of which rank will be shown on labels
+        /// </summary>
+        public int RankNumberToShow { get; private set; }
 
-        public ILayerBoundariesVM BoundariesVM { get; private set; }
-        public ColumnVM ColumnVM { get; private set; }
+        /// <param name="rankNumberToShow">Number of which rank will be shown on labels</param>
+        public BoundaryEditorColumnVM(ColumnVM targetColumn, ILayerBoundariesVM boundariesVM, int rankNumberToShow) :base(targetColumn,boundariesVM) {
+            RankNumberToShow = rankNumberToShow;
+        }                      
     }
 }
 

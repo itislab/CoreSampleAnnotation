@@ -169,6 +169,7 @@
     </Compile>
     <Compile Include="AnnotationPlane\LayerBoundaries\LayerBoundaryEditorVM.cs" />
     <Compile Include="AnnotationPlane\LayerBoundaries\RankMatchingBoundaryCollection.cs" />
+    <Compile Include="AnnotationPlane\LayerBoundaries\Utils.cs" />
     <Compile Include="AnnotationPlane\LayersAnnotation.cs" />
     <Compile Include="AnnotationPlane\AnnotationGrid.xaml.cs">
       <DependentUpon>AnnotationGrid.xaml</DependentUpon>
@@ -280,7 +281,6 @@
     <Compile Include="PhotoMarkup\AnnotatedPolygon.xaml.cs">
       <DependentUpon>AnnotatedPolygon.xaml</DependentUpon>
     </Compile>
-    <Compile Include="PhotoMarkup\CalibratedRegion.cs" />
     <Compile Include="PhotoMarkup\CalibratedRegionInfoView.xaml.cs">
       <DependentUpon>CalibratedRegionInfoView.xaml</DependentUpon>
     </Compile>
@@ -320,6 +320,8 @@
     <Compile Include="Reports\SVG\Helpers.cs" />
     <Compile Include="Reports\SVG\ImageColumnPainter.cs" />
     <Compile Include="Reports\SVG\LayerPainter.cs" />
+    <Compile Include="Reports\SVG\LegendAdapters.cs" />
+    <Compile Include="Reports\SVG\LegendFactory.cs" />
     <Compile Include="Reports\SVG\Report.cs" />
     <Compile Include="Reports\SVG\SamplesColumnPainter.cs" />
     <Compile Include="Reports\SVG\VisualColumnPainter.cs" />

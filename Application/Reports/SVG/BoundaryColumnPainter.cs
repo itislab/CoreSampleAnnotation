@@ -33,16 +33,9 @@ namespace CoreSampleAnnotation.Reports.SVG
 
             int minRank = int.MaxValue;
 
-            LayerBoundary[] boundaries = vm.Boundaries.OrderBy(b => b.Level).ToArray();
+            LayerBoundary[] boundaries = vm.Boundaries.OrderBy(b => b.Level).ToArray();            
 
-            //First layer is always at the start ofthe column
-            SvgText text = new SvgText("1");
-            text.Transforms.Add(new Svg.Transforms.SvgTranslate(labelXoffset, labelYoffset));
-            text.FontSize = Helpers.dtos(10.0);
-            text.Fill = blackPaint;
-            linesGroup.Children.Add(text);
-
-            int numCounter = 2;
+            var rank = boundaries.Select(b => b.Rank).Min();
 
             for (int i = 0; i < boundaries.Length; i++)
             {                
@@ -55,17 +48,9 @@ namespace CoreSampleAnnotation.Reports.SVG
                 line.Stroke = blackPaint;
                 linesGroup.Children.Add(line);
 
-                minRank = Math.Min(minRank, boundary.Rank);
+                minRank = Math.Min(minRank, boundary.Rank);                
 
-                int numToPrint = 0;
-                if (boundary.Rank > minRank)
-                {
-                    numCounter = 1;
-                }
-
-                numToPrint = numCounter++;
-
-                string textStr = string.Format("{0}",numToPrint);
+                string textStr = string.Format("{0}",boundary.Numbers[rank]);
 
                 //putting layer number as well
                 SvgText text2 = new SvgText(textStr);

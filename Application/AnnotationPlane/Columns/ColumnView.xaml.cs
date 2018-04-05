@@ -27,6 +27,26 @@ namespace CoreSampleAnnotation.AnnotationPlane
         }
     }
 
+    public class NumberSelectorConverter : IMultiValueConverter
+    {
+        public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (values.Length != 2)
+                return null;
+            int[] numbers = values[0] as int[];
+            if (numbers == null)
+                return null;
+            int idx = (int)values[1];
+            return string.Format("{0}",numbers[idx]);
+
+        }
+
+        public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
     public class SampleOffsetConverter : IMultiValueConverter
     {
         public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)

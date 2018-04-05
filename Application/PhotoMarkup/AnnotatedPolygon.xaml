@@ -35,6 +35,8 @@
                 <MultiBinding Converter="{StaticResource labelTextConverter}">
                     <Binding Path="Order" />
                     <Binding Path="Length" />
+                    <Binding Path="UpperDepth" />
+                    <Binding Path="LowerDepth" />
                 </MultiBinding>
             </Label.Content>
             <Label.RenderTransform>

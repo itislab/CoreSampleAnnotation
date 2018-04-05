@@ -20,11 +20,25 @@ namespace CoreSampleAnnotation.Reports.SVG
             if (vm is ClassificationLayerTextPresentingVM)
             {
                 ClassificationLayerTextPresentingVM cltpVM = (ClassificationLayerTextPresentingVM)vm;
-                SvgText text = new SvgText(cltpVM.Text);
-                text.FontSize = Helpers.dtos(fontSize);
-                text.Fill = blackPaint;
-                text.Transforms.Add(new Svg.Transforms.SvgTranslate((float)textXoffset, (float)(availableHeight * 0.5 + textYoffset)));
-                return text;
+                if (cltpVM.Text != null)
+                {
+                    string[] spans = cltpVM.Text.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries).Select(s => s.Trim()).ToArray();
+                    SvgText text = new SvgText();
+                    text.Transforms.Add(new Svg.Transforms.SvgTranslate((float)textXoffset, (float)(availableHeight * 0.5 + textYoffset)));
+                    foreach (var span in spans)
+                    {
+                        SvgTextSpan tspan = new SvgTextSpan();
+                        tspan.Text = span;
+                        tspan.FontSize = Helpers.dtos(fontSize);
+                        tspan.Dy.Add(Helpers.dtos(fontSize*1.2));
+                        tspan.X.Add(0);
+                        tspan.Fill = blackPaint;
+                        text.Children.Add(tspan);
+                    }
+                    return text;
+                }
+                else
+                    return new SvgGroup();
             }
             else if (vm is LengthLayerVM)
             {
@@ -56,9 +70,7 @@ namespace CoreSampleAnnotation.Reports.SVG
                         SvgFragment copy = (SvgFragment)item.DeepCopy();
 
                         float aspectRatio = copy.Bounds.Width / copy.Bounds.Height;
-
-                        float ratio = iconWidth /  copy.Bounds.Width;
-
+                        
                         copy.ViewBox = copy.Bounds;
                         copy.X += offset;
                         copy.Y = (float)(availableHeight - maxHeight) * 0.5f;

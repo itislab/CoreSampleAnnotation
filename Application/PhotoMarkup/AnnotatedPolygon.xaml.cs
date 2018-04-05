@@ -155,9 +155,12 @@ namespace CoreSampleAnnotation.PhotoMarkup
             if (values != null) {
                 int order = (int)(values[0]);
                 double length = (double)(values[1]);
+                double upperDepth = (double)(values[2]);
+                double lowerDepth = (double)(values[3]);
+
                 string lengthStr = "не задана";
                 if (length > 0.0)
-                    lengthStr = string.Format("{0} см", length);
+                    lengthStr = string.Format("{0:#.00} м ({1:#.00} м - {2:#.00} м)", length, upperDepth,lowerDepth);
                 return string.Format("№{0}: длина {1}", order, lengthStr);
             }
             else return null;
@@ -174,6 +177,20 @@ namespace CoreSampleAnnotation.PhotoMarkup
     /// </summary>
     public partial class AnnotatedPolygon : UserControl
     {
+
+
+        public CalibratedRegionVM AssocaitedCalibratedRegion
+        {
+            get { return (CalibratedRegionVM)GetValue(AssocaitedCalibratedRegionProperty); }
+            set { SetValue(AssocaitedCalibratedRegionProperty, value); }
+        }
+
+        // Using a DependencyProperty as the backing store for AssocaitedCalibratedRegion.  This enables animation, styling, binding, etc...
+        public static readonly DependencyProperty AssocaitedCalibratedRegionProperty =
+            DependencyProperty.Register("AssocaitedCalibratedRegion", typeof(CalibratedRegionVM), typeof(AnnotatedPolygon), new PropertyMetadata(null));
+
+
+
         public AnnotatedPolygon()
         {
             InitializeComponent();

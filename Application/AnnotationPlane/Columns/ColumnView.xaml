@@ -11,6 +11,8 @@
              d:DesignHeight="300" d:DesignWidth="300">
     <UserControl.Resources>
         <local:SampleOffsetConverter x:Key="sampleOffsetConverter"/>
+        <local:NumberSelectorConverter x:Key="NumberSelectorConverter"/>
+        <app:DebugDoubleConverter x:Key="DebugDoubleConverter" />
         <DataTemplate DataType="{x:Type local:DepthAxisColumnVM}">
             <local:DepthAxisView />
         </DataTemplate>
@@ -82,7 +84,14 @@
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
                             <Border Width="100" Height="40">
-                                <TextBlock FontSize="16" Foreground="Black" VerticalAlignment="Center" TextAlignment="Center" Text="{Binding Number}"></TextBlock>
+                                <TextBlock FontSize="16" Foreground="Black" VerticalAlignment="Center" TextAlignment="Center">
+                                    <TextBlock.Text>
+                                        <MultiBinding Converter="{StaticResource NumberSelectorConverter}">
+                                            <Binding Path="Numbers" />
+                                            <Binding Path="DataContext.RankNumberToShow" RelativeSource="{RelativeSource AncestorType={x:Type ItemsControl}}" />
+                                        </MultiBinding>
+                                    </TextBlock.Text>
+                                </TextBlock>
                             </Border>
                         </DataTemplate>
                 </ItemsControl.ItemTemplate>

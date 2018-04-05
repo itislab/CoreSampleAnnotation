@@ -62,9 +62,7 @@ namespace CoreSampleAnnotation
 
             menuVM.ActivateAnnotationPlaneCommand = this.ActivateAnnotationPlaneDelegateCommand;
 
-            vm.CurrentProjectVM.PlaneColumnSettingsVM.ActivateAnnotationPlaneCommand = menuVM.ActivateAnnotationPlaneCommand;
-
-            menuVM.ActivateTemplateEditorCommand = new DelegateCommand(obj => { }, obj => false);
+            vm.CurrentProjectVM.PlaneColumnSettingsVM.ActivateAnnotationPlaneCommand = menuVM.ActivateAnnotationPlaneCommand;            
 
             menuVM.ActivateReportGenerationCommand = new DelegateCommand(obj =>
             {
@@ -94,11 +92,12 @@ namespace CoreSampleAnnotation
                         string[] rankNames = vm.CurrentProjectVM.LayerRankNameSource.NominativeNames;
 
                         //transforming boundaryVMs to report specific boundaries
+                        
                         Reports.RTF.LayerBoundary[] boundaries =
                             vm.CurrentProjectVM.PlaneVM.LayerBoundaries
                                 .Select(b =>
                                     new Reports.RTF.LayerBoundary(
-                                        b.Number,
+                                        b.Numbers,
                                         vm.CurrentProjectVM.PlaneVM.LayerSyncController.WpfToDepth(b.Level),
                                         b.Rank
                                         )).ToArray();
@@ -162,7 +161,7 @@ namespace CoreSampleAnnotation
                                 layers,
                                 rankNames,
                                 samples,
-                                true
+                                vm.CurrentProjectVM.AnnotationDirection
                                 );
 
                         Reports.RTF.TableDocument.FormRTFDocument(dlg.FileName,table);
@@ -356,7 +355,7 @@ namespace CoreSampleAnnotation
                     emptyAnnotation.LayerBoundaries = new double[] { upperBoundary, lowerBoundary };
                     emptyAnnotation.Columns = new ColumnValues[0];
 
-                    vm.CurrentProjectVM.PlaneVM = new PlaneVM(emptyAnnotation, vm.CurrentProjectVM.LayersTemplateSource);
+                    vm.CurrentProjectVM.PlaneVM = new PlaneVM(emptyAnnotation, vm.CurrentProjectVM.LayersTemplateSource, vm.CurrentProjectVM.LayerRankNameSource);
                 }
                 else
                 {
@@ -440,7 +439,7 @@ namespace CoreSampleAnnotation
                     {
                         //recreating VM with new corrected depth bounds
                         layersAnnotation.LayerBoundaries = boundaries;
-                        vm.CurrentProjectVM.PlaneVM = new PlaneVM(layersAnnotation, vm.CurrentProjectVM.LayersTemplateSource);
+                        vm.CurrentProjectVM.PlaneVM = new PlaneVM(layersAnnotation, vm.CurrentProjectVM.LayersTemplateSource, vm.CurrentProjectVM.LayerRankNameSource);
                         vm.CurrentProjectVM.PlaneVM.SamplesColumnVM.Samples = validSamples.Select(s => new SampleVM(s)).ToArray();
                     }
                 }

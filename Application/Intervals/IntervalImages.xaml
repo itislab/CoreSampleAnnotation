@@ -13,7 +13,7 @@
         <local:MoreThanOneVisibilityConverter x:Key="moreThanOneVisibilityConverter" />
     </UserControl.Resources>
     <Grid>
-        <markup:PhotoMarkup x:Name="Markup" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Panel.ZIndex="1" CalibratedRegions="{Binding CalibratedRegions, Mode=TwoWay}"/>
+        <markup:PhotoMarkup x:Name="Markup" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Panel.ZIndex="1" CalibratedRegions="{Binding CalibratedRegions, Mode=TwoWay}" FocusedRegion="{Binding FocusedRegion, Mode=TwoWay }"/>
         <markup:ExtractionInfoView x:Name="ExtractionView" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="30" Panel.ZIndex="3">
         </markup:ExtractionInfoView>
         <Grid HorizontalAlignment="Right" VerticalAlignment="Center" Panel.ZIndex="3">

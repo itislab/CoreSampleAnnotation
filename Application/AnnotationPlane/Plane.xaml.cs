@@ -62,22 +62,62 @@ namespace CoreSampleAnnotation.AnnotationPlane
                     if (res.HasValue && res.Value)
                     {
                         string filepath = dialog.FileName;
-
-
+                        
                         List<Reports.SVG.ISvgRenderableColumn> columnRenderers = new List<Reports.SVG.ISvgRenderableColumn>();
+                        
                         int idx = 0;
+
+                        List<Tuple<Reports.SVG.LegendItemKey, Reports.SVG.ILegendItem>> foundLegendItems = new List<Tuple<Reports.SVG.LegendItemKey, Reports.SVG.ILegendItem>>();
+
                         foreach (UIElement elem in AnnoGrid.HeadersGrid.Children)
                         {
-                            columnRenderers.Add(Reports.SVG.ColumnPainterFactory.Create(elem, AnnoGrid.ColumnsGrid.Children[idx] as ColumnView, vm.AnnoGridVM.Columns[idx]));
+                            var colVm = vm.AnnoGridVM.Columns[idx];
+                            //gathering column SVG representation ...
+                            columnRenderers.Add(Reports.SVG.ColumnPainterFactory.Create(elem, AnnoGrid.ColumnsGrid.Children[idx] as ColumnView, colVm));                            
+                            //... and possible appearence in the legend
+                            if (colVm is ILayerColumn) {
+                                ILayerColumn lcVM = colVm as ILayerColumn;
+                                foundLegendItems.AddRange(lcVM.Layers.SelectMany(l => Reports.SVG.LegendFactory.GetLegendItemsForLayer(l)));
+                            }
+                            if (colVm is Columns.VisualColumnVM) {
+                                Columns.VisualColumnVM vcVM = (Columns.VisualColumnVM)colVm;
+                                foundLegendItems.AddRange(vcVM.Layers.SelectMany(l => Reports.SVG.LegendFactory.GetLegendItemsForVisualLayer(l)));
+                            }
                             idx++;
                         }
-                        var svg = Reports.SVG.Report.Generate(columnRenderers.ToArray());
+
+                        //the legend items are split into groups
+                        Dictionary<Tuple<string, Reports.SVG.PropertyRepresentation>, List<Reports.SVG.ILegendItem>> groupsData
+                            = new Dictionary<Tuple<string, Reports.SVG.PropertyRepresentation>, List<Reports.SVG.ILegendItem>>();
+                        foreach (var item in foundLegendItems)
+                        {
+                            Tuple<string, Reports.SVG.PropertyRepresentation> key = Tuple.Create(item.Item1.PropID, item.Item1.Representation);                            
+                            if (!groupsData.ContainsKey(key)) {
+                                groupsData.Add(key, new List<Reports.SVG.ILegendItem>());
+                            }
+                            groupsData[key].Add(item.Item2);
+                        }
+
+                        //groups are transformed into ILegnedGroups
+                        List<Reports.SVG.ILegendGroup> legendGroups = new List<Reports.SVG.ILegendGroup>();
+                        foreach (var kvp in groupsData)
+                        {
+                            Reports.SVG.ILegendGroup group = new Reports.SVG.LegendGroup(
+                                kvp.Key.Item1,
+                                kvp.Value.ToArray());
+                            legendGroups.Add(group);
+                        }
+
+                        
+
+                        var svg = Reports.SVG.Report.Generate(columnRenderers.ToArray(), legendGroups.ToArray());
                         using (XmlTextWriter writer = new XmlTextWriter(filepath, Encoding.UTF8))
                         {
                             svg.Write(writer);
                         }
 
                         MessageBox.Show(string.Format("SVG отчет успешно сохранен в файл {0}", filepath), "Успешно", MessageBoxButton.OK, MessageBoxImage.Information);
+
                         /*
                         FixedDocument fixedDoc = new FixedDocument();
                         PageContent pageContent = new PageContent();

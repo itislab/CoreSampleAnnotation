@@ -9,7 +9,7 @@ namespace CoreSampleAnnotation.AnnotationPlane.LayerBoundaries
 
     public class FilteringBoundaryCollection : ViewModel, ILayerBoundariesVM
     {
-        private LayerBoundaryEditorVM target;
+        private ILayerBoundariesVM target;
 
         private Func<LayerBoundary, bool> isBoundaryPermited;
 
@@ -21,7 +21,7 @@ namespace CoreSampleAnnotation.AnnotationPlane.LayerBoundaries
             }
         }
 
-        public FilteringBoundaryCollection(LayerBoundaryEditorVM target, Func<LayerBoundary,bool> isBoundaryPermited) {
+        public FilteringBoundaryCollection(ILayerBoundariesVM target, Func<LayerBoundary,bool> isBoundaryPermited) {
             this.isBoundaryPermited = isBoundaryPermited;
             this.target = target;
             target.PropertyChanged += Target_PropertyChanged;
@@ -49,7 +49,7 @@ namespace CoreSampleAnnotation.AnnotationPlane.LayerBoundaries
             get { return rank; }
         }
                 
-        public RankMatchingBoundaryCollection(LayerBoundaryEditorVM target, int rank):
+        public RankMatchingBoundaryCollection(ILayerBoundariesVM target, int rank):
             base(target, lb => lb.Rank == rank)
         {
             this.rank = rank;   
@@ -68,7 +68,7 @@ namespace CoreSampleAnnotation.AnnotationPlane.LayerBoundaries
             get { return rank; }
         }
 
-        public RankMoreOrEqualBoundaryCollection(LayerBoundaryEditorVM target, int rank):
+        public RankMoreOrEqualBoundaryCollection(ILayerBoundariesVM target, int rank):
             base(target, lb => lb.Rank >= rank)
         {
             this.rank = rank;

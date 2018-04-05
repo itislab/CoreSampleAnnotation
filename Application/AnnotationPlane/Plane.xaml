@@ -16,6 +16,12 @@
         <local:AnnotationGrid x:Name="AnnoGrid" Grid.Row="1" DataContext="{ Binding AnnoGridVM }" >
         </local:AnnotationGrid>
         <StackPanel HorizontalAlignment="Right" VerticalAlignment="Center" Grid.Row="1">
+            <Button Style="{StaticResource MetroButton}" Command="{Binding ZoomInCommand}" Height="50">
+                +
+            </Button>
+            <Button Style="{StaticResource MetroButton}" Command="{Binding ZoomOutCommand}" Height="50">
+                -
+            </Button>
             <Button Style="{StaticResource MetroButton}" Command="{Binding ActivateSettingsCommand}" Height="50">
                 <media:GearsIcon />
             </Button>

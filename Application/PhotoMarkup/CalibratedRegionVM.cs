@@ -57,15 +57,15 @@ namespace CoreSampleAnnotation.PhotoMarkup
             }
         }
 
-        private bool isFocused = false;
-        public bool IsFocused {
+        private bool areMarkersVisible = false;
+        public bool AreMarkersVisible {
             get {
-                return isFocused;
+                return areMarkersVisible;
             }
             set {
-                if (isFocused != value) {
-                    isFocused = value;
-                    RaisePropertyChanged(nameof(IsFocused));
+                if (areMarkersVisible != value) {
+                    areMarkersVisible = value;
+                    RaisePropertyChanged(nameof(AreMarkersVisible));
                 }
             }
         }
@@ -88,9 +88,41 @@ namespace CoreSampleAnnotation.PhotoMarkup
             }
         }
 
+        private double upperDepth;
+        /// <summary>
+        /// In meters. Positive value.
+        /// </summary>
+        public double UpperDepth {
+            get {
+                return upperDepth;
+            }
+            set {
+                if (upperDepth != value) {
+                    upperDepth = value;
+                    RaisePropertyChanged(nameof(UpperDepth));
+                }
+            }
+        }
+
+        private double lowerDepth;
+        /// <summary>
+        /// In meters. Positive value.
+        /// </summary>
+        public double LowerDepth {
+            get {
+                return lowerDepth;
+            }
+            set {
+                if (lowerDepth != value) {
+                    lowerDepth = value;
+                    RaisePropertyChanged(nameof(LowerDepth));
+                }
+            }
+        }
+
         private double length;
         /// <summary>
-        /// The real (measured with ruller) length (in cm) of current core sample part
+        /// The real (measured with ruller) length (in m) of current core sample part
         /// </summary>
         public double Length {
             get {
@@ -145,7 +177,18 @@ namespace CoreSampleAnnotation.PhotoMarkup
             }
         }
 
-        public void RecalcMoveRelatedProps() {
+        private ICommand focusToNext;
+        public ICommand FocusToNextCommand {
+            get { return focusToNext; }
+            set {
+                if (focusToNext != value) {
+                    focusToNext = value;
+                    RaisePropertyChanged(nameof(FocusToNextCommand));
+                }
+            }
+        }
+
+        public void RaiseCanMoveChanged() {
             DelegateCommand dc = MoveDown as DelegateCommand;
             if(dc != null)
                 dc.RaiseCanExecuteChanged();

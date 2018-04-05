@@ -9,7 +9,6 @@
     <UserControl.Resources>
         <local:ImageCanvasTopConverter x:Key="topConverter" />
         <local:ImageCanvasHeightConverter x:Key="heightConverter" />
-        <local:IdentityConverter x:Key="identityConverter" />
     </UserControl.Resources>
     <ItemsControl ItemsSource="{Binding ImageRegions}"  Height="{Binding ColumnHeight}" Width="{Binding MaxImageWidth}">
         <ItemsControl.ItemsPanel>
@@ -34,7 +33,7 @@
         </ItemsControl.ItemContainerStyle>
         <ItemsControl.ItemTemplate>
             <DataTemplate>
-                <local:RegionImage Source="{Binding BitmapImage}" ActualWidth2="{Binding WpfWidth, Mode=OneWayToSource, Converter={StaticResource identityConverter}}">
+                <local:RegionImage Source="{Binding BitmapImage}" ActualWidth2="{Binding WpfWidth, Mode=OneWayToSource}">
                     <Image.Height>
                         <MultiBinding Converter="{StaticResource heightConverter}">
                             <Binding Path="ImageUpperDepth" />

@@ -29,6 +29,10 @@ namespace CoreSampleAnnotation.Reports.SVG
                 {
                     BoundaryLineColumnVM blcVM = (BoundaryLineColumnVM)becVM.ColumnVM;
                     lbVM = blcVM.BoundariesVM;
+                    if (blcVM.ColumnVM is BoundaryLabelColumnVM) {
+                        BoundaryLabelColumnVM blcVM2 = (BoundaryLabelColumnVM)blcVM.ColumnVM;
+                        lbVM = blcVM2.BoundariesVM;
+                    }
                 }
                 return new BoundaryColumnPainter(headerView, view, vm, lbVM);
             }

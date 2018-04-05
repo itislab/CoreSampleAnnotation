@@ -88,6 +88,14 @@ namespace CoreSampleAnnotation.AnnotationPlane
             }
         }
 
+        /// <summary>
+        /// How many WPF units in 1 real meter
+        /// </summary>
+        public double CurrentScaleFactor {
+            get {
+                return ColumnHeight / (lowerBound - upperBound);
+            }
+        }
 
         public ColumnVM(string heading)
         {
