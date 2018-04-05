@@ -12,6 +12,7 @@
             <Button Style="{StaticResource MetroButton}" Command="{Binding OpenSamplesCSVDialogCommand}">Таблица образцов</Button>
             <Button Style="{StaticResource MetroButton}">Таблица слоёв</Button>
             <Button Style="{StaticResource MetroButton}" Command="{Binding OpenTextReportDialogCommand}">Заготовка текстового отчёта</Button>
+            <Button Style="{StaticResource MetroButton}" Command="{Binding OpenFullCSVDialogCommand}">Заготовка csv отчёта</Button>
         </StackPanel>
     </Grid>
 </UserControl>

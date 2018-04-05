@@ -137,12 +137,12 @@ namespace CoreSampleAnnotation.Reports.RTF
         /// <param name="samples">All samples in the project</param>
         /// <returns></returns>
         public static ReportTable GenerateTableContents(
-        Intervals.BoreIntervalVM[] intervals,
-        LayerBoundary[] boundaries,
-        LayerDescrition[] layers,
-        string[] rankNames,
-        Sample[] samples,
-        bool isDepthIncreases)
+            Intervals.BoreIntervalVM[] intervals,
+            LayerBoundary[] boundaries,
+            LayerDescrition[] layers,
+            string[] rankNames,
+            Sample[] samples,
+            bool isDepthIncreases)
         {
             //asserting intervals
             //lower - upper bounds order
@@ -282,5 +282,6 @@ namespace CoreSampleAnnotation.Reports.RTF
 
             return new ReportTable(rows.ToArray());
         }
+
     }
 }
