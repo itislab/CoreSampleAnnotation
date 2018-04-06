@@ -116,33 +116,7 @@ namespace CoreSampleAnnotation.AnnotationPlane
                             svg.Write(writer);
                         }
 
-                        MessageBox.Show(string.Format("SVG отчет успешно сохранен в файл {0}", filepath), "Успешно", MessageBoxButton.OK, MessageBoxImage.Information);
-
-                        /*
-                        FixedDocument fixedDoc = new FixedDocument();
-                        PageContent pageContent = new PageContent();
-                        FixedPage fixedPage = new FixedPage();
-                        fixedPage.Width = ActualWidth;
-                        fixedPage.Height = AnnoGrid.HeadersGrid.ActualHeight + AnnoGrid.ColumnsGrid.ActualHeight;
-
-                        Plane planeToPrint = new Plane();
-                        Grid.SetIsSharedSizeScope(planeToPrint, true);
-                        //planeToPrint.Width = 800;
-                        //planeToPrint.Height = 8000;
-                        planeToPrint.DataContext = vm;
-
-                        //Create first page of document
-                        fixedPage.Children.Add(planeToPrint);
-                        ((System.Windows.Markup.IAddChild)pageContent).AddChild(fixedPage);
-                        fixedDoc.Pages.Add(pageContent);
-                        //Create any other required pages here
-
-                        //save the document
-                        XpsDocument xpsd = new XpsDocument("report.xps", FileAccess.Write);
-                        System.Windows.Xps.XpsDocumentWriter xw = XpsDocument.CreateXpsDocumentWriter(xpsd);
-                        xw.Write(fixedDoc);
-                        xpsd.Close();
-                        */
+                        MessageBox.Show(string.Format("SVG отчет успешно сохранен в файл {0}", filepath), "Успешно", MessageBoxButton.OK, MessageBoxImage.Information);                        
                     }
                 });
             }
