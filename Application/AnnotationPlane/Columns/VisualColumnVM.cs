@@ -153,13 +153,7 @@ namespace CoreSampleAnnotation.AnnotationPlane.Columns
                     RaisePropertyChanged(nameof(ColumnWidth));
                 }
             }
-        }
-
-        private void Subscribe(VisualLayerPresentingVM vlpVM, SingleClassificationLayerVM sclVM)
-        {
-            vlpVM.AvailableWidth = ColumnWidth;
-        }
-
+        }             
 
         public VisualColumnVM(string heading, LayeredColumnVM lVm, Func<SingleClassificationLayerVM, VisualLayerPresentingVM> adapter) : base(heading)
         {
@@ -168,26 +162,33 @@ namespace CoreSampleAnnotation.AnnotationPlane.Columns
             target.Layers.CollectionChanged += Layers_CollectionChanged;
             target.PropertyChanged += Target_PropertyChanged;
             columnWidth = 200.0;
-            
+
+            foreach (var layerVM in target.Layers)            
+                layerVM.PropertyChanged += SingleClass_Vm_PropertyChanged;
+
+            Reinit();
+        }
+
+        /// <summary>
+        /// Repopulates layers
+        /// </summary>
+        private void Reinit() {
+            List<VisualLayerPresentingVM> content = new List<VisualLayerPresentingVM>();
+
             foreach (SingleClassificationLayerVM vm in target.Layers)
-            {
-                vm.PropertyChanged += Vm_PropertyChanged;
+            {                
                 var adapted = adapter(vm);
                 adapted.AvailableWidth = ColumnWidth;
-                Subscribe(adapted, vm);
-                layers.Add(adapted);
+                content.Add(adapted);
             }
+
+            Layers = new ObservableCollection<VisualLayerPresentingVM>(content);
             ReclacYs();
         }
 
-        private void Vm_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        private void SingleClass_Vm_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
-            switch (e.PropertyName) {
-                case nameof(SingleClassificationLayerVM.Length):
-                    ReclacYs();
-                    break;
-            }
-            ReclacYs();
+            Reinit();
         }
 
         private void ReclacYs()
@@ -229,8 +230,9 @@ namespace CoreSampleAnnotation.AnnotationPlane.Columns
                     for (int i = 0; i < e.NewItems.Count; i++)
                     {
                         SingleClassificationLayerVM addedVM = (SingleClassificationLayerVM)e.NewItems[i];
+                        addedVM.PropertyChanged += SingleClass_Vm_PropertyChanged;
                         VisualLayerPresentingVM craftedVM = adapter(addedVM);
-                        Subscribe(craftedVM, addedVM);
+                        craftedVM.AvailableWidth = columnWidth;
                         if (e.NewItems.Count == 0)
                             Layers.Add(craftedVM);
                         else
@@ -241,6 +243,8 @@ namespace CoreSampleAnnotation.AnnotationPlane.Columns
                 case System.Collections.Specialized.NotifyCollectionChangedAction.Remove:
                     if (e.OldItems.Count != 1)
                         throw new InvalidOperationException();
+                    SingleClassificationLayerVM removedVM = (SingleClassificationLayerVM)e.OldItems[0];
+                    removedVM.PropertyChanged -= SingleClass_Vm_PropertyChanged;
                     Layers.RemoveAt(e.OldStartingIndex);
                     ReclacYs();
                     break;
