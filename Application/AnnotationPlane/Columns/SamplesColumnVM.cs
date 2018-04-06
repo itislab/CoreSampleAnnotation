@@ -9,17 +9,22 @@ using System.Windows.Input;
 namespace CoreSampleAnnotation.AnnotationPlane
 {
     [Serializable]
-    public class SampleVM : ViewModel, ISerializable {
+    public class SampleVM : ViewModel, ISerializable
+    {
         private double level;
         /// <summary>
         /// Depth in WPF units
         /// </summary>
-        public double Level {
-            get {
+        public double Level
+        {
+            get
+            {
                 return level;
             }
-            set {
-                if (level != value) {
+            set
+            {
+                if (level != value)
+                {
                     level = value;
                     RaisePropertyChanged(nameof(Level));
                 }
@@ -30,10 +35,13 @@ namespace CoreSampleAnnotation.AnnotationPlane
         /// <summary>
         /// Order number of the sample
         /// </summary>
-        public int Number {
+        public int Number
+        {
             get { return number; }
-            set {
-                if (number != value) {
+            set
+            {
+                if (number != value)
+                {
                     number = value;
                     RaisePropertyChanged(nameof(Number));
                 }
@@ -44,19 +52,43 @@ namespace CoreSampleAnnotation.AnnotationPlane
         /// <summary>
         /// In meters (positive value)
         /// </summary>
-        public double Depth {
-            get {
+        public double Depth
+        {
+            get
+            {
                 return depth;
             }
-            set {
-                if (depth != value) {
+            set
+            {
+                if (depth != value)
+                {
                     depth = value;
                     RaisePropertyChanged(nameof(Depth));
                 }
             }
         }
 
-        public ICommand DragStarted { get; set; }        
+        private string comment;
+        public string Comment
+        {
+            get
+            {
+                return comment;
+            }
+            set
+            {
+                if (comment != value)
+                {
+                    comment = value;
+                    RaisePropertyChanged(nameof(Comment));
+                }
+            }
+        }
+
+        public ICommand DragStarted { get; set; }
+
+        public ICommand EditingRequested { get; set; }
+
 
         /// <param name="depth">in meters (positive value)</param>
         public SampleVM(double depth) {
@@ -66,10 +98,12 @@ namespace CoreSampleAnnotation.AnnotationPlane
         #region serialization
         protected SampleVM(SerializationInfo info, StreamingContext context) {
             Depth = info.GetDouble("Depth");
+            Comment = info.GetString("Comment");
         }
         public virtual void GetObjectData(SerializationInfo info, StreamingContext context)
         {
             info.AddValue("Depth",Depth);
+            info.AddValue("Comment", Comment);
         }
         #endregion
     }
@@ -92,6 +126,10 @@ namespace CoreSampleAnnotation.AnnotationPlane
                         vm.Level = RealDepthToWPF(vm.Depth);
                         if (DragStart != null)
                             vm.DragStarted = DragStart;
+                        if (SampleEditRequestedCommand != null)
+                            vm.EditingRequested = SampleEditRequestedCommand;
+                        if (!string.IsNullOrEmpty(RecentSampleComment) && (vm.Comment==null))
+                            vm.Comment = RecentSampleComment;
                     }
 
                     RaisePropertyChanged(nameof(Samples));
@@ -126,6 +164,26 @@ namespace CoreSampleAnnotation.AnnotationPlane
                             vm.DragStarted = dragStart;
                         }
                     }
+                }
+            }
+        }
+
+        /// <summary>
+        /// the comment of most recently edited sample
+        /// </summary>
+        public string RecentSampleComment { get; set; }
+
+        private ICommand sampleEditRequestedCommand;
+        public ICommand SampleEditRequestedCommand {
+            get { return sampleEditRequestedCommand; }
+            set {
+                if (sampleEditRequestedCommand != value) {
+                    sampleEditRequestedCommand = value;                    
+                    foreach (SampleVM vm in samples)
+                    {                        
+                        vm.EditingRequested = value;
+                    }
+                    RaisePropertyChanged(nameof(SampleEditRequestedCommand));
                 }
             }
         }

@@ -6,11 +6,16 @@
              xmlns:local="clr-namespace:CoreSampleAnnotation.AnnotationPlane.Columns"
              mc:Ignorable="d" 
              d:DesignHeight="150" d:DesignWidth="100">
-    <Grid Width="100" Height="130">
+    <Grid Width="100">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="100"></RowDefinition>
+            <RowDefinition Height="auto"></RowDefinition>
+        </Grid.RowDefinitions>
         <Grid Height="100" Width="100" VerticalAlignment="Top" HorizontalAlignment="Center">
+            <!-- The height is important here, as other code reliyes on it to recalc sample depth -->
             <Ellipse StrokeThickness="2" Stroke="Black" StrokeDashArray="5 5" Fill="White"/>
-            <TextBlock FontSize="20" VerticalAlignment="Center" HorizontalAlignment="Center" Text="{Binding Number, FallbackValue=номер}"></TextBlock>
+            <TextBlock FontSize="20" VerticalAlignment="Center" HorizontalAlignment="Center" Text="{Binding Depth, FallbackValue=глубина, StringFormat={}{0:#.##} м}"></TextBlock>
         </Grid>
-        <TextBlock FontSize="20" VerticalAlignment="Bottom" HorizontalAlignment="Center" Text="{Binding Depth, FallbackValue=глубина, StringFormat={}{0:#.##} м}"></TextBlock>
+        <TextBlock Grid.Row="1" MaxWidth="100" FontSize="20" HorizontalAlignment="Center" Text="{Binding Comment, FallbackValue=комментарий}" TextWrapping="WrapWithOverflow"></TextBlock>
     </Grid>
 </UserControl>
