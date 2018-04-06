@@ -39,8 +39,9 @@ namespace CoreSampleAnnotation.Reports.SamplesCSV
 
         public static void Generate(string fileName, SamplesColumnVM samplesCol, Intervals.BoreIntervalVM[] intervals, Layer[] layers, string[] propNames)
         {
-            using (TextWriter textWriter = File.CreateText(fileName))
+            using (StreamWriter textWriter = new StreamWriter(File.Open(fileName, FileMode.Create), Encoding.UTF8))
             {
+
                 var csv = new CsvWriter(textWriter);
 
                 //writing header
