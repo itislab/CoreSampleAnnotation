@@ -150,7 +150,7 @@ namespace CoreSampleAnnotation
                             .Select(s => new Reports.RTF.Sample(
                                 s.Number.ToString(),
                                 vm.CurrentProjectVM.PlaneVM.LayerSyncController.WpfToDepth(s.Level),
-                                "")).ToArray();
+                                s.Comment)).ToArray();
 
                         Reports.RTF.ReportTable table =
                             Reports.RTF.ReportHelpers.GenerateTableContents(
