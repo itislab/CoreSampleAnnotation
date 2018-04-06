@@ -75,8 +75,20 @@ namespace CoreSampleAnnotation
                     dlg.DefaultExt = ".csv";
                     dlg.Filter = "CSV files|*.csv";
                     bool? result = dlg.ShowDialog();
-                    if (result == true)
-                        Reports.SamplesCSV.Report.Generate(dlg.FileName, sampleColVM);
+                if (result == true)
+                    Reports.SamplesCSV.Report.Generate(
+                        dlg.FileName,
+                        sampleColVM,
+                        vm.CurrentProjectVM.BoreIntervalsVM.Intervals.ToArray(),
+                        Reports.Helpers.FormLayers(
+                            vm.CurrentProjectVM.LayersTemplateSource.Template,
+                            vm.CurrentProjectVM.PlaneVM.LayerBoundaries.Select(
+                                b => vm.CurrentProjectVM.PlaneVM.LayerSyncController.WpfToDepth(b.Level)
+                                ).ToArray(),
+                            vm.CurrentProjectVM.PlaneVM.LayerProps.ToArray()
+                            ),
+                            vm.CurrentProjectVM.PlaneVM.LayerProps.Select(p => p.Heading).ToArray()
+                       );
                     MessageBox.Show("Файл с образцами успешно сохранен","Успешно",MessageBoxButton.OK,MessageBoxImage.Information);
                 });
 

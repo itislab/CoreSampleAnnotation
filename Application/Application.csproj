@@ -50,6 +50,10 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="CsvHelper, Version=7.0.0.0, Culture=neutral, PublicKeyToken=8c4959082be5c823, processorArchitecture=MSIL">
+      <HintPath>..\packages\CsvHelper.7.1.0\lib\net45\CsvHelper.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="FileHelpers, Version=3.2.7.0, Culture=neutral, PublicKeyToken=3e0c08d59cc3d657, processorArchitecture=MSIL">
       <HintPath>..\packages\FileHelpers.3.2.7\lib\net45\FileHelpers.dll</HintPath>
       <Private>True</Private>
@@ -299,6 +303,7 @@
     <Compile Include="ProjectMenuVM.cs" />
     <Compile Include="ProjectVM.cs" />
     <Compile Include="Persistence\FolderPersister.cs" />
+    <Compile Include="Reports\Helpers.cs" />
     <Compile Include="Reports\RTF\ReportHelpers.cs" />
     <Compile Include="Reports\RTF\TableDocument.cs" />
     <Compile Include="Reports\SVG\BoundaryColumnPainter.cs" />
