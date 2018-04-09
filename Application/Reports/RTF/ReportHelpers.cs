@@ -426,5 +426,6 @@ namespace CoreSampleAnnotation.Reports.RTF
 
             return new ReportTable(rows.ToArray());
         }
+
     }
 }
