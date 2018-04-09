@@ -31,6 +31,8 @@ namespace CoreSampleAnnotation
 
         private DelegateCommand ActivateAnnotationPlaneDelegateCommand;
 
+        private DelegateCommand ActivateReportGenerationDelegateCommand;
+
         private void LoadProjectWithPersister(IProjectPersister persister)
         {
             vm.ActivePersister = persister;
@@ -62,9 +64,83 @@ namespace CoreSampleAnnotation
 
             menuVM.ActivateAnnotationPlaneCommand = this.ActivateAnnotationPlaneDelegateCommand;
 
-            vm.CurrentProjectVM.PlaneColumnSettingsVM.ActivateAnnotationPlaneCommand = menuVM.ActivateAnnotationPlaneCommand;            
+            vm.CurrentProjectVM.PlaneColumnSettingsVM.ActivateAnnotationPlaneCommand = menuVM.ActivateAnnotationPlaneCommand;
 
-            menuVM.ActivateReportGenerationCommand = new DelegateCommand(obj =>
+            menuVM.ActivateReportGenerationCommand = ActivateReportGenerationDelegateCommand;
+        }
+
+        public MainWindow()
+        {
+            InitializeComponent();
+            DataContext = vm;
+
+            ExitCommand = new DelegateCommand(() =>
+            {
+                if (vm.CurrentProjectVM == null) //there is not project loaded yet. nothing to save
+                    Close();
+                else
+                {
+                    var result = MessageBox.Show("Сохранить проект перед закрытием приложения?", "Сохранение при выходе", MessageBoxButton.YesNoCancel, MessageBoxImage.Question);
+                    switch (result)
+                    {
+                        case MessageBoxResult.Yes:
+                            try
+                            {
+                                vm.ActivePersister.SaveProject(vm.CurrentProjectVM);
+                                MessageBox.Show("Проект успешно сохранен", "Успешно", MessageBoxButton.OK, MessageBoxImage.Information);
+                                Close();
+                            }
+                            catch (Exception ex)
+                            {
+                                MessageBox.Show("происошла ошибка сохранения проекта: \n" + ex.ToString(), "Ошибка сохранения проекта", MessageBoxButton.OK, MessageBoxImage.Error);
+                            }
+                            break;
+                        case MessageBoxResult.No:
+                            Close();
+                            break;
+                        case MessageBoxResult.Cancel:
+                            break;
+                        default: throw new InvalidOperationException();
+                    }
+                }
+            });
+
+            vm.StartupMenuVM.ExitAppCommand = ExitCommand;
+
+            vm.StartupMenuVM.NewProjectCommand = new DelegateCommand(() =>
+            {
+                IProjectPersister createdPersister;
+
+                if (vm.ProjectPersisterFactory.TryCreateNew(out createdPersister))
+                {
+                    LoadProjectWithPersister(createdPersister);
+                }
+            });
+
+            vm.StartupMenuVM.LoadProjectCommand = new DelegateCommand(() =>
+            {
+                IProjectPersister restoredPersister;
+
+                if (vm.ProjectPersisterFactory.TryRestoreExisting(out restoredPersister))
+                {
+                    try
+                    {
+                        LoadProjectWithPersister(restoredPersister);
+                    }
+                    catch (System.IO.FileNotFoundException)
+                    {
+                        MessageBox.Show("Выбранная вами папка не является папкой проекта описания скважины. Проверьте, правильную ли папку вы выбрали.", "Не папка проекта", MessageBoxButton.OK, MessageBoxImage.Exclamation);
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show("происошла ошибка загрузки проекта: \n" + ex.ToString(), "Ошибка загрузки проекта", MessageBoxButton.OK, MessageBoxImage.Error);
+                    }
+                }
+            });
+
+            vm.ActiveSectionVM = vm.StartupMenuVM;
+
+            ActivateReportGenerationDelegateCommand = new DelegateCommand(obj =>
             {
                 ReportsMenuVM reportsMenuVM = new ReportsMenuVM(vm.CurrentProjectVM);
                 reportsMenuVM.OpenSamplesCSVDialogCommand = new DelegateCommand(() =>
@@ -76,8 +152,20 @@ namespace CoreSampleAnnotation
                     dlg.Filter = "CSV files|*.csv";
                     bool? result = dlg.ShowDialog();
                     if (result == true)
-                        Reports.SamplesCSV.Report.Generate(dlg.FileName, sampleColVM);
-                    MessageBox.Show("Файл с образцами успешно сохранен","Успешно",MessageBoxButton.OK,MessageBoxImage.Information);
+                        Reports.SamplesCSV.Report.Generate(
+                            dlg.FileName,
+                            sampleColVM,
+                            vm.CurrentProjectVM.BoreIntervalsVM.Intervals.ToArray(),
+                            Reports.Helpers.FormLayers(
+                                vm.CurrentProjectVM.LayersTemplateSource.Template,
+                                vm.CurrentProjectVM.PlaneVM.LayerBoundaries.Select(
+                                    b => vm.CurrentProjectVM.PlaneVM.LayerSyncController.WpfToDepth(b.Level)
+                                    ).ToArray(),
+                                vm.CurrentProjectVM.PlaneVM.LayerProps.ToArray()
+                                ),
+                                vm.CurrentProjectVM.PlaneVM.LayerProps.Select(p => p.Heading).ToArray()
+                           );
+                    MessageBox.Show("Файл с образцами успешно сохранен", "Успешно", MessageBoxButton.OK, MessageBoxImage.Information);
                 });
 
                 reportsMenuVM.OpenTextReportDialogCommand = new DelegateCommand(() =>
@@ -92,7 +180,7 @@ namespace CoreSampleAnnotation
                         string[] rankNames = vm.CurrentProjectVM.LayerRankNameSource.NominativeNames;
 
                         //transforming boundaryVMs to report specific boundaries
-                        
+
                         Reports.RTF.LayerBoundary[] boundaries =
                             vm.CurrentProjectVM.PlaneVM.LayerBoundaries
                                 .Select(b =>
@@ -150,7 +238,7 @@ namespace CoreSampleAnnotation
                             .Select(s => new Reports.RTF.Sample(
                                 s.Number.ToString(),
                                 vm.CurrentProjectVM.PlaneVM.LayerSyncController.WpfToDepth(s.Level),
-                                "")).ToArray();
+                                s.Comment)).ToArray();
 
                         Reports.RTF.ReportTable table =
                             Reports.RTF.ReportHelpers.GenerateTableContents(
@@ -164,7 +252,7 @@ namespace CoreSampleAnnotation
                                 vm.CurrentProjectVM.AnnotationDirection
                                 );
 
-                        Reports.RTF.TableDocument.FormRTFDocument(dlg.FileName,table);
+                        Reports.RTF.TableDocument.FormRTFDocument(dlg.FileName, table);
                         MessageBox.Show("Файл с заготовкой текстового отчета успешно сохранен", "Успешно", MessageBoxButton.OK, MessageBoxImage.Information);
                     }
                 });
@@ -253,79 +341,9 @@ namespace CoreSampleAnnotation
                 });
 
                 vm.ActiveSectionVM = reportsMenuVM;
-            });
-        }
-
-        public MainWindow()
-        {
-            InitializeComponent();
-            DataContext = vm;
-
-            ExitCommand = new DelegateCommand(() =>
-            {
-                if (vm.CurrentProjectVM == null) //there is not project loaded yet. nothing to save
-                    Close();
-                else
-                {
-                    var result = MessageBox.Show("Сохранить проект перед закрытием приложения?", "Сохранение при выходе", MessageBoxButton.YesNoCancel, MessageBoxImage.Question);
-                    switch (result)
-                    {
-                        case MessageBoxResult.Yes:
-                            try
-                            {
-                                vm.ActivePersister.SaveProject(vm.CurrentProjectVM);
-                                MessageBox.Show("Проект успешно сохранен", "Успешно", MessageBoxButton.OK, MessageBoxImage.Information);
-                                Close();
-                            }
-                            catch (Exception ex)
-                            {
-                                MessageBox.Show("происошла ошибка сохранения проекта: \n" + ex.ToString(), "Ошибка сохранения проекта", MessageBoxButton.OK, MessageBoxImage.Error);
-                            }
-                            break;
-                        case MessageBoxResult.No:
-                            Close();
-                            break;
-                        case MessageBoxResult.Cancel:
-                            break;
-                        default: throw new InvalidOperationException();
-                    }
-                }
-            });
-
-            vm.StartupMenuVM.ExitAppCommand = ExitCommand;
-
-            vm.StartupMenuVM.NewProjectCommand = new DelegateCommand(() =>
-            {
-                IProjectPersister createdPersister;
-
-                if (vm.ProjectPersisterFactory.TryCreateNew(out createdPersister))
-                {
-                    LoadProjectWithPersister(createdPersister);
-                }
-            });
-
-            vm.StartupMenuVM.LoadProjectCommand = new DelegateCommand(() =>
-            {
-                IProjectPersister restoredPersister;
-
-                if (vm.ProjectPersisterFactory.TryRestoreExisting(out restoredPersister))
-                {
-                    try
-                    {
-                        LoadProjectWithPersister(restoredPersister);
-                    }
-                    catch (System.IO.FileNotFoundException)
-                    {
-                        MessageBox.Show("Выбранная вами папка не является папкой проекта описания скважины. Проверьте, правильную ли папку вы выбрали.", "Не папка проекта", MessageBoxButton.OK, MessageBoxImage.Exclamation);
-                    }
-                    catch (Exception ex)
-                    {
-                        MessageBox.Show("происошла ошибка загрузки проекта: \n" + ex.ToString(), "Ошибка загрузки проекта", MessageBoxButton.OK, MessageBoxImage.Error);
-                    }
-                }
-            });
-
-            vm.ActiveSectionVM = vm.StartupMenuVM;
+            }, new Predicate<object>((obj1) => {
+                return vm.CurrentProjectVM.PlaneVM != null;
+            }));
 
             ActivateAnnotationPlaneDelegateCommand = new DelegateCommand((obj) =>
             {
@@ -456,6 +474,7 @@ namespace CoreSampleAnnotation
                 vm.CurrentProjectVM.PlaneVM.SaveProjectCommand = menuVM.SaveCommand;
 
                 vm.ActiveSectionVM = vm.CurrentProjectVM.PlaneVM;
+                ActivateReportGenerationDelegateCommand.RaiseCanExecuteChanged();
             }, (obj) =>
             {
                 var intervals = vm.CurrentProjectVM.BoreIntervalsVM.Intervals.

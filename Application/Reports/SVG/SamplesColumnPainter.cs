@@ -47,6 +47,12 @@ namespace CoreSampleAnnotation.Reports.SVG
                 depthText.Fill = blackPaint;
                 depthText.FontSize = Helpers.dtos(textFontSize);
                 group.Children.Add(depthText);
+                //sample comment
+                SvgText commentText = new SvgText(sample.Comment);
+                commentText.Transforms.Add(new Svg.Transforms.SvgTranslate(textXoffset, (float)(sample.Level + 2.0 * circleRadius + textFontSize * 1.5)));
+                commentText.Fill = blackPaint;
+                commentText.FontSize = Helpers.dtos(textFontSize);
+                group.Children.Add(commentText);
             }
 
             result.SVG = group;

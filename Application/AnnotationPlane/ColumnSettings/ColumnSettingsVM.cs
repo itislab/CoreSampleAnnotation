@@ -282,7 +282,11 @@ namespace CoreSampleAnnotation.AnnotationPlane.ColumnSettings
             {
                 ColumnDefinitionVM[] settings;
                 if (colSettingPersistence.Load(out settings))
+                {
                     ColumnDefinitions = settings;
+                    foreach (var col in ColumnDefinitions)
+                        InitializeColumn(col);
+                }
             });
             ExportToFileCommand = new DelegateCommand(() => {
                 colSettingPersistence.Persist(OrderedColumnDefinitions);

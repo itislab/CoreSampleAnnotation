@@ -54,8 +54,8 @@ namespace CoreSampleAnnotation.AnnotationPlane
             if (values != null)
             {
                 double depth = (double)values[0];
-                double height = (double)values[1];
-                return depth - (height / 2);
+                //double height = (double)values[1];
+                return depth - 50;
             }
             else return null;
         }

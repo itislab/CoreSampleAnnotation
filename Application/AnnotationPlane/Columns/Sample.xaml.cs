@@ -31,12 +31,21 @@ namespace CoreSampleAnnotation.AnnotationPlane.Columns
             SampleVM vm = DataContext as SampleVM;
             if (vm != null)
             {
-                if (vm.DragStarted != null)
+                if (e.RightButton == MouseButtonState.Pressed)
                 {
-                    DragStartEventArgs dsea = new DragStartEventArgs();
-                    dsea.FrameworkElement = sender as FrameworkElement;
-                    dsea.GetEventPoint = (elem => e.GetPosition(elem));
-                    vm.DragStarted.Execute(dsea);                    
+                    if (vm.EditingRequested != null) {
+                        vm.EditingRequested.Execute(vm);
+                    }
+                }
+                else if (e.LeftButton == MouseButtonState.Pressed)
+                {
+                    if (vm.DragStarted != null)
+                    {
+                        DragStartEventArgs dsea = new DragStartEventArgs();
+                        dsea.FrameworkElement = sender as FrameworkElement;
+                        dsea.GetEventPoint = (elem => e.GetPosition(elem));
+                        vm.DragStarted.Execute(dsea);
+                    }
                 }
             }
             e.Handled = true;

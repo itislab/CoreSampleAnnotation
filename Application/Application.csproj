@@ -303,6 +303,7 @@
     <Compile Include="ProjectMenuVM.cs" />
     <Compile Include="ProjectVM.cs" />
     <Compile Include="Persistence\FolderPersister.cs" />
+    <Compile Include="Reports\Helpers.cs" />
     <Compile Include="Reports\CSV\ReportCSV.cs" />
     <Compile Include="Reports\CSV\ReportHelpersCSV.cs" />
     <Compile Include="Reports\RTF\ReportHelpers.cs" />

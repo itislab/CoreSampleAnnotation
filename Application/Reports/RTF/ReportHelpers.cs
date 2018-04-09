@@ -128,7 +128,7 @@ namespace CoreSampleAnnotation.Reports.RTF
             StringBuilder samplesSb = new StringBuilder();
             List<string> sampleStrings = new List<string>();
             foreach (var sample in samples)
-                sampleStrings.Add(string.Format("{0}/{1:0.##} м; {2}", sample.ID, sample.Depth, sample.Purpose));
+                sampleStrings.Add(string.Format("{1:0.##} м; {2}", sample.ID, sample.Depth, sample.Purpose));
 
             return new ReportRow(new TextCell[] {
                         new TextCell(sb.ToString(),LeftColWidth),
@@ -205,7 +205,7 @@ namespace CoreSampleAnnotation.Reports.RTF
                 new TextCell(
                     string.Format("Описание керна {0}.\nИнтервал / выход керна в м.",directionString),
                     LeftColWidth, horizontalAlignement:TextAlignement.Centered, isBold:true),
-                new TextCell("№ образца/место отбора от начала керна, м", RightcolWidth, horizontalAlignement: TextAlignement.Centered, isBold: true)
+                new TextCell("место отбора от начала керна, м; описание", RightcolWidth, horizontalAlignement: TextAlignement.Centered, isBold: true)
                 });
 
             rows.Add(header);

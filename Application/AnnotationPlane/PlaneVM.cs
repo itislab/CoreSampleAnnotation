@@ -83,8 +83,11 @@ namespace CoreSampleAnnotation.AnnotationPlane
             }
         }
 
-        private LayerBoundaryEditorVM allLayersBoundaryEditorVM;
+        private LayerBoundaryEditorVM allLayersBoundaryEditorVM;        
         private FrameworkElement dragReferenceElem;
+
+
+        private double dragInnerYoffset = 0;
         /// <summary>
         /// Coordinates dragging elements are calculated related to this element
         /// </summary>
@@ -113,8 +116,22 @@ namespace CoreSampleAnnotation.AnnotationPlane
                     LayerSyncController.RemoveLayer(boundIdx, LayerSyncronization.FreeSpaceAccepter.UpperLayer); break;
                 default: throw new NotImplementedException();
             }
-
         }
+
+        private SampleVM sampleUnderCorrection;
+        public SampleVM SampleUnderCorrection {
+            get {
+                return sampleUnderCorrection;
+            }
+            set {
+                if (sampleUnderCorrection != value) {
+                    sampleUnderCorrection = value;
+                    RaisePropertyChanged(nameof(SampleUnderCorrection));
+                }
+            }
+        }
+
+        public ICommand CloseSampleEditingCommand  { get; private set;}
 
         /// <param name="boundIdx">which bound to move?</param>
         /// <param name="level">in WPF units</param>
@@ -572,7 +589,7 @@ namespace CoreSampleAnnotation.AnnotationPlane
                 {
                     System.Diagnostics.Debug.WriteLine("dropped smaple with offset {0}", edea.WpfTopOffset);
                     if ((edea.ColumnIdx != -1) && (AnnoGridVM.Columns[edea.ColumnIdx] is SamplesColumnVM))
-                    {
+                    {                                                
                         double depth = layerSyncController.WpfToDepth(edea.WpfTopOffset + 50);//TODO: grap center coord of the UI from UI, not from hardcoded value of 50
                         sample.Depth = depth;
                         samplesColumnVM.Samples = samplesColumnVM.Samples.ToArray(); //asignment forces refresh
@@ -631,6 +648,13 @@ namespace CoreSampleAnnotation.AnnotationPlane
                     l.Add(sampleVM);
                     scVM.Samples = l.ToArray();
                 }
+            });
+
+            CloseSampleEditingCommand = new DelegateCommand(() =>
+            {
+                if (!string.IsNullOrEmpty(SampleUnderCorrection.Comment))
+                    samplesColumnVM.RecentSampleComment = SampleUnderCorrection.Comment;
+                SampleUnderCorrection = null;
             });
 
             LayerSyncController.PropertyChanged += LayerSyncController_PropertyChanged;
@@ -701,6 +725,9 @@ namespace CoreSampleAnnotation.AnnotationPlane
             });
 
             samplesColumnVM.DragStart = allLayersBoundaryEditorVM.DragStart;
+            samplesColumnVM.SampleEditRequestedCommand = new DelegateCommand(arg => {
+                SampleUnderCorrection = (SampleVM)arg;
+            });
 
             double colHeight = LayerSyncController.DepthToWPF(lowerDepth) - LayerSyncController.DepthToWPF(upperDepth);
 
