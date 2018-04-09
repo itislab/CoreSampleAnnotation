@@ -183,7 +183,7 @@ namespace CoreSampleAnnotation
                             vm.CurrentProjectVM.PlaneVM.LayerBoundaries
                                 .Select(b =>
                                     new Reports.RTF.LayerBoundary(
-                                        b.Number,
+                                        b.Numbers,
                                         vm.CurrentProjectVM.PlaneVM.LayerSyncController.WpfToDepth(b.Level),
                                         b.Rank
                                         )).ToArray();
@@ -243,7 +243,8 @@ namespace CoreSampleAnnotation
                                 layers,
                                 rankNames,
                                 samples,
-                                true
+                                vm.CurrentProjectVM.AnnotationDirection,
+                                vm.CurrentProjectVM.LayersTemplateSource.Template
                                 );
 
                         Reports.CSV.ReportCSV.Generate(dlg.FileName, table);

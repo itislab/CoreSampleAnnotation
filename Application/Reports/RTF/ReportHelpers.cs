@@ -150,7 +150,6 @@ namespace CoreSampleAnnotation.Reports.RTF
         LayerDescrition[] layers,
         string[] rankNames,
         Sample[] samples,
-        bool isDepthIncreases,
         AnnotationDirection annotationDirection)
         {
             //asserting intervals

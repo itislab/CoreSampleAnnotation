@@ -4,13 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CoreSampleAnnotation.AnnotationPlane.Template
-{
+namespace CoreSampleAnnotation.AnnotationPlane.Template {
     /// <summary>
     /// A property of the layer
     /// </summary>
-    public class Property
-    {
+    public class Property {
         /// <summary>
         /// All available classes that this property can take
         /// </summary>
@@ -23,5 +21,5 @@ namespace CoreSampleAnnotation.AnnotationPlane.Template
         public string Name { get; set; }
 
         public string ID { get; set; }
-    }    
+    }
 }
