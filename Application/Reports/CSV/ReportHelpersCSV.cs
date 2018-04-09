@@ -15,8 +15,8 @@ namespace CoreSampleAnnotation.Reports.CSV {
             return string.Format("{0} {1}", orderNumber, rankName);
         }
 
-        private static List<string> GetGroupPackNumbersForUpperLaBound(RTF.LayerBoundary upperLaBound, int laIndex, RTF.LayerBoundary[] boundaries, double curIntLower, string[] rankNames) {
-            List<string> rrl = new List<string>();
+        private static List<int> GetGroupPackNumbersForUpperLaBound(RTF.LayerBoundary upperLaBound, int laIndex, RTF.LayerBoundary[] boundaries, double curIntLower, string[] rankNames) {
+            List<int> rrl = new List<int>();
             for (int rank = upperLaBound.Rank; rank > 0; rank--) {
                 double length = 0.0;
                 for (int i = laIndex + 1; i < boundaries.Length; i++) {
@@ -27,15 +27,14 @@ namespace CoreSampleAnnotation.Reports.CSV {
                 }
 
                 length = Math.Min(length, curIntLower - upperLaBound.Depth);
-                //rrl.Add(GetRankDescrRow(upperLaBound.OrderNumbers[rank], rankNames[rank], length));
-                rrl.Add(upperLaBound.OrderNumbers[rank].ToString());
+                rrl.Add(upperLaBound.OrderNumbers[rank]);
             }
 
             return rrl;
         }
 
-        private static List<string> GetGroupPackNumbersForLowerLaBound(RTF.LayerBoundary lowerLaBound, int laIndex, RTF.LayerBoundary[] boundaries, double curIntUpper, string[] rankNames) {
-            List<string> rrl = new List<string>();
+        private static List<int> GetGroupPackNumbersForLowerLaBound(RTF.LayerBoundary lowerLaBound, int laIndex, RTF.LayerBoundary[] boundaries, double curIntUpper, string[] rankNames) {
+            List<int> rrl = new List<int>();
             for (int rank = lowerLaBound.Rank; rank > 0; rank--) {
                 double length = 0.0;
                 for (int i = laIndex; i >= 0; i--) {
@@ -50,19 +49,18 @@ namespace CoreSampleAnnotation.Reports.CSV {
                     switch (rank) {
                         case 2:
                             //rrl.Add(GetRankDescrRow(lowerLaBound.OrderNumbers[2] + 1, rankNames[2], length));
-                            rrl.Add((lowerLaBound.OrderNumbers[2] + 1).ToString());
+                            rrl.Add(lowerLaBound.OrderNumbers[2] + 1);
                             break;
                         case 1:
                             //rrl.Add(GetRankDescrRow(lowerLaBound.OrderNumbers[0] + 1, rankNames[1], length));
-                            rrl.Add((lowerLaBound.OrderNumbers[0] + 1).ToString());
+                            rrl.Add(lowerLaBound.OrderNumbers[0] + 1);
                             break;
                         default:
                             break;
                     }
                 }
                 else {
-                    //rrl.Add(GetRankDescrRow(1, rankNames[rank], length));
-                    rrl.Add("1");
+                    rrl.Add(1);
                 }
             }
 
@@ -75,24 +73,24 @@ namespace CoreSampleAnnotation.Reports.CSV {
         /// </summary>        
         /// <param name="length">in meters</param>        
         /// <returns></returns>
-        public static ReportRow GetLayerDescrRow(int orderNum, double lower, double upper, RTF.LayerDescrition description, RTF.Sample[] samples, string group_number, string pack_number, AnnotationPlane.Template.Property[] allProperties) {
+        public static ReportRow GetLayerDescrRow(int orderNum, double lower, double upper, RTF.LayerDescrition description, RTF.Sample[] samples, int group_number, int pack_number, AnnotationPlane.Template.Property[] allProperties) {
             List<string> row = new List<string>();
 
-            row.Add(group_number);
-            row.Add(pack_number);
+            row.Add(group_number.ToString());
+            row.Add(pack_number.ToString());
             row.Add(orderNum.ToString());
-            row.Add(lower.ToString());
-            row.Add(upper.ToString());
+            row.Add(Math.Round(upper, 4).ToString());
+            row.Add(Math.Round(lower, 4).ToString());
 
             foreach (AnnotationPlane.Template.Property propFromAllProps in allProperties) {
                 RTF.PropertyDescription propDescr = description.Properties.FirstOrDefault(p => string.Equals(p.Name, propFromAllProps.Name, StringComparison.CurrentCulture));
                 if (propDescr != null) {
-                    ///if property is set for current layer
                     string entries = "";
                     if (propDescr.Values == null) {
                         row.Add("");
                         continue;
                     }
+                    ///if property is set for current layer
                     entries += string.Join(", ", propDescr.Values.Select(v => v.ToLower()));
                     if (!string.IsNullOrEmpty(propDescr.Comment)) {
                         entries += string.Format(" ({0})", propDescr.Comment);
@@ -106,7 +104,6 @@ namespace CoreSampleAnnotation.Reports.CSV {
             }
 
             if (description.Properties.Count() == 0) {
-                row.Add("");
                 row.Add("");
             }
 
@@ -192,8 +189,8 @@ namespace CoreSampleAnnotation.Reports.CSV {
             int inIndex;
             int laIndex;
             int layerOrderNum;
-            string group_number = "";
-            string pack_number = "";
+            int group_number = 1;
+            int pack_number = 1;
             
             switch (annotationDirection) {
                 case AnnotationDirection.UpToBottom:
@@ -239,12 +236,12 @@ namespace CoreSampleAnnotation.Reports.CSV {
                             doInInc = true;
                         }
 
-                        List<string> group_pack = GetGroupPackNumbersForUpperLaBound(upperLabound, laIndex, boundaries, curIntLower, rankNames);
+                        List<int> group_pack = GetGroupPackNumbersForUpperLaBound(upperLabound, laIndex, boundaries, curIntLower, rankNames);
 
                         switch (upperLabound.Rank) {
                             case 2:
                                 group_number = group_pack[0];
-                                pack_number = "1";
+                                pack_number = 1;
                                 layerOrderNum = 1;
                                 break;
                             case 1:
@@ -310,7 +307,7 @@ namespace CoreSampleAnnotation.Reports.CSV {
                         }
 
                         if (!skipReporting) {
-                            List<string> group_pack = GetGroupPackNumbersForLowerLaBound(lowerLaBound, laIndex, boundaries, curIntUpper, rankNames);
+                            List<int> group_pack = GetGroupPackNumbersForLowerLaBound(lowerLaBound, laIndex, boundaries, curIntUpper, rankNames);
 
                             switch (lowerLaBound.Rank) {
                                 case 2:

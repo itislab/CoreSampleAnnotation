@@ -31,7 +31,7 @@ namespace CoreSampleAnnotation.Reports.CSV {
             using (var writer = new System.IO.StreamWriter(fileName))
             using (var csv = new CsvHelper.CsvWriter(writer)) {
                 csv.Configuration.Delimiter = ",";
-                csv.Configuration.QuoteAllFields = true;
+                csv.Configuration.QuoteAllFields = false;
                 foreach (ReportRow row in table.Rows) {
                     foreach(string s in row.Cells)
                         csv.WriteField(s);
