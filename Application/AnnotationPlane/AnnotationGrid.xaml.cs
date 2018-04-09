@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 using System.Text;
@@ -21,9 +22,7 @@ namespace CoreSampleAnnotation.AnnotationPlane
     /// Interaction logic for AnnotationGrid.xaml
     /// </summary>
     public partial class AnnotationGrid : UserControl
-    {
-        private bool isMouseCaptured = false;
-
+    {        
         public AnnotationGrid()
         {
             InitializeComponent();
@@ -39,13 +38,14 @@ namespace CoreSampleAnnotation.AnnotationPlane
             Binding b2 = new Binding("ScaleFactor");
             b2.Source = this;
             b2.Mode = BindingMode.TwoWay;
-            SetBinding(AnnotationGrid.InternalScaleFactorProperty, b2);
+            SetBinding(InternalScaleFactorProperty, b2);
 
             LowerGrid.PreviewMouseMove += LowerGrid_PreviewMouseMove;
             LowerGrid.PreviewMouseUp += LowerGrid_PreviewMouseUp;
             LowerGrid.PreviewTouchMove += LowerGrid_PreviewTouchMove;
-            LowerGrid.PreviewTouchUp += LowerGrid_PreviewTouchUp;
+            LowerGrid.PreviewTouchUp += LowerGrid_PreviewTouchUp;            
         }
+        
 
         private void LowerGrid_PreviewTouchUp(object sender, TouchEventArgs e)
         {
@@ -54,9 +54,10 @@ namespace CoreSampleAnnotation.AnnotationPlane
         }
 
         private void LowerGrid_PreviewTouchMove(object sender, TouchEventArgs e)
-        {
+        {   
             if (HandleDrag(elem => e.GetTouchPoint(elem).Position))
                 e.Handled = true;
+            //Trace.WriteLine(string.Format("LowerGrid_PreviewTouchMove: handled: {0}", e.Handled));
         }
 
         private bool IsInVisualTree(DependencyObject elem, DependencyObject parent)
@@ -82,13 +83,7 @@ namespace CoreSampleAnnotation.AnnotationPlane
                     Point curLocation = eventPointExtractor(ColumnsGrid);
                     Point droppedLocation = new Point(
                         curLocation.X - localOffset.X + agVM.DraggedItem.ActualWidth / 2, //X coord is the location of the centre of the dragged element
-                        curLocation.Y - localOffset.Y); //Y coord is a top of the dragged element
-                    if (isMouseCaptured)
-                    {
-                        //ReleaseMouseCapture();
-                        System.Diagnostics.Trace.WriteLine("Mouse release");
-                        isMouseCaptured = false;
-                    }
+                        curLocation.Y - localOffset.Y); //Y coord is a top of the dragged element                    
 
                     int col = -1;
                     var htResult = VisualTreeHelper.HitTest(ColumnsGrid, droppedLocation);
@@ -105,6 +100,7 @@ namespace CoreSampleAnnotation.AnnotationPlane
                     ElementDropped?.Invoke(this, new ElemDroppedEventArgs(agVM.DraggedItem, col, droppedLocation.Y));
 
                     agVM.DraggedItem = null;
+                    agVM.DragCandidateItem = null;
                     return true;
                 }
             }
@@ -113,8 +109,14 @@ namespace CoreSampleAnnotation.AnnotationPlane
 
         private void LowerGrid_PreviewMouseUp(object sender, MouseButtonEventArgs e)
         {
-            if (HandleDragEnd(elem => e.GetPosition(elem)))
-                e.Handled = true;
+            if (e.StylusDevice == null)
+            {
+                //if StylusDevis is not null, the mouse event is actualy a promoted touch event.
+                //touch events are handled separetly.
+                //to avoid double hanglig of mouse up, the handler operates with "pure" mouse events (e.StylusDevice == null)
+                if (HandleDragEnd(elem => e.GetPosition(elem)))
+                    e.Handled = true;
+            }
         }
 
         /// <summary>
@@ -127,19 +129,24 @@ namespace CoreSampleAnnotation.AnnotationPlane
             AnnotationGridVM agVM = DataContext as AnnotationGridVM;
             if (agVM != null)
             {
-                if (agVM.DraggedItem != null)
+                if (agVM.DragCandidateItem != null)
                 {
                     Point localOffset = agVM.LocalDraggedItemOffset;
-                    Point curLocation = eventPointExtractor(LowerGrid);
-                    DraggedItemLeft = curLocation.X - localOffset.X;
-                    DraggedItemTop = curLocation.Y - localOffset.Y;
-                    System.Diagnostics.Trace.WriteLine(string.Format("Elem moved to {0}:{1}", DraggedItemLeft, DraggedItemTop));
-                    if (!isMouseCaptured)
-                    {
-                        //CaptureMouse();
-                        System.Diagnostics.Trace.WriteLine("Mouse captured");
-                        isMouseCaptured = true;
+                    Point curLocation = eventPointExtractor(LowerGrid);                    
+                    double proposedLeft = curLocation.X - localOffset.X;
+                    double proposedTop = curLocation.Y - localOffset.Y;
+                    Vector move = agVM.DragItemInitialLocation - new Point(proposedLeft, proposedTop);
+                    if (move.LengthSquared > 900 && agVM.DraggedItem ==null) {
+                        //move far enough to trigger drag
+                        agVM.DraggedItem = agVM.DragCandidateItem;
+                        //System.Diagnostics.Trace.WriteLine(string.Format("Elem drag started at {0}:{1} as movement was {2:#.##}", proposedLeft, proposedTop, move.Length));
                     }
+                    if (agVM.DraggedItem != null) {
+                        DraggedItemLeft = proposedLeft;
+                        DraggedItemTop = proposedTop;
+                        //System.Diagnostics.Trace.WriteLine(string.Format("Elem moved to {0:#.00} {1:#.00}", proposedLeft, proposedTop));
+                        //System.Diagnostics.Trace.WriteLine(string.Format("Curr offset {0:#.00} {1:#.00}", curLocation.X, curLocation.Y));                        
+                    }                                        
                     return true;
                 }
             }
@@ -148,8 +155,15 @@ namespace CoreSampleAnnotation.AnnotationPlane
 
         private void LowerGrid_PreviewMouseMove(object sender, MouseEventArgs e)
         {
-            if (HandleDrag(elem => e.GetPosition(elem)))
-                e.Handled = true;
+            if (e.StylusDevice == null)
+            {
+                //if StylusDevis is not null, the mouse event is actualy a promoted touch event.
+                //touch events are handled separetly.
+                //to avoid double hanglig of move, the handler operates with "pure" mouse events (e.StylusDevice == null)
+                if (HandleDrag(elem => e.GetPosition(elem)))
+                    e.Handled = true;
+                Trace.WriteLine(string.Format("LowerGrid_PreviewMouseMove: handled:{0}", e.Handled));
+            }
         }
 
         private void ColumnsGrid_ManipulationDelta(object sender, ManipulationDeltaEventArgs e)
@@ -214,7 +228,7 @@ namespace CoreSampleAnnotation.AnnotationPlane
 
         #region long hold related
         private Point touchPoint;
-        private Timer holdTimer = null;
+        private Timer columnHoldTimer = null;
         private ColumnView touchedView = null;
 
         private void View_TouchMove(object sender, TouchEventArgs e)
@@ -224,12 +238,12 @@ namespace CoreSampleAnnotation.AnnotationPlane
             if (dist > 15)
             {
                 //diactivating touch and hold
-                if (holdTimer != null)
+                if (columnHoldTimer != null)
                 {
                     //System.Diagnostics.Debug.WriteLine("touch-hold timer diactivated due to move ({0})", dist);
-                    holdTimer.Elapsed -= HoldTimer_Elapsed;
-                    holdTimer.Stop();
-                    holdTimer = null;
+                    columnHoldTimer.Elapsed -= HoldTimer_Elapsed;
+                    columnHoldTimer.Stop();
+                    columnHoldTimer = null;
                 }
             }
         }
@@ -241,35 +255,35 @@ namespace CoreSampleAnnotation.AnnotationPlane
                 int idx = Grid.GetColumn(touchedView);
                 PointSelected?.Invoke(this, new PointSelectedEventArgs(idx, touchPoint.Y));
             }));
-            if (holdTimer != null)
+            if (columnHoldTimer != null)
             {
                 //System.Diagnostics.Debug.WriteLine("touch-hold timer diactivated as it ticked");
-                holdTimer.Elapsed -= HoldTimer_Elapsed;
-                holdTimer.Stop();
-                holdTimer = null;
+                columnHoldTimer.Elapsed -= HoldTimer_Elapsed;
+                columnHoldTimer.Stop();
+                columnHoldTimer = null;
             }
         }
 
 
         private void View_TouchLeave(object sender, TouchEventArgs e)
         {
-            if (holdTimer != null)
+            if (columnHoldTimer != null)
             {
                 //System.Diagnostics.Debug.WriteLine("touch-hold timer diactivated due to touch leave");
-                holdTimer.Elapsed -= HoldTimer_Elapsed;
-                holdTimer.Stop();
-                holdTimer = null;
+                columnHoldTimer.Elapsed -= HoldTimer_Elapsed;
+                columnHoldTimer.Stop();
+                columnHoldTimer = null;
             }
         }
 
         private void View_TouchUp(object sender, TouchEventArgs e)
         {
-            if (holdTimer != null)
+            if (columnHoldTimer != null)
             {
                 //System.Diagnostics.Debug.WriteLine("touch-hold timer diactivated due to up event");
-                holdTimer.Elapsed -= HoldTimer_Elapsed;
-                holdTimer.Stop();
-                holdTimer = null;
+                columnHoldTimer.Elapsed -= HoldTimer_Elapsed;
+                columnHoldTimer.Stop();
+                columnHoldTimer = null;
             }
         }
 
@@ -278,16 +292,16 @@ namespace CoreSampleAnnotation.AnnotationPlane
             touchedView = (ColumnView)sender;
 
             touchPoint = e.GetTouchPoint(ColumnsGrid).Position;
-            if (holdTimer != null)
+            if (columnHoldTimer != null)
             {
                 System.Diagnostics.Debug.WriteLine("touch-hold timer diactivated as the new one starting");
-                holdTimer.Elapsed -= HoldTimer_Elapsed;
-                holdTimer.Stop();
-                holdTimer = null;
+                columnHoldTimer.Elapsed -= HoldTimer_Elapsed;
+                columnHoldTimer.Stop();
+                columnHoldTimer = null;
             }
-            holdTimer = new Timer(1000);
-            holdTimer.Elapsed += HoldTimer_Elapsed;
-            holdTimer.Start();
+            columnHoldTimer = new Timer(1000);
+            columnHoldTimer.Elapsed += HoldTimer_Elapsed;
+            columnHoldTimer.Start();
             System.Diagnostics.Debug.WriteLine("touch-hold timer activated");
         }
 

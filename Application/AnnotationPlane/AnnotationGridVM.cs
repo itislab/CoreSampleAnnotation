@@ -39,6 +39,26 @@ namespace CoreSampleAnnotation.AnnotationPlane
             }
         }
 
+        private FrameworkElement dragCandidateItem;
+        public FrameworkElement DragCandidateItem
+        {
+            get
+            {
+                return dragCandidateItem;
+            }
+            set
+            {
+                if (dragCandidateItem != value)
+                {
+                    dragCandidateItem = value;
+                    RaisePropertyChanged(nameof(DragCandidateItem));
+                }
+            }
+        }
+
+        //private ICommand touchAndHoldOnDraggableElement;
+        //public ICommand touc
+
         private Point localDraggedItemOffset;
         public Point LocalDraggedItemOffset {
             get {
@@ -52,15 +72,15 @@ namespace CoreSampleAnnotation.AnnotationPlane
             }
         }
 
-        private Point dragItemLocation;
-        public Point DragItemLocation {
+        private Point dragItemInitialLocation;
+        public Point DragItemInitialLocation {
             get {
-                return dragItemLocation;
+                return dragItemInitialLocation;
             }
             set {
-                if (dragItemLocation != value) {
-                    dragItemLocation = value;
-                    RaisePropertyChanged(nameof(DragItemLocation));
+                if (dragItemInitialLocation != value) {
+                    dragItemInitialLocation = value;
+                    RaisePropertyChanged(nameof(DragItemInitialLocation));
                 }
             }
         }        

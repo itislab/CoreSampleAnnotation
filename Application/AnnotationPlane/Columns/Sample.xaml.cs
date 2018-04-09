@@ -22,9 +22,8 @@ namespace CoreSampleAnnotation.AnnotationPlane.Columns
         {
             InitializeComponent();            
             MouseDown += Sample_MouseDown;
-            TouchDown += Sample_TouchDown;
-            
-        }
+            TouchDown += Sample_TouchDown;            
+        }        
 
         private void Sample_MouseDown(object sender, MouseEventArgs e)
         {

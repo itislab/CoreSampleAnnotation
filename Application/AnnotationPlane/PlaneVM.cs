@@ -718,9 +718,9 @@ namespace CoreSampleAnnotation.AnnotationPlane
                     Point localDragOffset = dsea.GetEventPoint(dsea.FrameworkElement);
                     Point dragItemLocation = startDragCoord - new Vector(localDragOffset.X, localDragOffset.Y);
                     AnnoGridVM.LocalDraggedItemOffset = localDragOffset;
-                    AnnoGridVM.DragItemLocation = dragItemLocation;
+                    AnnoGridVM.DragItemInitialLocation = dragItemLocation;
                     dsea.FrameworkElement.Tag = dsea.FrameworkElement.DataContext; // storing original data context in tag befor the element is moved out of the UI tree
-                    AnnoGridVM.DraggedItem = dsea.FrameworkElement;
+                    AnnoGridVM.DragCandidateItem = dsea.FrameworkElement;
                 }
             });
 
