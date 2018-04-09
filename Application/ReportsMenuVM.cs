@@ -37,6 +37,19 @@ namespace CoreSampleAnnotation {
             }
         }
 
+        private ICommand openFullCSVDialogCommand = null;
+        public ICommand OpenFullCSVDialogCommand {
+            get {
+                return openFullCSVDialogCommand;
+            }
+            set {
+                if (openFullCSVDialogCommand != value) {
+                    openFullCSVDialogCommand = value;
+                    RaisePropertyChanged(nameof(OpenFullCSVDialogCommand));
+                }
+            }
+        }
+
         public ProjectVM ProjectVM {
             get {
                 return projectVM;

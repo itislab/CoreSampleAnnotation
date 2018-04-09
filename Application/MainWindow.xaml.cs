@@ -257,6 +257,91 @@ namespace CoreSampleAnnotation
                     }
                 });
 
+                reportsMenuVM.OpenFullCSVDialogCommand = new DelegateCommand(() => {
+                    SaveFileDialog dlg = new SaveFileDialog();
+                    dlg.FileName = "ТаблицаСлоёв";
+                    dlg.DefaultExt = ".csv";
+                    dlg.Filter = "csv|*.csv";
+                    bool? result = dlg.ShowDialog();
+                    if (result == true) {
+                        string[] rankNames = vm.CurrentProjectVM.LayerRankNameSource.NominativeNames;
+                        string[] genRankNames = vm.CurrentProjectVM.LayerRankNameSource.GeneritiveNames;
+
+                        //transforming boundaryVMs to report specific boundaries
+                        Reports.RTF.LayerBoundary[] boundaries =
+                            vm.CurrentProjectVM.PlaneVM.LayerBoundaries
+                                .Select(b =>
+                                    new Reports.RTF.LayerBoundary(
+                                        b.Numbers,
+                                        vm.CurrentProjectVM.PlaneVM.LayerSyncController.WpfToDepth(b.Level),
+                                        b.Rank
+                                        )).ToArray();
+
+                        //preparing RTF specific layer data
+                        Reports.RTF.LayerDescrition[] layers = new Reports.RTF.LayerDescrition[boundaries.Length - 1];
+                        var layersAnnotation = vm.CurrentProjectVM.PlaneVM.AsLayersAnnotation;
+
+                        Dictionary<string, AnnotationPlane.Template.Property> propHelper = new Dictionary<string, AnnotationPlane.Template.Property>();
+                        foreach (var prop in vm.CurrentProjectVM.LayersTemplateSource.Template) {
+                            propHelper.Add(prop.ID, prop);
+                        }
+
+                        Func<AnnotationPlane.Template.Class, string> texturalRepresentation =
+                                    classValue => {
+                                        if (!string.IsNullOrEmpty(classValue.ShortName))
+                                            return classValue.ShortName;
+                                        if (!string.IsNullOrEmpty(classValue.Acronym))
+                                            return classValue.Acronym;
+                                        return classValue.ID;
+                                    };
+
+                        for (int i = 0; i < layers.Length; i++) {
+                            List<Reports.RTF.PropertyDescription> props = new List<Reports.RTF.PropertyDescription>();
+
+                            for (int j = 0; j < layersAnnotation.Columns.Length; j++) {
+                                var col = layersAnnotation.Columns[j];
+                                var value = col.LayerValues;
+                                var prop1 = propHelper[col.PropID];
+
+                                string[] values = null;
+                                if (value[i].Value != null)
+                                    values = value[i].Value.Select(v => texturalRepresentation(prop1.Classes.Single(c => c.ID == v))).ToArray();
+
+                                Reports.RTF.PropertyDescription prop =
+                                new Reports.RTF.PropertyDescription(
+                                    prop1.Name,
+                                    values,
+                                    value[i].Remarks);
+                                props.Add(prop);
+                            }
+                            layers[i] = new Reports.RTF.LayerDescrition(props.ToArray());
+                        }
+
+                        var samples = vm.CurrentProjectVM.PlaneVM.SamplesColumnVM.Samples
+                            .Select(s => new Reports.RTF.Sample(
+                                s.Number.ToString(),
+                                vm.CurrentProjectVM.PlaneVM.LayerSyncController.WpfToDepth(s.Level),
+                                "")).ToArray();
+
+                        Reports.CSV.ReportTable table =
+                            Reports.CSV.CSVReportHelpers.GenerateCVSTableContents(
+                                vm.CurrentProjectVM.BoreIntervalsVM.Intervals
+                                    .Where(i => !double.IsNaN(i.UpperDepth) && !double.IsNaN(i.LowerDepth))
+                                    .ToArray(),
+                                boundaries,
+                                layers,
+                                rankNames,
+                                samples,
+                                vm.CurrentProjectVM.AnnotationDirection,
+                                vm.CurrentProjectVM.LayersTemplateSource.Template,
+                                genRankNames
+                                );
+
+                        Reports.CSV.ReportCSV.Generate(dlg.FileName, table);
+                        MessageBox.Show("Файл с заготовкой csv отчета успешно сохранен", "Успешно", MessageBoxButton.OK, MessageBoxImage.Information);
+                    }
+                });
+
                 vm.ActiveSectionVM = reportsMenuVM;
             }, new Predicate<object>((obj1) => {
                 return vm.CurrentProjectVM.PlaneVM != null;

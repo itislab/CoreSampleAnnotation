@@ -304,6 +304,8 @@
     <Compile Include="ProjectVM.cs" />
     <Compile Include="Persistence\FolderPersister.cs" />
     <Compile Include="Reports\Helpers.cs" />
+    <Compile Include="Reports\CSV\ReportCSV.cs" />
+    <Compile Include="Reports\CSV\ReportHelpersCSV.cs" />
     <Compile Include="Reports\RTF\ReportHelpers.cs" />
     <Compile Include="Reports\RTF\TableDocument.cs" />
     <Compile Include="Reports\SVG\BoundaryColumnPainter.cs" />

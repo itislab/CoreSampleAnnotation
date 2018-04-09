@@ -10,7 +10,7 @@
         <StackPanel Orientation="Vertical" VerticalAlignment="Center" HorizontalAlignment="Center">
             <!--<TextBlock Text="Отчёты" MinWidth="400"/>-->
             <Button Style="{StaticResource MetroButton}" Command="{Binding OpenSamplesCSVDialogCommand}">Таблица образцов</Button>
-            <Button Style="{StaticResource MetroButton}">Таблица слоёв</Button>
+            <Button Style="{StaticResource MetroButton}" Command="{Binding OpenFullCSVDialogCommand}">Таблица слоёв</Button>
             <Button Style="{StaticResource MetroButton}" Command="{Binding OpenTextReportDialogCommand}">Заготовка текстового отчёта</Button>
         </StackPanel>
     </Grid>
