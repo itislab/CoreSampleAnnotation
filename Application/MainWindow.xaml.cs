@@ -265,6 +265,7 @@ namespace CoreSampleAnnotation
                     bool? result = dlg.ShowDialog();
                     if (result == true) {
                         string[] rankNames = vm.CurrentProjectVM.LayerRankNameSource.NominativeNames;
+                        string[] genRankNames = vm.CurrentProjectVM.LayerRankNameSource.GeneritiveNames;
 
                         //transforming boundaryVMs to report specific boundaries
                         Reports.RTF.LayerBoundary[] boundaries =
@@ -332,7 +333,8 @@ namespace CoreSampleAnnotation
                                 rankNames,
                                 samples,
                                 vm.CurrentProjectVM.AnnotationDirection,
-                                vm.CurrentProjectVM.LayersTemplateSource.Template
+                                vm.CurrentProjectVM.LayersTemplateSource.Template,
+                                genRankNames
                                 );
 
                         Reports.CSV.ReportCSV.Generate(dlg.FileName, table);

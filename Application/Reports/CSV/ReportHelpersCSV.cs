@@ -7,17 +7,6 @@ using System.Threading.Tasks;
 namespace CoreSampleAnnotation.Reports.CSV {
     public static class CSVReportHelpers {
         /// <summary>
-        /// Generates the row depicting extraction interval
-        /// </summary>
-        /// <param name="upperDepth">in meters (positive)</param>
-        /// <param name="lowerDepth">in meters (positive)</param>
-        /// <param name="extractedLength">in meters (positive)</param>
-        /// <returns></returns>
-        public static CSV.ReportRow GetIntervalRow(double upperDepth, double lowerDepth, double extractedLength) {
-            return new CSV.ReportRow(new String[] { string.Format("Интервал {0:0.#}-{1:0.##}/{2:0.##} м (присутствует {3:0.##} м)", upperDepth, lowerDepth, lowerDepth - upperDepth, extractedLength) });
-        }
-
-        /// <summary>
         /// Generates the row depicting group of layers with specific rank
         /// </summary>
         /// <param name="length">group total length (in meters)</param>
@@ -38,7 +27,8 @@ namespace CoreSampleAnnotation.Reports.CSV {
                 }
 
                 length = Math.Min(length, curIntLower - upperLaBound.Depth);
-                rrl.Add(GetRankDescrRow(upperLaBound.OrderNumbers[rank], rankNames[rank], length));
+                //rrl.Add(GetRankDescrRow(upperLaBound.OrderNumbers[rank], rankNames[rank], length));
+                rrl.Add(upperLaBound.OrderNumbers[rank].ToString());
             }
 
             return rrl;
@@ -59,17 +49,20 @@ namespace CoreSampleAnnotation.Reports.CSV {
                 if (rank == lowerLaBound.Rank) {
                     switch (rank) {
                         case 2:
-                            rrl.Add(GetRankDescrRow(lowerLaBound.OrderNumbers[2] + 1, rankNames[2], length));
+                            //rrl.Add(GetRankDescrRow(lowerLaBound.OrderNumbers[2] + 1, rankNames[2], length));
+                            rrl.Add((lowerLaBound.OrderNumbers[2] + 1).ToString());
                             break;
                         case 1:
-                            rrl.Add(GetRankDescrRow(lowerLaBound.OrderNumbers[0] + 1, rankNames[1], length));
+                            //rrl.Add(GetRankDescrRow(lowerLaBound.OrderNumbers[0] + 1, rankNames[1], length));
+                            rrl.Add((lowerLaBound.OrderNumbers[0] + 1).ToString());
                             break;
                         default:
                             break;
                     }
                 }
                 else {
-                    rrl.Add(GetRankDescrRow(1, rankNames[rank], length));
+                    //rrl.Add(GetRankDescrRow(1, rankNames[rank], length));
+                    rrl.Add("1");
                 }
             }
 
@@ -87,7 +80,7 @@ namespace CoreSampleAnnotation.Reports.CSV {
 
             row.Add(group_number);
             row.Add(pack_number);
-            row.Add(string.Format("{0} Cлой", orderNum));
+            row.Add(orderNum.ToString());
             row.Add(lower.ToString());
             row.Add(upper.ToString());
 
@@ -137,7 +130,9 @@ namespace CoreSampleAnnotation.Reports.CSV {
             string[] rankNames,
             RTF.Sample[] samples,
             AnnotationDirection annotationDirection,
-            AnnotationPlane.Template.Property[] allProperties) {
+            AnnotationPlane.Template.Property[] allProperties,
+            string[] genRankNames
+            ) {
             List<KeyValuePair<double, int>> intBounds = new List<KeyValuePair<double, int>>();
             for (int i = 0; i < intervals.Length; i++) {
                 Intervals.BoreIntervalVM interval = intervals[i];
@@ -180,9 +175,11 @@ namespace CoreSampleAnnotation.Reports.CSV {
 
             List<string> allColumnsList = new List<string>();
 
-            allColumnsList.Add("№ слоя");
-            allColumnsList.Add("Верхняя граница слоя, м");
-            allColumnsList.Add("Нижняя граница слоя, м");
+            allColumnsList.Add("№ " + genRankNames[0]);
+            allColumnsList.Add("№ " + genRankNames[1]);
+            allColumnsList.Add("№ " + genRankNames[2]);
+            allColumnsList.Add("Верхняя граница слоя (м)");
+            allColumnsList.Add("Нижняя граница слоя (м)");
 
             foreach (AnnotationPlane.Template.Property prop in allProperties) {
                 allColumnsList.Add(string.IsNullOrEmpty(prop.Name) ? prop.Name : prop.ID);
@@ -247,7 +244,7 @@ namespace CoreSampleAnnotation.Reports.CSV {
                         switch (upperLabound.Rank) {
                             case 2:
                                 group_number = group_pack[0];
-                                pack_number = "1 Пачка";
+                                pack_number = "1";
                                 layerOrderNum = 1;
                                 break;
                             case 1:
