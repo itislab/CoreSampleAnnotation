@@ -492,7 +492,9 @@ namespace CoreSampleAnnotation.AnnotationPlane
             if (cl.ExampleImage != null)
                 result.ExampleImage = cl.ExampleImage;
             return result;
-        }               
+        }
+
+        private DelegateCommand AnnoPlaneLongHoldHandler;
 
         /// <summary>
         /// Fills the LayerProps view models with the information passed in annotatioN
@@ -513,9 +515,18 @@ namespace CoreSampleAnnotation.AnnotationPlane
                 availableClasses.Add(p.ID, availableClassesOfP.ToArray()); //global dict of available choices
             }
 
+            AnnoPlaneLongHoldHandler = new DelegateCommand((obj1) => {
+                SampleVM sVM = obj1 as SampleVM;
+                if (sVM != null)
+                {
+                    SampleUnderCorrection = sVM;
+                }                
+            });
 
             AnnoGridVM = new AnnotationGridVM();
-            
+            AnnoGridVM.LongHoldOnDragabaleElementCommand = AnnoPlaneLongHoldHandler;
+
+
             ElementDropped = new DelegateCommand(obj =>
             {
                 ElemDroppedEventArgs edea = obj as ElemDroppedEventArgs;
@@ -658,7 +669,7 @@ namespace CoreSampleAnnotation.AnnotationPlane
             });
 
             LayerSyncController.PropertyChanged += LayerSyncController_PropertyChanged;
-            ColScaleController.PropertyChanged += ColScaleController_PropertyChanged;
+            ColScaleController.PropertyChanged += ColScaleController_PropertyChanged;            
 
             zoomInCommand = new DelegateCommand(() => {
                 ScaleFactor *= 1.1;
@@ -826,6 +837,7 @@ namespace CoreSampleAnnotation.AnnotationPlane
 
             //reseting previous selected columns
             AnnoGridVM = new AnnotationGridVM();
+            AnnoGridVM.LongHoldOnDragabaleElementCommand = AnnoPlaneLongHoldHandler;
 
             MassColumnRemove();
 
