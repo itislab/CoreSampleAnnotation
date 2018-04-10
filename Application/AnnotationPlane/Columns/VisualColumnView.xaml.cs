@@ -40,6 +40,7 @@ namespace CoreSampleAnnotation.AnnotationPlane.Columns
         private static ISideCurveGenerator straight = new StraightSideCurveGenerator();
         private static ISideCurveGenerator steps = new OscillatingSignalCurveGenerator(20, 3, new StepOscillationGenerator());
         private static ISideCurveGenerator wave = new OscillatingSignalCurveGenerator(20,3,new SinOscillationGenerator(10));
+        private static ISideCurveGenerator zigzag = new OscillatingSignalCurveGenerator(20, 3, new ZigZagOscillationGenerator());
 
 
         public static ISideCurveGenerator GetGeneratorFor(Template.RightSideFormEnum rightSideForm) {
@@ -47,6 +48,7 @@ namespace CoreSampleAnnotation.AnnotationPlane.Columns
                 case Template.RightSideFormEnum.Straight: return straight;
                 case Template.RightSideFormEnum.Steps: return steps;
                 case Template.RightSideFormEnum.Wave: return wave;
+                case Template.RightSideFormEnum.ZigZag: return zigzag;
                 default:
                     throw new NotSupportedException("Unknown right side form");
             }

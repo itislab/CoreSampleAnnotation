@@ -113,6 +113,7 @@ namespace CoreSampleAnnotation.Persistence
                             case "прямая": rightSide = RightSideFormEnum.Straight; break;
                             case "ступеньки": rightSide = RightSideFormEnum.Steps; break;
                             case "волна": rightSide = RightSideFormEnum.Wave; break;
+                            case "зигзаг": rightSide = RightSideFormEnum.ZigZag; break;
                             default:
                                 MessageBox.Show(
                                     string.Format("Форма правой границы крапа \"{0}\", указанная в шаблоне, не поддерживается. Будет использована прямая форма. ({1})", row.RightSideForm, row.ToString()),

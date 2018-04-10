@@ -98,6 +98,20 @@ namespace CoreSampleAnnotation.AnnotationPlane.Columns
         }
     }
 
+    public class ZigZagOscillationGenerator : IOscillationGenerator
+    {
+        public IEnumerable<Point> GeneratePeriod(double xPeriod, double signalMaxY)
+        {
+            double halfPeriod = xPeriod * 0.5;
+            double quaterPeriod = halfPeriod * 0.5;
+            List<Point> result = new List<Point>();
+            result.Add(new Point(quaterPeriod, signalMaxY));
+            result.Add(new Point(quaterPeriod + halfPeriod, -signalMaxY));            
+            result.Add(new Point(xPeriod, 0.0));
+            return result;
+        }
+    }
+
     public class StepOscillationGenerator : IOscillationGenerator
     {
         public IEnumerable<Point> GeneratePeriod(double xPeriod, double signalMaxY)
