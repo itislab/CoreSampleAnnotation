@@ -13,25 +13,7 @@ namespace CoreSampleAnnotation.Reports.CSV {
         /// <returns></returns>
         public static string GetRankDescrRow(int orderNumber, string rankName, double length) {
             return string.Format("{0} {1}", orderNumber, rankName);
-        }
-
-        private static List<int> GetGroupPackNumbersForUpperLaBound(RTF.LayerBoundary upperLaBound, int laIndex, RTF.LayerBoundary[] boundaries, double curIntLower, string[] rankNames) {
-            List<int> rrl = new List<int>();
-            for (int rank = upperLaBound.Rank; rank > 0; rank--) {
-                double length = 0.0;
-                for (int i = laIndex + 1; i < boundaries.Length; i++) {
-                    int curRank = boundaries[i].Rank;
-                    length += boundaries[i].Depth - boundaries[i - 1].Depth;
-                    if (curRank >= rank)
-                        break;
-                }
-
-                length = Math.Min(length, curIntLower - upperLaBound.Depth);
-                rrl.Add(upperLaBound.OrderNumbers[rank]);
-            }
-
-            return rrl;
-        }
+        }        
 
         private static List<int> GetGroupPackNumbersForLowerLaBound(RTF.LayerBoundary lowerLaBound, int laIndex, RTF.LayerBoundary[] boundaries, double curIntUpper, string[] rankNames) {
             List<int> rrl = new List<int>();
@@ -70,15 +52,14 @@ namespace CoreSampleAnnotation.Reports.CSV {
 
         /// <summary>
         /// Generates row deorcting specific layer
-        /// </summary>        
-        /// <param name="length">in meters</param>        
+        /// </summary>                    
         /// <returns></returns>
-        public static ReportRow GetLayerDescrRow(int orderNum, double lower, double upper, RTF.LayerDescrition description, RTF.Sample[] samples, int group_number, int pack_number, AnnotationPlane.Template.Property[] allProperties) {
+        public static ReportRow GetLayerDescrRow(double lower, double upper, RTF.LayerDescrition description, int[] layerNumbers, AnnotationPlane.Template.Property[] allProperties) {
             List<string> row = new List<string>();
 
-            row.Add(group_number.ToString());
-            row.Add(pack_number.ToString());
-            row.Add(orderNum.ToString());
+            for (int i = layerNumbers.Length-1; i >= 0; i--)            
+                row.Add(layerNumbers[i].ToString());
+                        
             row.Add(Math.Round(upper, 4).ToString());
             row.Add(Math.Round(lower, 4).ToString());
 
@@ -93,7 +74,7 @@ namespace CoreSampleAnnotation.Reports.CSV {
                     ///if property is set for current layer
                     entries += string.Join(", ", propDescr.Values.Select(v => v.ToLower()));
                     if (!string.IsNullOrEmpty(propDescr.Comment)) {
-                        entries += string.Format(" ({0})", propDescr.Comment);
+                        entries += string.Format(". {0}", propDescr.Comment);
                     }
                     row.Add(entries);
                 }
@@ -114,67 +95,29 @@ namespace CoreSampleAnnotation.Reports.CSV {
         /// <summary>
         /// Forms a table by filling it with supplied data
         /// </summary>
-        /// <param name="intervals"></param>
         /// <param name="boundaries">including the "outer boundaries" of bounding layer</param>    
         /// <param name="layers"></param>
-        /// <param name="isDepthIncreases">true if depth increases (other parameter arrays are sorted so the depth increases)</param>
-        /// <param name="samples">All samples in the project</param>
+        /// <param name="isDepthIncreases">true if depth increases (other parameter arrays are sorted so the depth increases)</param>        
         /// <returns></returns>
-        public static CSV.ReportTable GenerateCVSTableContents(
-            Intervals.BoreIntervalVM[] intervals,
+        public static CSV.ReportTable GenerateCVSTableContents(            
             RTF.LayerBoundary[] boundaries,
-            RTF.LayerDescrition[] layers,
-            string[] rankNames,
-            RTF.Sample[] samples,
+            RTF.LayerDescrition[] layers,            
             AnnotationDirection annotationDirection,
             AnnotationPlane.Template.Property[] allProperties,
             string[] genRankNames
-            ) {
-            List<KeyValuePair<double, int>> intBounds = new List<KeyValuePair<double, int>>();
-            for (int i = 0; i < intervals.Length; i++) {
-                Intervals.BoreIntervalVM interval = intervals[i];
-                if (interval.LowerDepth < interval.UpperDepth)
-                    throw new ArgumentException("The upper bound is lower than lower bound");
-                intBounds.Add(new KeyValuePair<double, int>(interval.UpperDepth, 1));
-                intBounds.Add(new KeyValuePair<double, int>(interval.LowerDepth, -1));
-            }
-            double[] keys = intBounds.Select(kvp => kvp.Key).ToArray();
-            foreach (int key in keys) {
-                int curKeyValsSum = intBounds.Where(kvp => kvp.Key == key).Sum(kvp => kvp.Value);
-                if (curKeyValsSum == 0) {
-                    intBounds = intBounds.Where(kvp => kvp.Key != key).ToList();
-                }
-            }
-
-            int[] events = intBounds.OrderBy(kvp => kvp.Key).Select(kvp => kvp.Value).ToArray();
-            int sum = 0;
-            for (int i = 0; i < events.Length; i++) {
-                sum += events[i];
-                if (Math.Abs(sum) > 1)
-                    throw new InvalidOperationException("You've passed intersecting intervals");
-            }
-
-
+            ) {                        
+            
             List<CSV.ReportRow> rows = new List<CSV.ReportRow>();
 
             if (boundaries.Length - 1 != layers.Length)
-                throw new ArgumentException("Layers count must be exactly one more than boundary count");
-
-            string directionString = string.Empty;
-            switch (annotationDirection) {
-                case AnnotationDirection.UpToBottom:
-                    directionString = "сверху вниз";
-                    break;
-                case AnnotationDirection.BottomToUp:
-                    directionString = "снизу вверх";
-                    break;
-            }
+                throw new ArgumentException("Layers count must be exactly one more than boundary count");            
 
             List<string> allColumnsList = new List<string>();
 
-            allColumnsList.Add("№ " + genRankNames[0]);
-            allColumnsList.Add("№ " + genRankNames[1]);
-            allColumnsList.Add("№ " + genRankNames[2]);
+            for (int i = genRankNames.Length-1; i >=0; i--)
+            {
+                allColumnsList.Add(string.Format("№ {0}",genRankNames[i]));
+            }
             allColumnsList.Add("Верхняя граница слоя (м)");
             allColumnsList.Add("Нижняя граница слоя (м)");
 
@@ -184,152 +127,30 @@ namespace CoreSampleAnnotation.Reports.CSV {
 
             CSV.ReportRow header = new CSV.ReportRow(allColumnsList.ToArray());
             rows.Add(header);
-
-            int reportedInIndex;
-            int inIndex;
-            int laIndex;
-            int layerOrderNum;
-            int group_number = 1;
-            int pack_number = 1;
+            
+            int[] ranksNumbers = Enumerable.Repeat(1, genRankNames.Length).ToArray();
             
             switch (annotationDirection) {
                 case AnnotationDirection.UpToBottom:
-                    intervals = intervals.OrderBy(i => i.UpperDepth).ToArray();
-                    for (int i = 0; i < boundaries.Length - 1; i++)
-                        if (boundaries[i + 1].Depth < boundaries[i].Depth)
-                            throw new NotSupportedException("Boundary depths must increase");
-
-                    reportedInIndex = -1;
-                    inIndex = 0;
-                    laIndex = 0;
-                    layerOrderNum = 1;
-                    while (inIndex < intervals.Length && laIndex < layers.Length) {
-                        if (reportedInIndex != inIndex) {
-                            reportedInIndex = inIndex;
+                    for (int i = 0; i < layers.Length; i++)
+                    {
+                        for (int j = 0; j < boundaries[i].OrderNumbers.Length; j++) {
+                            ranksNumbers[j] = boundaries[i].OrderNumbers[j];
                         }
-                        RTF.LayerBoundary upperLabound = boundaries[laIndex];
-                        double curLaUpper = upperLabound.Depth;
-                        double curLaLower = boundaries[laIndex + 1].Depth;
-                        double curIntUpper = intervals[inIndex].UpperDepth;
-                        double curIntLower = intervals[inIndex].UpperDepth + intervals[inIndex].ExtractedLength;
-                        bool doInInc = false;
-                        bool doLaInc = false;
-                        bool skipReporting = false;
-                        
-                        if (curIntLower >= curLaLower) {
-                            if (curIntUpper > curLaLower) {
-                                skipReporting = true;
-                            }
-                            else {
-                                if (curIntUpper > curLaUpper) {
-                                    curLaUpper = curIntUpper;
-                                }
-                            }
-                            doLaInc = true;
-                        }
-                        else {
-                            curLaLower = curIntLower;
-                            if (curIntUpper > curLaUpper) {
-                                curLaUpper = curIntUpper;
-                            }
-
-                            doInInc = true;
-                        }
-
-                        List<int> group_pack = GetGroupPackNumbersForUpperLaBound(upperLabound, laIndex, boundaries, curIntLower, rankNames);
-
-                        switch (upperLabound.Rank) {
-                            case 2:
-                                group_number = group_pack[0];
-                                pack_number = 1;
-                                layerOrderNum = 1;
-                                break;
-                            case 1:
-                                pack_number = group_pack[0];
-                                layerOrderNum = 1;
-                                break;
-                            default:
-                                break;
-                        }
-
-                        if (!skipReporting) {
-                            var layerSamples = samples.Where(s => (s.Depth > curLaUpper) && (s.Depth < curLaLower)).ToArray();
-                            rows.Add(GetLayerDescrRow(layerOrderNum++, curLaLower, curLaUpper, layers[laIndex], layerSamples, group_number, pack_number, allProperties));
-                        }
-                        if (doLaInc)
-                            laIndex++;
-                        if (doInInc)
-                            inIndex++;
+                        rows.Add(GetLayerDescrRow(boundaries[i+1].Depth, boundaries[i].Depth, layers[i], ranksNumbers, allProperties));
                     }
+                            
+                      
                     break;
                 case AnnotationDirection.BottomToUp:
-                    intervals = intervals.OrderBy(i => i.UpperDepth).ToArray();
-                    for (int i = boundaries.Length - 2; i >= 0; i--)
-                        if (boundaries[i + 1].Depth < boundaries[i].Depth)
-                            throw new NotSupportedException("Boundary depths must increase");
-
-                    reportedInIndex = intervals.Length;
-                    inIndex = intervals.Length - 1;
-                    laIndex = layers.Length - 1;
-                    layerOrderNum = 1;
-                    while (inIndex >= 0 && laIndex >= 0) {
-                        if (reportedInIndex != inIndex) {
-                            reportedInIndex = inIndex;
+                    for (int i = layers.Length - 1; i >= 0 ; i--)
+                    {
+                        rows.Add(GetLayerDescrRow(boundaries[i + 1].Depth, boundaries[i].Depth, layers[i], ranksNumbers, allProperties));
+                        ranksNumbers[boundaries[i].OrderNumbers.Length - 1] = boundaries[i].OrderNumbers[boundaries[i].OrderNumbers.Length - 1] + 1;
+                        for (int j = 0; j < boundaries[i].OrderNumbers.Length - 1; j++)
+                        {
+                            ranksNumbers[j] = 1;
                         }
-                        RTF.LayerBoundary upperLabound = boundaries[laIndex];
-                        RTF.LayerBoundary lowerLaBound = boundaries[laIndex + 1];
-                        double curLaUpper = upperLabound.Depth;
-                        double curLaLower = boundaries[laIndex + 1].Depth;
-                        double curIntUpper = intervals[inIndex].UpperDepth;
-                        double curIntLower = intervals[inIndex].UpperDepth + intervals[inIndex].ExtractedLength;
-                        bool doInDec = false;
-                        bool doLaDec = false;
-                        bool skipReporting = false;
-                        
-                        if (curIntUpper <= curLaUpper) {
-                            if (curIntLower < curLaUpper) {
-                                skipReporting = true;
-                            }
-                            else {
-                                if (curIntLower < curLaLower) {
-                                    curLaLower = curIntLower;
-                                }
-                            }
-                            doLaDec = true;
-                        }
-                        else {
-                            curLaUpper = curIntUpper;
-                            if (curIntLower < curLaLower) {
-                                curLaLower = curIntLower;
-                            }
-
-                            doInDec = true;
-                        }
-
-                        if (!skipReporting) {
-                            List<int> group_pack = GetGroupPackNumbersForLowerLaBound(lowerLaBound, laIndex, boundaries, curIntUpper, rankNames);
-
-                            switch (lowerLaBound.Rank) {
-                                case 2:
-                                    group_number = group_pack[0];
-                                    pack_number = group_pack[1];
-                                    layerOrderNum = 1;
-                                    break;
-                                case 1:
-                                    pack_number = group_pack[0];
-                                    layerOrderNum = 1;
-                                    break;
-                                default:
-                                    break;
-                            }
-
-                            var layerSamples = samples.Where(s => (s.Depth > curLaUpper) && (s.Depth < curLaLower)).ToArray();
-                            rows.Add(GetLayerDescrRow(layerOrderNum++, curLaLower, curLaUpper, layers[laIndex], layerSamples, group_number, pack_number, allProperties));
-                        }
-                        if (doLaDec)
-                            laIndex--;
-                        if (doInDec)
-                            inIndex--;
                     }
                     break;
                 default:

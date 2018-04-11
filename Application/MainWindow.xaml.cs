@@ -325,13 +325,8 @@ namespace CoreSampleAnnotation
 
                         Reports.CSV.ReportTable table =
                             Reports.CSV.CSVReportHelpers.GenerateCVSTableContents(
-                                vm.CurrentProjectVM.BoreIntervalsVM.Intervals
-                                    .Where(i => !double.IsNaN(i.UpperDepth) && !double.IsNaN(i.LowerDepth))
-                                    .ToArray(),
                                 boundaries,
                                 layers,
-                                rankNames,
-                                samples,
                                 vm.CurrentProjectVM.AnnotationDirection,
                                 vm.CurrentProjectVM.LayersTemplateSource.Template,
                                 genRankNames
