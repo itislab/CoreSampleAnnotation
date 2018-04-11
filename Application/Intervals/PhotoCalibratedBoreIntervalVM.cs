@@ -209,6 +209,9 @@ namespace CoreSampleAnnotation.Intervals
 
         private Dictionary<int, List<Action>> canMoveRegionChangedActivations = new Dictionary<int, List<Action>>();
 
+        /// <summary>
+        /// Updates upper and lower depths, as well as can move up/down on all of the regions
+        /// </summary>
         private void RecalculateRegionProperties()
         {
             //recalculating depths
@@ -363,9 +366,10 @@ namespace CoreSampleAnnotation.Intervals
                     case nameof(vm.Length):
                         RaisePropertyChanged(nameof(AnnotatedLength));
                         RaisePropertyChanged(nameof(AnnotatedPercentage));
+                        RecalculateRegionProperties();
                         break;
                     case nameof(vm.Order):
-                        RecalculateRegionProperties();                        
+                        RecalculateRegionProperties();
                         break;
                 }
             }

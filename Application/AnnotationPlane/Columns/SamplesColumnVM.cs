@@ -140,6 +140,19 @@ namespace CoreSampleAnnotation.AnnotationPlane
         public SamplesColumnVM() : base("Образцы")
         {
             Samples = new SampleVM[0];
+            PropertyChanged += SamplesColumnVM_PropertyChanged;
+        }
+
+        private void SamplesColumnVM_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            switch (e.PropertyName) {
+                case nameof(ColumnHeight):
+                case nameof(UpperBound):
+                case nameof(LowerBound):
+                    //reassigning samples causes recalculation their positions in WPF units
+                    Samples = Samples.ToArray();
+                    break;
+            }
         }
 
         private ICommand dragStart;
@@ -195,6 +208,7 @@ namespace CoreSampleAnnotation.AnnotationPlane
             LowerBound = info.GetDouble("Bottom");
             ColumnHeight = info.GetDouble("Height");
             Samples = (SampleVM[])info.GetValue("Samples",typeof(SampleVM[]));
+            PropertyChanged += SamplesColumnVM_PropertyChanged;
         }
         public virtual void GetObjectData(SerializationInfo info, StreamingContext context)
         {
