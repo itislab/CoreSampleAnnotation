@@ -20,22 +20,27 @@
             <Button Style="{StaticResource MetroButton}" Command="{Binding ImportFromFileCommnad}" Content="Импорт столбцов"/>
             <Button Style="{StaticResource MetroButton}" Command="{Binding ExportToFileCommand}" Content="Экспорт столбцов"/>
         </StackPanel>
-        <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
-            <ItemsControl ItemsSource="{Binding OrderedColumnDefinitions}" Grid.Row="0" VerticalAlignment="Top"  Grid.IsSharedSizeScope="True">
-        </ItemsControl>
-        <StackPanel Grid.Row="1" Orientation="Horizontal" VerticalAlignment="Center" Margin="0,30,0,0">
-            <TextBlock VerticalAlignment="Center" FontSize="20">Добавить колонку:</TextBlock>
+        <Grid VerticalAlignment="Stretch" HorizontalAlignment="Center">
+            <Grid.RowDefinitions>
+                <RowDefinition/>
+                <RowDefinition Height="auto"/>
+            </Grid.RowDefinitions>
+            <ScrollViewer Grid.Row="0" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+                <ItemsControl ItemsSource="{Binding OrderedColumnDefinitions}"  VerticalAlignment="Center" Grid.IsSharedSizeScope="True"/>
+            </ScrollViewer>            
+            <StackPanel Grid.Row="1" Orientation="Horizontal" VerticalAlignment="Center" Margin="0,30,0,30">
+                <TextBlock VerticalAlignment="Center" FontSize="20">Добавить колонку:</TextBlock>
                 <WrapPanel>
-                <Button Style="{StaticResource MetroButton}" Command="{Binding AddDepthCommand}">Шкала глубин</Button>
-                <Button Style="{StaticResource MetroButton}" Command="{Binding AddPhotoCommand}">Фото</Button>
-                <Button Style="{StaticResource MetroButton}" Command="{Binding AddLayerLengthCommand}">Мощность слоя</Button>
-                <Button Style="{StaticResource MetroButton}" Command="{Binding AddLayerBoundsCommand}">Границы слоев</Button>
-                <Button Style="{StaticResource MetroButton}" Command="{Binding AddLayerPropCommand}">Свойство слоя</Button>
-                <Button Style="{StaticResource MetroButton}" Command="{Binding AddLayerSamplesCommand}">Образцы</Button>
-                <Button Style="{StaticResource MetroButton}" Command="{Binding AddVisualCommand}">Крап</Button>
-                <Button Style="{StaticResource MetroButton}" Command="{Binding AddIconsCommand}">Значки</Button>
+                    <Button Style="{StaticResource MetroButton}" Command="{Binding AddDepthCommand}">Шкала глубин</Button>
+                    <Button Style="{StaticResource MetroButton}" Command="{Binding AddPhotoCommand}">Фото</Button>
+                    <Button Style="{StaticResource MetroButton}" Command="{Binding AddLayerLengthCommand}">Мощность слоя</Button>
+                    <Button Style="{StaticResource MetroButton}" Command="{Binding AddLayerBoundsCommand}">Границы слоев</Button>
+                    <Button Style="{StaticResource MetroButton}" Command="{Binding AddLayerPropCommand}">Свойство слоя</Button>
+                    <Button Style="{StaticResource MetroButton}" Command="{Binding AddLayerSamplesCommand}">Образцы</Button>
+                    <Button Style="{StaticResource MetroButton}" Command="{Binding AddVisualCommand}">Крап</Button>
+                    <Button Style="{StaticResource MetroButton}" Command="{Binding AddIconsCommand}">Значки</Button>
                 </WrapPanel>
             </StackPanel>
-        </StackPanel>
+        </Grid>
     </Grid>
 </UserControl>
