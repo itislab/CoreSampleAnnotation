@@ -150,16 +150,19 @@ namespace CoreSampleAnnotation.Reports.SVG
                 //items
                 var items = group.Items;
 
-                int j = 0;
+                int j = -1;
 
                 SvgElement[] fragments = items.Select(item => item.GetPresentation(itemImageWidth, itemImageHeight)).ToArray();
 
+                int drawnItems = 0;
+
                 foreach (var item in items)
-                {                    
+                {
+                    j++;
                     if (fragments[j] == null)
                         continue;
 
-                    float yOffset = currGroupOffset + titleYoffset + itemsYoffset + j * (itemYgap+ itemImageHeight);
+                    float yOffset = currGroupOffset + titleYoffset + itemsYoffset + drawnItems * (itemYgap+ itemImageHeight);
 
                     if (fragments[j] is SvgFragment)
                     {
@@ -177,9 +180,9 @@ namespace CoreSampleAnnotation.Reports.SVG
                     text.Fill = new SvgColourServer(System.Drawing.Color.Black);
                     text.Transforms.Add(new SvgTranslate(descrXoffset, yOffset+ itemImageHeight * 0.5f));
                     legendGroup.Children.Add(text);
-                    j++;
+                    drawnItems++;
                 }
-                currGroupOffset += titleYoffset + itemsYoffset + (itemYgap + itemImageHeight) * items.Length + interGroupYgap;
+                currGroupOffset += titleYoffset + itemsYoffset + (itemYgap + itemImageHeight) * drawnItems + interGroupYgap;
                 k++;
             }
 
