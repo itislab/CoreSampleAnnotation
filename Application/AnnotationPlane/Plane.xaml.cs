@@ -73,15 +73,16 @@ namespace CoreSampleAnnotation.AnnotationPlane
                         {
                             var colVm = vm.AnnoGridVM.Columns[idx];
                             //gathering column SVG representation ...
-                            columnRenderers.Add(Reports.SVG.ColumnPainterFactory.Create(elem, AnnoGrid.ColumnsGrid.Children[idx] as ColumnView, colVm));                            
+                            columnRenderers.Add(Reports.SVG.ColumnPainterFactory.Create(elem, AnnoGrid.ColumnsGrid.Children[idx] as ColumnView, colVm));
                             //... and possible appearence in the legend
+                            var comparer = new Comparer1();
                             if (colVm is ILayerColumn) {
                                 ILayerColumn lcVM = colVm as ILayerColumn;
-                                foundLegendItems.AddRange(lcVM.Layers.SelectMany(l => Reports.SVG.LegendFactory.GetLegendItemsForLayer(l)));
+                                foundLegendItems.AddRange(lcVM.Layers.SelectMany(l => Reports.SVG.LegendFactory.GetLegendItemsForLayer(l)).Distinct(comparer));
                             }
                             if (colVm is Columns.VisualColumnVM) {
                                 Columns.VisualColumnVM vcVM = (Columns.VisualColumnVM)colVm;
-                                foundLegendItems.AddRange(vcVM.Layers.SelectMany(l => Reports.SVG.LegendFactory.GetLegendItemsForVisualLayer(l)));
+                                foundLegendItems.AddRange(vcVM.Layers.SelectMany(l => Reports.SVG.LegendFactory.GetLegendItemsForVisualLayer(l)).Distinct(comparer));
                             }
                             idx++;
                         }
@@ -155,5 +156,18 @@ namespace CoreSampleAnnotation.AnnotationPlane
         }
 
 
+    }
+
+    class Comparer1 : IEqualityComparer<Tuple<Reports.SVG.LegendItemKey, Reports.SVG.ILegendItem>>
+    {
+        public bool Equals(Tuple<Reports.SVG.LegendItemKey, Reports.SVG.ILegendItem> x, Tuple<Reports.SVG.LegendItemKey, Reports.SVG.ILegendItem> y)
+        {
+            return x.Item1.Equals(y.Item1);
+        }
+
+        public int GetHashCode(Tuple<Reports.SVG.LegendItemKey, Reports.SVG.ILegendItem> obj)
+        {
+            return obj.Item1.GetHashCode();
+        }
     }
 }
