@@ -7,7 +7,7 @@ using System.Windows.Media;
 
 namespace CoreSampleAnnotation.AnnotationPlane.Template
 {
-    public enum RightSideFormEnum { Straight, Steps, Wave, ZigZag}
+    public enum RightSideFormEnum { NotDefined, Straight, Steps, Wave, ZigZag}
 
     /// <summary>
     /// A class that one property can take

@@ -35,10 +35,10 @@ namespace CoreSampleAnnotation.Reports.SVG
 
         public static Tuple<LegendItemKey, ILegendItem>[] GetLegendItemsForVisualLayer(VisualLayerPresentingVM layer)
         {
-            if (layer.BackgroundBrush != null && layer.Origin.CurrentClass != null)
+            if (layer.BackgroundBrush != null && layer.BackgroundClass.CurrentClass != null)
             {
-                LegendItemKey key = new LegendItemKey(layer.Origin.PropertyName, layer.Origin.CurrentClass.ID, PropertyRepresentation.BackgroundPattern);
-                return new Tuple<LegendItemKey, ILegendItem>[] { Tuple.Create(key, new BacgroundFillLegendItem(layer.Origin.CurrentClass) as ILegendItem) };
+                LegendItemKey key = new LegendItemKey(layer.BackgroundClass.PropertyName, layer.BackgroundClass.CurrentClass.ID, PropertyRepresentation.BackgroundPattern);
+                return new Tuple<LegendItemKey, ILegendItem>[] { Tuple.Create(key, new BacgroundFillLegendItem(layer.BackgroundClass.CurrentClass) as ILegendItem) };
             }
             else
                 return new Tuple<LegendItemKey, ILegendItem>[0];

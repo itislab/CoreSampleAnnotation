@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace CoreSampleAnnotation.AnnotationPlane.ColumnSettings
 {
-    public enum Presentation { BackgroundImage, Acronym, ShortName, Description, Icon }
+    public enum Presentation { BackgroundImage, Acronym, ShortName, Description, Icon, RightSide, Width }
 
     public class Variant
     {
@@ -38,11 +38,15 @@ namespace CoreSampleAnnotation.AnnotationPlane.ColumnSettings
                         enumText = "Короткое имя"; break;
                     case Presentation.Icon:
                         enumText = "Значок"; break;
+                    case Presentation.RightSide:
+                        enumText = "Форма границы"; break;
+                    case Presentation.Width:
+                        enumText = "Ширина крапа"; break;
                     default:
                         throw new NotImplementedException();
                 }
 
-                return string.Format("\"{0}\": {1}", PropertyName, enumText);
+                return string.Format("{0}: {1}", PropertyName, enumText);
             }
         }
     }

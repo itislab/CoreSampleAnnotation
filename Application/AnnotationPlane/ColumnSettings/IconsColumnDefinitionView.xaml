@@ -11,7 +11,7 @@
         <ComboBox VerticalAlignment="Center" FontSize="20" MinWidth="150" Margin="15" ItemsSource="{Binding AvailableIconProps}" SelectedItem="{Binding SelectedIconProp}">
             <ComboBox.ItemTemplate>
                 <DataTemplate>
-                    <TextBlock Text="{Binding TexturalString}" />
+                    <TextBlock Text="{Binding PropertyName}" />
                 </DataTemplate>
             </ComboBox.ItemTemplate>
         </ComboBox>

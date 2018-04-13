@@ -75,7 +75,7 @@ namespace CoreSampleAnnotation.Persistence
                 {
                     string classID = row.ID.ToLowerInvariant();
                     if (!row.WidthPercentage.HasValue)
-                        row.WidthPercentage = 100.0;
+                        row.WidthPercentage = double.NaN;
                     else
                     if (row.WidthPercentage < 0 || row.WidthPercentage > 100.0)
                     {
@@ -106,7 +106,7 @@ namespace CoreSampleAnnotation.Persistence
                         exampleImage = new BitmapImage(new Uri(Path.GetFullPath(exampleImagePath)));
                     }
 
-                    RightSideFormEnum rightSide = RightSideFormEnum.Straight;
+                    RightSideFormEnum rightSide = RightSideFormEnum.NotDefined;
                     if (!string.IsNullOrEmpty(row.RightSideForm))
                         switch (row.RightSideForm.ToLowerInvariant())
                         {                            
@@ -121,7 +121,6 @@ namespace CoreSampleAnnotation.Persistence
                                     MessageBoxButton.OK,
                                     MessageBoxImage.Warning);
                                 break;
-
                         }
 
                     loadedClasses.Add(row.ID.ToLowerInvariant(),

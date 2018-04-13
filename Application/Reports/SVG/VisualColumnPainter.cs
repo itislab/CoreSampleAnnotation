@@ -42,11 +42,11 @@ namespace CoreSampleAnnotation.Reports.SVG
             for (int i = 0; i < layers.Length; i++)
             {
                 VisualLayerPresentingVM lvm = layers[i];
-                if (lvm.Origin.CurrentClass != null)
+                if (lvm.BackgroundClass.CurrentClass != null && lvm.RightSideClass.CurrentClass != null && lvm.WidthClass.CurrentClass != null)
                 {
-                    ISideCurveGenerator sideCurveGenerator = SideCurveGeneratorFactory.GetGeneratorFor(lvm.Origin.CurrentClass.RightSideForm);
+                    ISideCurveGenerator sideCurveGenerator = SideCurveGeneratorFactory.GetGeneratorFor(lvm.RightSideClass.CurrentClass.RightSideForm);
 
-                    SvgPatternServer sps = lvm.Origin.CurrentClass.BackgroundPattern;
+                    SvgPatternServer sps = lvm.BackgroundClass.CurrentClass.BackgroundPattern;
                     sps.PatternContentUnits = SvgCoordinateUnits.ObjectBoundingBox;
                     sps.PatternUnits = SvgCoordinateUnits.UserSpaceOnUse;
                     float ratio = sps.Width.Value / 64f;
@@ -88,9 +88,9 @@ namespace CoreSampleAnnotation.Reports.SVG
                 for (int i = 0; i < layers.Length; i++)
                 {
                     VisualLayerPresentingVM lvm = layers[i];
-                    if (lvm.Origin.CurrentClass != null)
+                    if (lvm.BackgroundClass.CurrentClass != null)
                     {
-                        defs.Children.Add(lvm.Origin.CurrentClass.BackgroundPattern);
+                        defs.Children.Add(lvm.BackgroundClass.CurrentClass.BackgroundPattern);
                     }
                 }
                 return defs;
