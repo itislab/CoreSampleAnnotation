@@ -50,5 +50,24 @@
                 <Button Grid.Column="1" HorizontalAlignment="Right" Padding="10" Margin="15" BorderThickness="0"  Command="{Binding CloseSampleEditingCommand}" Background="{StaticResource ColorAccent}">закрыть</Button>
             </Grid>
         </Border>
+        <!-- end of sample Comment View -->
+        <!-- layer length edit View -->
+        <Border Opacity="0.98" BorderThickness="0" CornerRadius="15" Padding="25" Background="#E1E2E1" HorizontalAlignment="Center" VerticalAlignment="Center" MinWidth="400" Visibility="{Binding LayerLengthCorrectionVM, Converter={StaticResource NullToCollapsedConverter}}">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition/>
+                    <ColumnDefinition Width="auto"/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="auto"></RowDefinition>
+                    <RowDefinition></RowDefinition>
+                </Grid.RowDefinitions>
+                <TextBlock FontSize="18" Margin="15" Text="Введите новую мощность слоя (метры)"></TextBlock>
+                <app:TextInput Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="1" HintFontSize="14" HintText="Введите длину слоя (м)" InputFontSize="14" Text="{Binding LayerLengthCorrectionVM.LayerLength, Mode=TwoWay}" HorizontalAlignment="Stretch"/>
+                <Button Grid.Column="1" HorizontalAlignment="Right" Padding="10" Margin="15" BorderThickness="0"  Command="{Binding FinishLayerLengthCorrectionCommand}" Background="{StaticResource ColorAccent}">закрыть</Button>
+            </Grid>
+        </Border>
+        <!-- end of layer length edit View -->
+        
     </Grid>
 </UserControl>

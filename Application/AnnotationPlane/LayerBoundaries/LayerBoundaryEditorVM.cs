@@ -74,8 +74,7 @@ namespace CoreSampleAnnotation.AnnotationPlane.LayerBoundaries
                     Boundaries = Boundaries.ToArray(); //applies another order
                 }
             }
-        }
-
+        }        
 
         /// <summary>
         /// boundaries

@@ -135,7 +135,25 @@ namespace CoreSampleAnnotation.AnnotationPlane
             }
         }
 
+        private LayerLengthEditVM layerLengthCorrectionVM;
+        public LayerLengthEditVM LayerLengthCorrectionVM
+        {
+            get
+            {
+                return layerLengthCorrectionVM;
+            }
+            set
+            {
+                if (layerLengthCorrectionVM != value)
+                {
+                    layerLengthCorrectionVM = value;
+                    RaisePropertyChanged(nameof(LayerLengthCorrectionVM));
+                }
+            }
+        }
+
         public ICommand CloseSampleEditingCommand { get; private set; }
+        public ICommand FinishLayerLengthCorrectionCommand { get; private set; }
 
         /// <param name="boundIdx">which bound to move?</param>
         /// <param name="level">in WPF units</param>
@@ -675,6 +693,12 @@ namespace CoreSampleAnnotation.AnnotationPlane
                     l.Add(sampleVM);
                     scVM.Samples = l.ToArray();
                 }
+                else if (typeof(LayerRealLengthColumnVM) == relatedVmType)
+                {
+                    int layerIdx = layerSyncController.GetLayerIndex(psea.WpfTopOffset);
+                    LayerLengthCorrectionVM = new LayerLengthEditVM(layerIdx);
+                    LayerLengthCorrectionVM.LayerLength = Math.Round(layerSyncController.GetLayerRealHeight(layerIdx), 3);
+                }
             });
 
             CloseSampleEditingCommand = new DelegateCommand(() =>
@@ -682,6 +706,35 @@ namespace CoreSampleAnnotation.AnnotationPlane
                 if (!string.IsNullOrEmpty(SampleUnderCorrection.Comment))
                     samplesColumnVM.RecentSampleComment = SampleUnderCorrection.Comment;
                 SampleUnderCorrection = null;
+            });
+
+            FinishLayerLengthCorrectionCommand = new DelegateCommand(() =>
+            {
+                if (LayerLengthCorrectionVM.LayerLength >= 0.0)
+                {
+                    LayerSyncController.SetLayerLength(LayerLengthCorrectionVM.LayerIdx, LayerLengthCorrectionVM.LayerLength, AnnotationDirection);
+                    //removing the same layers from boundary editors
+                    int removedCount = allLayersBoundaryEditorVM.Boundaries.Length - LayerSyncController.DepthBoundaries.Length;
+                    switch (AnnotationDirection)
+                    {
+                        default: throw new NotSupportedException();
+                        case AnnotationDirection.UpToBottom:
+                            for (int i = 0; i < removedCount; i++)
+                                allLayersBoundaryEditorVM.RemoveBoundary(allLayersBoundaryEditorVM.Boundaries.Length - 2);
+                            break;
+                        case AnnotationDirection.BottomToUp:
+                            for (int i = 0; i < removedCount; i++)
+                                allLayersBoundaryEditorVM.RemoveBoundary(1);
+                            break;
+                    }
+                    //recalulating boundaries in editors
+                    var oldBoundaries = allLayersBoundaryEditorVM.Boundaries;
+                    var newBoundaries = new LayerBoundary[oldBoundaries.Length];
+                    for (int i = 0; i < oldBoundaries.Length; i++)
+                        newBoundaries[i] = new LayerBoundary(LayerSyncController.DepthToWPF(LayerSyncController.DepthBoundaries[i]), oldBoundaries[i].Rank);
+                    allLayersBoundaryEditorVM.Boundaries = newBoundaries;
+                }
+                LayerLengthCorrectionVM = null;
             });
 
             LayerSyncController.PropertyChanged += LayerSyncController_PropertyChanged;
@@ -724,6 +777,7 @@ namespace CoreSampleAnnotation.AnnotationPlane
                     mclVM.CurrentClasses = curClasses;
                 }
             });
+
             classificationVM.GroupSelectedCommand = new DelegateCommand(sender =>
             {
                 FrameworkElement fe = sender as FrameworkElement;
@@ -983,7 +1037,7 @@ namespace CoreSampleAnnotation.AnnotationPlane
                     if (bgColumnVM == null || wColumnVM == null || sColumnVM == null)
                         continue;
                     Columns.VisualColumnVM vcVM = new Columns.VisualColumnVM("Колонка",
-                        bgColumnVM,wColumnVM,sColumnVM,
+                        bgColumnVM, wColumnVM, sColumnVM,
                         (bgVM, wVM, sVM) => new Columns.VisualLayerPresentingVM(bgVM, wVM, sVM));
                     AnnoGridVM.Columns.Add(vcVM);
                     RegisterForScaleSync(vcVM, true);

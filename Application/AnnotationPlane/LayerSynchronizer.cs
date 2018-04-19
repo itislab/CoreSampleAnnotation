@@ -154,7 +154,12 @@ namespace CoreSampleAnnotation.AnnotationPlane.LayerSyncronization
         public double GetLayerWPFHeight(int idx)
         {
             AssertLayerIdx(idx);
-            return LengthToWPF(depthBoundaries[idx + 1] - depthBoundaries[idx]);
+            return LengthToWPF(GetLayerRealHeight(idx));
+        }
+
+        public double GetLayerRealHeight(int idx) {
+            AssertLayerIdx(idx);
+            return depthBoundaries[idx + 1] - depthBoundaries[idx];
         }
 
         public double GetLayerWPFTop(int idx)
@@ -244,23 +249,23 @@ namespace CoreSampleAnnotation.AnnotationPlane.LayerSyncronization
         }
 
         public const double MinLayerLength = 1e-4;
-
-        /// <param name="depths"></param>
-        /// <param name="idx"></param>
-        /// <param name="newLength"></param>
-        /// <param name="direction"></param>
-        /// <returns>Layer indices to remove</returns>
+        
+        /// <param name="idx">layer index. zero based. zero index is always the upper one</param>
+        /// <returns>new depths</returns>
         public static double[] LayerLengthEditWithShift(double[] depths, int idx, double newLength, AnnotationDirection direction)
         {
             double[] results;
             if (newLength < 0)
                 throw new ArgumentException("newLength must be non-negative");
+            if ((idx < 0) || (idx >= depths.Length - 1))
+                throw new IndexOutOfRangeException("layer index");
             if (newLength == 0.0)
                 newLength = MinLayerLength;
+            
             switch (direction)
             {
                 case AnnotationDirection.UpToBottom:
-                    if (idx == depths.Length - 1)
+                    if (idx == depths.Length - 2)
                     { //the last layer length can't be edited
                         results = depths.ToArray();
                         return results;
@@ -275,7 +280,9 @@ namespace CoreSampleAnnotation.AnnotationPlane.LayerSyncronization
 
                     int toRemove = 0;
                     double removedLayersLength = 0.0;
-                    while ((depths.Length - 2 - toRemove > 0) && (depths[depths.Length - 1 - toRemove] - depths[depths.Length - 2 - toRemove] + removedLayersLength <= addition))
+                    while (
+                        (depths.Length - 2 - toRemove > idx) && //do not proceed further corrected layer (affect the layers befor the idx)                        
+                        (depths[depths.Length - 1 - toRemove] - depths[depths.Length - 2 - toRemove] + removedLayersLength <= addition))
                     {
                         removedLayersLength += depths[depths.Length - 1 - toRemove] - depths[depths.Length - 2 - toRemove];
                         toRemove++;
@@ -328,7 +335,27 @@ namespace CoreSampleAnnotation.AnnotationPlane.LayerSyncronization
         /// <param name="fromButtomToUp"></param>
         public void SetLayerLength(int idx, double newLength, AnnotationDirection direction)
         {
-
+            double[] newDepthBoundaries = LayerLengthEditWithShift(depthBoundaries, idx, newLength, direction);
+            if (newDepthBoundaries.Length < depthBoundaries.Length) {
+                //layer removals is required (as they are pushed out)
+                int toRemove = depthBoundaries.Length - newDepthBoundaries.Length;
+                switch (direction) {
+                    case AnnotationDirection.UpToBottom:                        
+                        for (int i = 0; i < toRemove; i++)                        
+                            RemoveLayer(depthBoundaries.Length - 2, FreeSpaceAccepter.UpperLayer);                       
+                        break;
+                    case AnnotationDirection.BottomToUp:
+                        for (int i = 0; i < toRemove; i++)
+                            RemoveLayer(0, FreeSpaceAccepter.LowerLayer);
+                        break;
+                    default:
+                        throw new NotSupportedException("unexpected annotation direction");                        
+                }
+            }
+            //now appling new depths
+            System.Diagnostics.Debug.Assert(depthBoundaries.Length == newDepthBoundaries.Length);
+            depthBoundaries = newDepthBoundaries;
+            ResetAllcolumns();
         }
 
         public void UnregisterColumn(ILayersColumn column)
