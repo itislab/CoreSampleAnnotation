@@ -245,9 +245,6 @@ namespace CoreSampleAnnotation.AnnotationPlane.LayerSyncronization
 
         public const double MinLayerLength = 1e-4;
 
-        /// <summary>
-        /// 
-        /// </summary>
         /// <param name="depths"></param>
         /// <param name="idx"></param>
         /// <param name="newLength"></param>
@@ -263,6 +260,12 @@ namespace CoreSampleAnnotation.AnnotationPlane.LayerSyncronization
             switch (direction)
             {
                 case AnnotationDirection.UpToBottom:
+                    if (idx == depths.Length - 1)
+                    { //the last layer length can't be edited
+                        results = depths.ToArray();
+                        return results;
+                    }
+
                     double oldLength = depths[idx + 1] - depths[idx];
 
                     int initialBoundaryCount = depths.Length;
@@ -273,7 +276,7 @@ namespace CoreSampleAnnotation.AnnotationPlane.LayerSyncronization
                     int toRemove = 0;
                     double removedLayersLength = 0.0;
                     while ((depths.Length - 2 - toRemove > 0) && (depths[depths.Length - 1 - toRemove] - depths[depths.Length - 2 - toRemove] + removedLayersLength <= addition))
-                    {                        
+                    {
                         removedLayersLength += depths[depths.Length - 1 - toRemove] - depths[depths.Length - 2 - toRemove];
                         toRemove++;
                     }
@@ -283,6 +286,33 @@ namespace CoreSampleAnnotation.AnnotationPlane.LayerSyncronization
                     for (int i = idx + 1; i < initialBoundaryCount - toRemove - 1; i++)
                         results[i] += addition;
                     results[initialBoundaryCount - toRemove - 1] = lowerDepth;
+                    break;
+                case AnnotationDirection.BottomToUp:
+                    if (idx == 0) {
+                        //the last layer length can't be edited
+                        results = depths.ToArray();
+                        return results;
+                    }
+                    oldLength = depths[idx + 1] - depths[idx];
+
+                    initialBoundaryCount = depths.Length;
+                    double upperDepth = depths[0];
+
+                    double substraction = newLength - oldLength;
+
+                    toRemove = 0;
+                    removedLayersLength = 0.0;
+                    while ((idx - toRemove - 1 >= 0) && (depths[idx - toRemove] - depths[idx - toRemove - 1] + removedLayersLength <= substraction))
+                    {
+                        removedLayersLength += depths[idx - toRemove] - depths[idx - toRemove - 1];
+                        toRemove++;
+                    }
+                    System.Diagnostics.Trace.WriteLine("{0} layers to remove");
+
+                    results = depths.Skip(toRemove).ToArray();
+                    for (int i = idx-toRemove ; i > 0; i--)
+                        results[i] -= substraction;
+                    results[0] = upperDepth;
                     break;
                 default:
                     throw new NotSupportedException("unexpected annotatiuon direction");

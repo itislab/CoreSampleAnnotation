@@ -170,6 +170,7 @@
     <Compile Include="AnnotationPlane\LayerBoundaries\LayerBoundaryEditorVM.cs" />
     <Compile Include="AnnotationPlane\LayerBoundaries\RankMatchingBoundaryCollection.cs" />
     <Compile Include="AnnotationPlane\LayerBoundaries\Utils.cs" />
+    <Compile Include="AnnotationPlane\LayerLengthEditVM.cs" />
     <Compile Include="AnnotationPlane\LayersAnnotation.cs" />
     <Compile Include="AnnotationPlane\AnnotationGrid.xaml.cs">
       <DependentUpon>AnnotationGrid.xaml</DependentUpon>
