@@ -17,6 +17,7 @@ namespace CoreSampleAnnotation.Persistence
     {
         
         private string path;
+        private Dictionary<Guid, string> imageNames = new Dictionary<Guid, string>();
 
         /// <summary>
         /// Where the images are stored (absolute path)
@@ -49,6 +50,7 @@ namespace CoreSampleAnnotation.Persistence
             {
                 Guid id = Guid.NewGuid();
                 File.Copy(ofd.FileName, GetFilePath(id));
+                imageNames.Add(id, ofd.SafeFileName);
                 return id;
             }
             else return Guid.Empty;
@@ -60,20 +62,33 @@ namespace CoreSampleAnnotation.Persistence
             string path = GetFilePath(id);
             if (File.Exists(path))
                 File.Delete(path);
+            if (imageNames.ContainsKey(id))
+                imageNames.Remove(id);
+        }
+
+        public string GetImageName(Guid imageID)
+        {
+            if (imageNames.ContainsKey(imageID))
+                return imageNames[imageID];
+            else
+                return string.Empty;
         }
 
         #region serialization
 
         protected FolderImageStorage(SerializationInfo info, StreamingContext context) {
             FolderPath = Path.Combine(Directory.GetCurrentDirectory(), info.GetString("Folder"));
+            imageNames = info.GetValue("Names", typeof(Dictionary<Guid, string>)) as Dictionary<Guid, string>;
+            if (imageNames == null)
+                imageNames = new Dictionary<Guid, string>();
         }
 
         public virtual void GetObjectData(SerializationInfo info, StreamingContext context)
         {
             string relativePath = PathUtils.MakeRelativePath(Directory.GetCurrentDirectory() + "\\", FolderPath);
             info.AddValue("Folder", relativePath);
-
-        }
+            info.AddValue("Names", imageNames);
+        }        
         #endregion
     }
 }

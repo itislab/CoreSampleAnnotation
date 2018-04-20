@@ -23,6 +23,13 @@ namespace CoreSampleAnnotation.Intervals
         /// <param name="imageID"></param>
         /// <returns></returns>
         string GetFilePath(Guid imageID);
+
+        /// <summary>
+        /// Returns original filname
+        /// </summary>
+        /// <param name="imageID"></param>
+        /// <returns></returns>
+        string GetImageName(Guid imageID);
         /// <summary>
         /// Returns the idx of newly added image
         /// </summary>
@@ -63,6 +70,7 @@ namespace CoreSampleAnnotation.Intervals
 
         private IImageStorage imageStorage;
 
+        private List<string> imageNames = new List<string>();
         private List<Transform> imageTransforms = new List<Transform>();
         private List<IEnumerable<CalibratedRegionVM>> imageRegions = new List<IEnumerable<CalibratedRegionVM>>();
 
@@ -199,7 +207,7 @@ namespace CoreSampleAnnotation.Intervals
 
 
             });
-            
+
             crCM.PropertyChanged += CalibratedRegion_PropertyChanged;
 
             crCM.MoveUp = delComUp;
@@ -227,7 +235,7 @@ namespace CoreSampleAnnotation.Intervals
                 depth += len;
                 region.LowerDepth = depth;
             }
-            
+
             //firing that as the order could change, the can move up/down must be recalulated
             foreach (var pair in canMoveRegionChangedActivations)
                 foreach (Action act in pair.Value)
@@ -263,9 +271,9 @@ namespace CoreSampleAnnotation.Intervals
         public PhotoRegion[] GetRegionImages()
         {
             List<PhotoRegion> gatheredRegions = new List<PhotoRegion>();
-            int N = ImagesCount;            
+            int N = ImagesCount;
             for (int i = 0; i < N; i++)
-            {                
+            {
                 var regions = imageRegions[i];
                 var transform = imageTransforms[i];
                 var backTransform = transform.Inverse;
@@ -338,7 +346,7 @@ namespace CoreSampleAnnotation.Intervals
                         bitmap.Freeze();
                     }
 
-                    gatheredRegions.Add(new PhotoRegion(bitmap, new Size(width, height), regVM.Order, regVM.Length )); //for now upper and lower are just placeholders holding order and length
+                    gatheredRegions.Add(new PhotoRegion(bitmap, new Size(width, height), regVM.Order, regVM.Length)); //for now upper and lower are just placeholders holding order and length
                 }
             }
 
@@ -346,7 +354,7 @@ namespace CoreSampleAnnotation.Intervals
 
             //transforming order into real depth
             var reorderedRegions = gatheredRegions.OrderBy(r => r.ImageUpperDepth).ToArray(); //ordering by order
-            double prevBound = UpperDepth;            
+            double prevBound = UpperDepth;
             for (int j = 0; j < reorderedRegions.Length; j++)
             {
                 PhotoRegion curReg = reorderedRegions[j];
@@ -416,12 +424,24 @@ namespace CoreSampleAnnotation.Intervals
                     curImageIdx = value;
                     IsImageTransformTracked = false;
                     RaisePropertyChanged(nameof(CurImageIdx));
+                    RaisePropertyChanged(nameof(ImageName));
                     RaisePropertyChanged(nameof(ImagePath));
                     RaisePropertyChanged(nameof(ImageSource));
                     RaisePropertyChanged(nameof(ImageTransform));
                     RaisePropertyChanged(nameof(CalibratedRegions));
                     IsImageTransformTracked = true;
                 }
+            }
+        }
+
+        public string ImageName
+        {
+            get
+            {
+                if (imageIDs.Count == 0)
+                    return null;
+                else
+                    return imageNames[curImageIdx];
             }
         }
 
@@ -466,11 +486,14 @@ namespace CoreSampleAnnotation.Intervals
         public ICommand NextImageCommand { private set; get; }
 
         private CalibratedRegionVM focusedRegion = null;
-        public CalibratedRegionVM FocusedRegion {
-            get {
+        public CalibratedRegionVM FocusedRegion
+        {
+            get
+            {
                 return focusedRegion;
             }
-            set {
+            set
+            {
                 if (focusedRegion != value)
                 {
                     focusedRegion = value;
@@ -478,7 +501,7 @@ namespace CoreSampleAnnotation.Intervals
                 }
             }
         }
-        
+
         public ICommand RotateCurrentImageCommand
         {
             get; private set;
@@ -514,18 +537,22 @@ namespace CoreSampleAnnotation.Intervals
 
             delComUp = new DelegateCommand(obj1 => MoveRegionOrder((int)obj1, OrderMoveDirection.Up), canMoveUp);
             delComDown = new DelegateCommand(obj1 => MoveRegionOrder((int)obj1, OrderMoveDirection.Down), canMoveDown);
-            focusToNext = new DelegateCommand((obj1) => {
-                if (FocusedRegion != null) {
+            focusToNext = new DelegateCommand((obj1) =>
+            {
+                if (FocusedRegion != null)
+                {
                     var array = CalibratedRegions.ToArray();
                     int idx = -1;
                     for (int i = 0; i < array.Length; i++)
                     {
-                        if (array[i] == FocusedRegion) {
+                        if (array[i] == FocusedRegion)
+                        {
                             idx = i;
                             break;
                         }
                     }
-                    if (idx != -1) {
+                    if (idx != -1)
+                    {
                         idx = (idx + 1) % array.Length;
                         FocusedRegion = array[idx];
                     }
@@ -536,17 +563,19 @@ namespace CoreSampleAnnotation.Intervals
             {
                 Guid id = imageStorage.AddNewImage();
                 string fileCandidate = imageStorage.GetFilePath(id);
-
+                string name = imageStorage.GetImageName(id);
                 if (System.IO.File.Exists(fileCandidate))
                 {
                     imageIDs.Add(id);
                     imageTransforms.Add(Transform.Identity);
                     imageRegions.Add(new List<CalibratedRegionVM>());
+                    imageNames.Add(name);
 
                     CurImageIdx = imageIDs.Count - 1;
                     RaisePropertyChanged(nameof(ImagesCount));
                     if (imageIDs.Count == 1)
                     {
+                        RaisePropertyChanged(nameof(ImageName));
                         RaisePropertyChanged(nameof(ImagePath));
                         RaisePropertyChanged(nameof(ImageSource));
                         RaisePropertyChanged(nameof(ImageTransform));
@@ -566,8 +595,8 @@ namespace CoreSampleAnnotation.Intervals
             });
 
             RotateCurrentImageCommand = new DelegateCommand(() =>
-            {                
-                BitmapImage bi = new BitmapImage(new Uri(ImagePath), new System.Net.Cache.RequestCachePolicy(System.Net.Cache.RequestCacheLevel.NoCacheNoStore));                
+            {
+                BitmapImage bi = new BitmapImage(new Uri(ImagePath), new System.Net.Cache.RequestCachePolicy(System.Net.Cache.RequestCacheLevel.NoCacheNoStore));
 
                 Transform prevTransform = ImageTransform;
 
@@ -597,6 +626,7 @@ namespace CoreSampleAnnotation.Intervals
                         imageStorage.RemoveImage(imageIDs[idxToRemove]);
 
                         imageIDs.RemoveAt(idxToRemove);
+                        imageNames.RemoveAt(idxToRemove);
                         imageTransforms.RemoveAt(idxToRemove);
                         imageRegions.RemoveAt(idxToRemove);
 
@@ -654,6 +684,8 @@ namespace CoreSampleAnnotation.Intervals
 
             imageIDs = (List<Guid>)info.GetValue(nameof(imageIDs), typeof(List<Guid>));
 
+            imageNames = (List<string>)info.GetValue(nameof(imageNames), typeof(List<string>));
+
             //TODO: avoid usage of explicit derived type here
             imageStorage = (IImageStorage)info.GetValue(nameof(imageStorage), typeof(Persistence.FolderImageStorage));
 
@@ -675,6 +707,8 @@ namespace CoreSampleAnnotation.Intervals
             info.AddValue("Regions", regionsList);
 
             info.AddValue(nameof(imageIDs), imageIDs);
+
+            info.AddValue(nameof(imageNames), imageNames);
 
             //TODO: avoid usage of explicit derived type here
             info.AddValue(nameof(imageStorage), (Persistence.FolderImageStorage)imageStorage);
