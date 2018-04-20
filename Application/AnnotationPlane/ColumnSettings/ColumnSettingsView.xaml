@@ -13,20 +13,13 @@
         </DataTemplate>
     </UserControl.Resources>
     <Grid>
-        <StackPanel VerticalAlignment="Center" HorizontalAlignment="Right">
-            <Button Style="{StaticResource MetroButton}" HorizontalAlignment="Right" Width="50" Height="50" Command="{Binding ActivateAnnotationPlaneCommand}">
-                <media:TableIcon></media:TableIcon>
-            </Button>
-            <Button Style="{StaticResource MetroButton}" Command="{Binding ImportFromFileCommnad}" Content="Импорт столбцов"/>
-            <Button Style="{StaticResource MetroButton}" Command="{Binding ExportToFileCommand}" Content="Экспорт столбцов"/>
-        </StackPanel>
         <Grid VerticalAlignment="Stretch" HorizontalAlignment="Center">
             <Grid.RowDefinitions>
                 <RowDefinition/>
                 <RowDefinition Height="auto"/>
             </Grid.RowDefinitions>
-            <ScrollViewer Grid.Row="0" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
-                <ItemsControl ItemsSource="{Binding OrderedColumnDefinitions}"  VerticalAlignment="Center" Grid.IsSharedSizeScope="True"/>
+            <ScrollViewer Grid.Row="0" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto" FlowDirection="RightToLeft">
+                <ItemsControl HorizontalAlignment="Right" ItemsSource="{Binding OrderedColumnDefinitions}"  VerticalAlignment="Center" Grid.IsSharedSizeScope="True" FlowDirection="LeftToRight"/>
             </ScrollViewer>            
             <StackPanel Grid.Row="1" Orientation="Horizontal" VerticalAlignment="Center" Margin="0,30,0,30">
                 <TextBlock VerticalAlignment="Center" FontSize="20">Добавить колонку:</TextBlock>
@@ -42,5 +35,13 @@
                 </WrapPanel>
             </StackPanel>
         </Grid>
+        <StackPanel VerticalAlignment="Center" HorizontalAlignment="Right">
+            <Button Style="{StaticResource MetroButton}" HorizontalAlignment="Right" Width="50" Height="50" Command="{Binding ActivateAnnotationPlaneCommand}">
+                <media:TableIcon></media:TableIcon>
+            </Button>
+            <Button Style="{StaticResource MetroButton}" Command="{Binding ImportFromFileCommnad}" Content="Импорт столбцов"/>
+            <Button Style="{StaticResource MetroButton}" Command="{Binding ExportToFileCommand}" Content="Экспорт столбцов"/>
+        </StackPanel>
+
     </Grid>
 </UserControl>
