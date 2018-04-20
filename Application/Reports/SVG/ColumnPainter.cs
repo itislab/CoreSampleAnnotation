@@ -33,11 +33,27 @@ namespace CoreSampleAnnotation.Reports.SVG
         }
 
         public RenderedSvg RenderHeader()
-        {
-            RenderedSvg result = new RenderedSvg();            
-            SvgText text = new SvgText(vm.Heading);
-            text.FontSize = new SvgUnit((float)10);
-            text.Fill = new SvgColourServer(System.Drawing.Color.Black);
+        {            
+            RenderedSvg result = new RenderedSvg();
+
+            SvgPaintServer blackPaint = new SvgColourServer(System.Drawing.Color.Black);
+
+            string[] spans = vm.Heading.Split(new char[] { '\n' }, StringSplitOptions.RemoveEmptyEntries).Select(s => s.Trim()).ToArray();
+            SvgText text = new SvgText();
+            float fontSize = 10.0f;
+                        
+            foreach (var span in spans)
+            {
+                SvgTextSpan tspan = new SvgTextSpan();
+                tspan.Text = span;
+                tspan.FontSize = new SvgUnit(fontSize);
+                tspan.Dy.Add(Helpers.dtos(fontSize * 1.2));
+                tspan.X.Add(0);
+                tspan.Fill = blackPaint;
+                text.Children.Add(tspan);
+            }
+            //text.Transforms.Add(new Svg.Transforms.SvgTranslate(0, (float)(- (fontSize * 1.2) * spans.Length * 0.5)));            
+
             result.RenderedSize = headerView.RenderSize;
             result.SVG = text;
             return result;

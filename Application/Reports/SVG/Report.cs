@@ -78,9 +78,9 @@ namespace CoreSampleAnnotation.Reports.SVG
                 rect.Height = Helpers.dtos(heading.RenderedSize.Height);
                 rect.X = Helpers.dtos(horizontalOffset);
                 rect.Y = Helpers.dtos(0.0);
-                rect.Stroke = blackPaint;
+                rect.Stroke = blackPaint;                
 
-                heading.SVG.Transforms.Add(new SvgTranslate((float)(horizontalOffset + heading.RenderedSize.Width * 0.5), (float)heading.RenderedSize.Height * 0.9f));
+                heading.SVG.Transforms.Add(new SvgTranslate((float)(horizontalOffset + heading.RenderedSize.Width * 0.3), (float)heading.RenderedSize.Height * 0.9f));
                 heading.SVG.Transforms.Add(new SvgRotate((float)-90.0));
 
                 headerGroup.Children.Add(rect);

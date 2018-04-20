@@ -245,6 +245,8 @@ namespace CoreSampleAnnotation.AnnotationPlane.Columns
             }
 
             Layers = new ObservableCollection<VisualLayerPresentingVM>(content);
+
+            Heading = string.Format("Колнка\n\nКрап: {0}\nШирина: {1}\nграница: {2}", backgroundTarget.Heading,widthTarget.Heading, sideTarget.Heading);
             ReclacYs();
         }
 

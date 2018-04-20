@@ -189,18 +189,8 @@ namespace CoreSampleAnnotation.AnnotationPlane
             double startOffset = GridScroll.VerticalOffset;
             double shift = -e.DeltaManipulation.Translation.Y;
 
-            //double startOffsetInScreen = ColumnsGrid.PointToScreen(new Point(0.0, GridScroll.VerticalOffset)).Y;
-
-            //double endOffsetInScreen = startOffset/prefScaleFactor + shi;            
-
             double endOffsetInWPF = scaleFactor * (startOffset + shift);
-
-            //double newOffset1 = (startOffset-mo+shift)*scaleFactor + mo;
-
-            //System.Diagnostics.Debug.WriteLine("screen mo is {0}; offset {1}l wpf mo is {2}",mo,startOffset, wpfMo.Y);
-
-
-
+            
             GridScroll.ScrollToVerticalOffset(endOffsetInWPF);
             e.Handled = true;
         }
@@ -425,6 +415,8 @@ namespace CoreSampleAnnotation.AnnotationPlane
             heading.HorizontalAlignment = HorizontalAlignment.Center;
             heading.VerticalAlignment = VerticalAlignment.Center;
             heading.Text = colVM.Heading;
+            //heading.TextWrapping = TextWrapping.Wrap;
+            //heading.MaxHeight = 200;
             heading.LayoutTransform = headingRotation;
             Border textBorder = new Border() { BorderBrush = new SolidColorBrush(Colors.Black), BorderThickness = new Thickness(1) };
             textBorder.Child = heading;
