@@ -45,6 +45,7 @@ namespace CoreSampleAnnotation.AnnotationPlane.Columns
 
         public static ISideCurveGenerator GetGeneratorFor(Template.RightSideFormEnum rightSideForm) {
             switch (rightSideForm) {
+                case Template.RightSideFormEnum.NotDefined: return straight;
                 case Template.RightSideFormEnum.Straight: return straight;
                 case Template.RightSideFormEnum.Steps: return steps;
                 case Template.RightSideFormEnum.Wave: return wave;

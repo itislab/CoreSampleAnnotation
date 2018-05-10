@@ -42,9 +42,14 @@ namespace CoreSampleAnnotation.Reports.SVG
             for (int i = 0; i < layers.Length; i++)
             {
                 VisualLayerPresentingVM lvm = layers[i];
-                if (lvm.BackgroundClass.CurrentClass != null && lvm.RightSideClass.CurrentClass != null && lvm.WidthClass.CurrentClass != null)
+                if (lvm.BackgroundClass.CurrentClass != null)
                 {
-                    ISideCurveGenerator sideCurveGenerator = SideCurveGeneratorFactory.GetGeneratorFor(lvm.RightSideClass.CurrentClass.RightSideForm);
+                    ISideCurveGenerator sideCurveGenerator = null;
+
+                    if (lvm.RightSideClass.CurrentClass != null)
+                        sideCurveGenerator = SideCurveGeneratorFactory.GetGeneratorFor(lvm.RightSideClass.CurrentClass.RightSideForm);
+                    else
+                        sideCurveGenerator = SideCurveGeneratorFactory.GetGeneratorFor(AnnotationPlane.Template.RightSideFormEnum.NotDefined);
 
                     SvgPatternServer sps = lvm.BackgroundClass.CurrentClass.BackgroundPattern;
                     sps.PatternContentUnits = SvgCoordinateUnits.ObjectBoundingBox;

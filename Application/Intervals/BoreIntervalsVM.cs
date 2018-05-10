@@ -80,6 +80,7 @@ namespace CoreSampleAnnotation.Intervals
                 //activating the command that are set externally
                 ActivateIntervalImagesCommand.Execute(obj);
                 ///now performing additional actions
+                MessageBox.Show("Геологи!!! Разметка фотографии начинается с верхнего фрагмента керна!", "Направление разметки фото", MessageBoxButton.OK, MessageBoxImage.Exclamation);
                 PhotoCalibratedBoreIntervalVM vm = obj as PhotoCalibratedBoreIntervalVM;
                 if (vm.ImagesCount == 0)
                     vm.AddNewImageCommand.Execute(null);

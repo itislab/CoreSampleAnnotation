@@ -160,7 +160,7 @@ namespace CoreSampleAnnotation.PhotoMarkup
 
                 string lengthStr = "не задана";
                 if (length > 0.0)
-                    lengthStr = string.Format("{0:#.00} м ({1:#.00} м - {2:#.00} м)", length, upperDepth,lowerDepth);
+                    lengthStr = string.Format("{0:#.00} м ({1:#.00} м - {2:#.00} м)", length, lowerDepth, upperDepth);
                 return string.Format("№{0}: длина {1}", order, lengthStr);
             }
             else return null;

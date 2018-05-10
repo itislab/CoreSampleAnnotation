@@ -26,7 +26,7 @@
                 <media:GearsIcon />
             </Button>
             <Button Style="{StaticResource MetroButton}" Command="{Binding SaveImageCommand}" Height="50">
-                <media:ApertureIcon />
+                SVG
             </Button>
             <Button Style="{StaticResource MetroButton}" Command="{Binding SaveProjectCommand}" Height="50">
                 <media:SaveIcon />
