@@ -1029,12 +1029,16 @@ namespace CoreSampleAnnotation.AnnotationPlane
                 else if (columnDefinition is VisualColumnDefinitionVM)
                 {
                     VisualColumnDefinitionVM vcdVM = (VisualColumnDefinitionVM)columnDefinition;
-                    if (vcdVM.SelectedBackgroundImageProp == null || vcdVM.SelectedWidthProp == null || vcdVM.SelectedRightSideProp == null)
+                    if (vcdVM.SelectedBackgroundImageProp == null)
                         continue;
                     LayeredColumnVM bgColumnVM = LayerProps.Where(p => p.Heading == vcdVM.SelectedBackgroundImageProp.PropID).FirstOrDefault();
-                    LayeredColumnVM wColumnVM = LayerProps.Where(p => p.Heading == vcdVM.SelectedWidthProp.PropID).FirstOrDefault();
-                    LayeredColumnVM sColumnVM = LayerProps.Where(p => p.Heading == vcdVM.SelectedRightSideProp.PropID).FirstOrDefault();
-                    if (bgColumnVM == null || wColumnVM == null || sColumnVM == null)
+                    LayeredColumnVM wColumnVM = null;
+                    if (vcdVM.SelectedWidthProp != null)
+                        wColumnVM = LayerProps.Where(p => p.Heading == vcdVM.SelectedWidthProp.PropID).FirstOrDefault();
+                    LayeredColumnVM sColumnVM = null;
+                    if(vcdVM.SelectedRightSideProp != null)
+                        sColumnVM = LayerProps.Where(p => p.Heading == vcdVM.SelectedRightSideProp.PropID).FirstOrDefault();
+                    if (bgColumnVM == null)
                         continue;
                     Columns.VisualColumnVM vcVM = new Columns.VisualColumnVM("Колонка",
                         bgColumnVM, wColumnVM, sColumnVM,

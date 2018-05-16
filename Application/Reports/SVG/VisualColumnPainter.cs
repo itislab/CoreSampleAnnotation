@@ -46,7 +46,7 @@ namespace CoreSampleAnnotation.Reports.SVG
                 {
                     ISideCurveGenerator sideCurveGenerator = null;
 
-                    if (lvm.RightSideClass.CurrentClass != null)
+                    if ((lvm.RightSideClass != null) && (lvm.RightSideClass.CurrentClass != null))
                         sideCurveGenerator = SideCurveGeneratorFactory.GetGeneratorFor(lvm.RightSideClass.CurrentClass.RightSideForm);
                     else
                         sideCurveGenerator = SideCurveGeneratorFactory.GetGeneratorFor(AnnotationPlane.Template.RightSideFormEnum.NotDefined);

@@ -45,8 +45,10 @@ namespace CoreSampleAnnotation.AnnotationPlane.Columns
             this.widthTarget = widthTarget;
             this.rightSideTarget = rightSideTarget;
             backgroundTarget.PropertyChanged += Target_PropertyChanged;
-            widthTarget.PropertyChanged += Target_PropertyChanged;
-            rightSideTarget.PropertyChanged += Target_PropertyChanged;
+            if(widthTarget != null)
+                widthTarget.PropertyChanged += Target_PropertyChanged;
+            if(rightSideTarget != null)
+                rightSideTarget.PropertyChanged += Target_PropertyChanged;
         }
 
         private void Target_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
@@ -108,7 +110,7 @@ namespace CoreSampleAnnotation.AnnotationPlane.Columns
         {
             get
             {
-                if (widthTarget.CurrentClass == null)
+                if (widthTarget == null || widthTarget.CurrentClass == null)
                     return 1.0;
                 else
                 {
@@ -133,7 +135,7 @@ namespace CoreSampleAnnotation.AnnotationPlane.Columns
         {
             get
             {
-                if (RightSideClass.CurrentClass == null)
+                if (RightSideClass == null || RightSideClass.CurrentClass == null)
                     return Template.RightSideFormEnum.Straight;
                 else
                     return RightSideClass.CurrentClass.RightSideForm;
@@ -209,18 +211,23 @@ namespace CoreSampleAnnotation.AnnotationPlane.Columns
 
             backgroundTarget.Layers.CollectionChanged += Layers_CollectionChanged;
             backgroundTarget.PropertyChanged += Target_PropertyChanged;
-            widthTarget.Layers.CollectionChanged += Layers_CollectionChanged;
-            widthTarget.PropertyChanged += Target_PropertyChanged;
-            sideTarget.Layers.CollectionChanged += Layers_CollectionChanged;
-            sideTarget.PropertyChanged += Target_PropertyChanged;
-            columnWidth = 200.0;
-
             foreach (var layerVM in backgroundTarget.Layers)
                 layerVM.PropertyChanged += SingleClass_Vm_PropertyChanged;
-            foreach (var layerVM in widthTarget.Layers)
-                layerVM.PropertyChanged += SingleClass_Vm_PropertyChanged;
-            foreach (var layerVM in sideTarget.Layers)
-                layerVM.PropertyChanged += SingleClass_Vm_PropertyChanged;
+            if (widthTarget != null)
+            {
+                widthTarget.Layers.CollectionChanged += Layers_CollectionChanged;
+                widthTarget.PropertyChanged += Target_PropertyChanged;
+                foreach (var layerVM in widthTarget.Layers)
+                    layerVM.PropertyChanged += SingleClass_Vm_PropertyChanged;
+            }
+            if (sideTarget != null)
+            {
+                sideTarget.Layers.CollectionChanged += Layers_CollectionChanged;
+                sideTarget.PropertyChanged += Target_PropertyChanged;
+                foreach (var layerVM in sideTarget.Layers)
+                    layerVM.PropertyChanged += SingleClass_Vm_PropertyChanged;
+            }
+            columnWidth = 200.0;                        
 
             Reinit();
         }
@@ -237,8 +244,16 @@ namespace CoreSampleAnnotation.AnnotationPlane.Columns
             for (int i = 0; i < N; i++)
             {
                 SingleClassificationLayerVM background = backgroundTarget.Layers[i] as SingleClassificationLayerVM;
-                SingleClassificationLayerVM width = widthTarget.Layers[i] as SingleClassificationLayerVM;
-                SingleClassificationLayerVM side = sideTarget.Layers[i] as SingleClassificationLayerVM;
+                SingleClassificationLayerVM width;
+                if (widthTarget != null)
+                    width = widthTarget.Layers[i] as SingleClassificationLayerVM;
+                else
+                    width = null; //the width source is not chosen
+                SingleClassificationLayerVM side;
+                if (sideTarget != null)
+                    side = sideTarget.Layers[i] as SingleClassificationLayerVM;
+                else
+                    side = null; // the side source is not chosen
                 var adapted = adapter(background, width, side);
                 adapted.AvailableWidth = ColumnWidth;
                 content.Add(adapted);
@@ -246,7 +261,16 @@ namespace CoreSampleAnnotation.AnnotationPlane.Columns
 
             Layers = new ObservableCollection<VisualLayerPresentingVM>(content);
 
-            Heading = string.Format("Колнка\n\nКрап: {0}\nШирина: {1}\nграница: {2}", backgroundTarget.Heading,widthTarget.Heading, sideTarget.Heading);
+            StringBuilder heading = new StringBuilder("");
+
+            heading.Append(string.Format("Колнка\n\nКрап: {0}", backgroundTarget.Heading));
+            if (widthTarget != null)
+                heading.Append(string.Format("\nШирина: {0}", widthTarget.Heading));
+            if (sideTarget != null)
+                heading.Append(string.Format("\nграница: {0}", sideTarget.Heading));           
+
+            Heading = heading.ToString();
+
             ReclacYs();
         }
 
