@@ -39,8 +39,8 @@
             <Button Style="{StaticResource MetroButton}" HorizontalAlignment="Right" Width="50" Height="50" Command="{Binding ActivateAnnotationPlaneCommand}">
                 <media:TableIcon></media:TableIcon>
             </Button>
-            <Button Style="{StaticResource MetroButton}" Command="{Binding ImportFromFileCommnad}" Content="Импорт столбцов"/>
-            <Button Style="{StaticResource MetroButton}" Command="{Binding ExportToFileCommand}" Content="Экспорт столбцов"/>
+            <Button Style="{StaticResource MetroButton}" Command="{Binding ImportFromFileCommnad}" Content="Загрузить столбцы"/>
+            <Button Style="{StaticResource MetroButton}" Command="{Binding ExportToFileCommand}" Content="Сохранить столбцы"/>
         </StackPanel>
 
     </Grid>
