@@ -24,7 +24,7 @@
         <ScrollViewer VerticalAlignment="Top" Grid.Row="1" Name="GridScroll">
             <Border BorderBrush="Black" BorderThickness="0">
                 <Grid Name="LowerGrid">
-                    <Grid Name="ColumnsGrid" IsManipulationEnabled="True"></Grid>
+                    <Grid Name="ColumnsGrid" IsManipulationEnabled="True" SnapsToDevicePixels="True"></Grid>
                     <Canvas Name="DraggingCanvas">
                         <ContentControl
                             Visibility="{Binding DraggedItem, Converter={StaticResource nullToCollapsed}}"

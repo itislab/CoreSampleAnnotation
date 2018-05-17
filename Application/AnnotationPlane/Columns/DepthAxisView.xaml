@@ -6,6 +6,6 @@
              xmlns:local="clr-namespace:CoreSampleAnnotation.AnnotationPlane"
              mc:Ignorable="d" 
              xmlns:d3="clr-namespace:InteractiveDataDisplay.WPF;assembly=InteractiveDataDisplay.WPF"
-             d:DesignHeight="300" d:DesignWidth="300">
+             d:DesignHeight="300" d:DesignWidth="300" SnapsToDevicePixels="True" BorderBrush="Black" BorderThickness="0,0,1,0">
     <d3:Axis x:Name="Axis" AxisOrientation="Left" Height="{Binding ColumnHeight}" Range="{Binding Range}"></d3:Axis>
 </UserControl>
