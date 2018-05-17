@@ -10,7 +10,7 @@
     <UserControl.Resources>
         <ap:NumberSelectorConverter x:Key="NumberSelectorConverter"/>
     </UserControl.Resources>
-    <Grid Height="40" Width="100">
+    <Grid Height="40" Width="50">
         <Rectangle HorizontalAlignment="Stretch" Height="40" Fill="LightCoral" Name="Rect"/>
         <TextBlock VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="16">
             <TextBlock.Text>

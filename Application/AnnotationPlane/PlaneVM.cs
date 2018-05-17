@@ -1017,7 +1017,7 @@ namespace CoreSampleAnnotation.AnnotationPlane
 
 
                         blankColumnVM.ColumnHeight = colHeight;
-                        blankColumnVM.ColumnWidth = 100;
+                        blankColumnVM.ColumnWidth = 50;
                         AnnoGridVM.Columns.Add(beVM);
                         RegisterForScaleSync(beVM, true);
                     }

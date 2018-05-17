@@ -11,6 +11,7 @@
     <UserControl.Resources>
         <app:VisibilityHiddenConverter x:Key="visibilityHiddenConverter"/>
         <app:NanToEmptyStringDoubleConverter x:Key="nanToEmptyStringDoubleConverter"/>
+        <local:NonZeroDoubleValidationRule x:Key="nonZeroDoubleValidationRule"/>
     </UserControl.Resources>
     <Border CornerRadius="0" Background="White" Padding="15" Margin="15" Opacity="0.95">
         <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
@@ -24,7 +25,15 @@
                 <Run Text="Участок №"/>
                 <Run Text="{Binding Order, FallbackValue=1}"/>
             </TextBlock>
-            <app:TextInput HintText="Введите длину участка (м)" Text="{Binding Length, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource nanToEmptyStringDoubleConverter}, ConverterParameter=#.00}" MinWidth="350"></app:TextInput>
+            <app:TextInput HintText="Введите длину участка (м)" MinWidth="350">
+                <app:TextInput.Text>
+                    <Binding Path="Length" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged" Converter="{StaticResource nanToEmptyStringDoubleConverter}" ConverterParameter="0.00">
+                        <Binding.ValidationRules>
+                            <local:NonZeroDoubleValidationRule />
+                        </Binding.ValidationRules>
+                    </Binding>
+                </app:TextInput.Text>
+            </app:TextInput>
             <Button Margin="2,10" FontSize="20" Visibility="{Binding CanMoveUp,Converter={StaticResource visibilityHiddenConverter}}" Command="{Binding MoveUp}" CommandParameter="{Binding Order}" Style="{StaticResource MetroButton}" Width="50">
                 <media:Arrow_In_circle>
                 </media:Arrow_In_circle>

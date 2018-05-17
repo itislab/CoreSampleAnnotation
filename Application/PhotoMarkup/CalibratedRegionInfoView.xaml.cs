@@ -25,4 +25,32 @@ namespace CoreSampleAnnotation.PhotoMarkup
             InitializeComponent();
         }
     }
+
+    public class NonZeroDoubleValidationRule : ValidationRule
+    {
+        public NonZeroDoubleValidationRule()
+        {
+        }
+
+        public override ValidationResult Validate(object value, System.Globalization.CultureInfo cultureInfo)
+        {
+            double result = 0;
+
+            try
+            {
+                if (((string)value).Length > 0) {
+                    result = Double.Parse((String)value);
+                }
+                else
+                    return new ValidationResult(false, "Пустое значение длины");
+            }
+            catch (Exception e)
+            {
+                return new ValidationResult(false, "Вы ввели не число: " + e.Message+". ВВедите число");
+            }
+            if (result <= 0.0)
+                return new ValidationResult(false,"Длина должна быть положительна");
+            return ValidationResult.ValidResult;
+        }
+    }
 }
