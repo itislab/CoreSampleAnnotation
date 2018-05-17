@@ -62,7 +62,14 @@ namespace CoreSampleAnnotation.Reports.SVG
     public static class Report
     {
 
-        public static SvgDocument Generate(ISvgRenderableColumn[] columns, ILegendGroup[] legend)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="columns"></param>
+        /// <param name="legend"></param>
+        /// <param name="oneMeterLength">How long is the one real meter of length in SVG</param>
+        /// <returns></returns>
+        public static SvgDocument Generate(ISvgRenderableColumn[] columns, ILegendGroup[] legend, float oneMeterLength)
         {
             //generating headers
             SvgGroup headerGroup = new SvgGroup();
@@ -186,6 +193,40 @@ namespace CoreSampleAnnotation.Reports.SVG
                 k++;
             }
 
+            //generating one meter length sample
+            SvgGroup meterGroup = new SvgGroup();
+
+            SvgGroup meter = new SvgGroup();
+            SvgLine line1 = new SvgLine();
+            line1.StartX = 0;
+            line1.StartY = 10;
+            line1.EndX = oneMeterLength;
+            line1.EndY = 10;
+            line1.Stroke = blackPaint;
+            SvgLine line2 = new SvgLine();
+            line2.StartX = 0;
+            line2.EndX = 0;
+            line2.StartY = 0;
+            line2.EndY = 20;
+            line2.Stroke = blackPaint;
+            SvgLine line3 = new SvgLine();
+            line3.StartX = oneMeterLength;
+            line3.EndX = oneMeterLength;
+            line3.StartY = 0;
+            line3.EndY = 20;
+            line3.Stroke = blackPaint;
+            meter.Children.Add(line1);
+            meter.Children.Add(line2);
+            meter.Children.Add(line3);
+            meter.Transforms.Add(new SvgTranslate(30.0f, Helpers.dtos(titleYoffset)));
+            meterGroup.Children.Add(meter);
+            meterGroup.Transforms.Add(new SvgTranslate(300, Helpers.dtos(headerHeight + columnHeight + legendYGap)));
+            SvgText meterTitle = new SvgText("Масштаб (1 метр)");
+            meterTitle.FontSize = 22;
+            meterTitle.Fill = new SvgColourServer(System.Drawing.Color.Black);
+            meterTitle.Transforms.Add(new SvgTranslate(30, Helpers.dtos(titleYoffset * 0.25f)));
+            meterGroup.Children.Add(meterTitle);
+
 
             //gathering definitions
             SvgDefinitionList allDefs = new SvgDefinitionList();
@@ -207,6 +248,7 @@ namespace CoreSampleAnnotation.Reports.SVG
             result.Children.Add(headerGroup);
             result.Children.Add(columnsGroup);
             result.Children.Add(legendGroup);
+            result.Children.Add(meterGroup);
 
             return result;
         }

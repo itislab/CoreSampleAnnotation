@@ -111,7 +111,7 @@ namespace CoreSampleAnnotation.AnnotationPlane
 
                         
 
-                        var svg = Reports.SVG.Report.Generate(columnRenderers.ToArray(), legendGroups.ToArray());
+                        var svg = Reports.SVG.Report.Generate(columnRenderers.ToArray(), legendGroups.ToArray(),(float)vm.ScaleFactor);
                         using (XmlTextWriter writer = new XmlTextWriter(filepath, Encoding.UTF8))
                         {
                             svg.Write(writer);

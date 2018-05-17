@@ -11,7 +11,8 @@ namespace CoreSampleAnnotation.Reports.SVG
 {
     public class DepthColumnPainter : ColumnPainter
     {
-        protected const float labelXoffset = 10f;
+        protected const float largeTickLen = 10f;
+        protected const float labelXoffset = 12f;
         protected const float labelYoffset = 5f;
         protected const float labelSize = 10f;
 
@@ -19,7 +20,7 @@ namespace CoreSampleAnnotation.Reports.SVG
         protected const int TickDepthResolutionOrder = -1;
 
         //the label resolution is 10^LabelDepthResolutionOrder meters. 0 is 10^0 = 1 meter resolution
-        protected const int LabelDepthResolutionOrder = -1;
+        protected const int LabelDepthResolutionOrder = 0;
 
         protected new DepthAxisColumnVM vm;
 
@@ -53,16 +54,21 @@ namespace CoreSampleAnnotation.Reports.SVG
 
             Func<double,double> depthToY = depth => (depth - vm.UpperBound) * depthScaleFactor;
 
+            int counter = 0;
+
             while (tick < vm.LowerBound) {
                 SvgLine line = new SvgLine();
                 line.Stroke = blackPiant;
                 line.StartX = Helpers.dtos(0);
-                line.EndX = Helpers.dtos(labelXoffset);
+                double endX = (counter % 5 == 0) ? largeTickLen : largeTickLen * 0.5; //every fifth tick is 2 time longer than others
+                line.EndX = Helpers.dtos(endX);
                 line.StartY = Helpers.dtos(depthToY(tick));
                 line.EndY = Helpers.dtos(depthToY(tick));
                 group.Children.Add(line);
 
                 tick += tickStep;
+
+                counter++;
 
                 //SvgText text = new SvgText(string.Format("{0}",tick));
                 //text.Transforms.Add(new Svg.Transforms.SvgTranslate());
