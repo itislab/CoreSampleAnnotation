@@ -45,9 +45,9 @@ namespace CoreSampleAnnotation.AnnotationPlane.Columns
             this.widthTarget = widthTarget;
             this.rightSideTarget = rightSideTarget;
             backgroundTarget.PropertyChanged += Target_PropertyChanged;
-            if(widthTarget != null)
+            if (widthTarget != null)
                 widthTarget.PropertyChanged += Target_PropertyChanged;
-            if(rightSideTarget != null)
+            if (rightSideTarget != null)
                 rightSideTarget.PropertyChanged += Target_PropertyChanged;
         }
 
@@ -227,7 +227,7 @@ namespace CoreSampleAnnotation.AnnotationPlane.Columns
                 foreach (var layerVM in sideTarget.Layers)
                     layerVM.PropertyChanged += SingleClass_Vm_PropertyChanged;
             }
-            columnWidth = 200.0;                        
+            columnWidth = 200.0;
 
             Reinit();
         }
@@ -267,7 +267,7 @@ namespace CoreSampleAnnotation.AnnotationPlane.Columns
             if (widthTarget != null)
                 heading.Append(string.Format("\nШирина: {0}", widthTarget.Heading));
             if (sideTarget != null)
-                heading.Append(string.Format("\nграница: {0}", sideTarget.Heading));           
+                heading.Append(string.Format("\nграница: {0}", sideTarget.Heading));
 
             Heading = heading.ToString();
 
@@ -312,6 +312,16 @@ namespace CoreSampleAnnotation.AnnotationPlane.Columns
 
         private void Layers_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
         {
+            if (e.OldItems != null)
+                foreach (LayerVM vm in e.OldItems)
+                {
+                    vm.PropertyChanged -= SingleClass_Vm_PropertyChanged;
+                }
+            if (e.NewItems != null)
+                foreach (LayerVM vm in e.NewItems)
+                {
+                    vm.PropertyChanged += SingleClass_Vm_PropertyChanged;
+                }
             Reinit();
         }
     }
