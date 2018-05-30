@@ -228,6 +228,8 @@ namespace CoreSampleAnnotation.AnnotationPlane.Columns
                     layerVM.PropertyChanged += SingleClass_Vm_PropertyChanged;
             }
             columnWidth = 200.0;
+            if (widthTarget == null && sideTarget == null)
+                columnWidth = 60.0;
 
             Reinit();
         }
@@ -236,11 +238,21 @@ namespace CoreSampleAnnotation.AnnotationPlane.Columns
         /// Repopulates layers
         /// </summary>
         private void Reinit()
-        {
-            List<VisualLayerPresentingVM> content = new List<VisualLayerPresentingVM>();
-
+        {            
             int N = backgroundTarget.Layers.Count;
 
+            // continuous reiniting during adding of new layers causes cases
+            // where some of the underlayinfg logical prop cols are already splited, while others are not
+            // e.g. background image bound already contains N layers, while SideColumn bound yet contains N-1
+            // eventually they will have N layers in each logical column
+            // but while the layers count is different, just dropping the reinit
+            if (widthTarget != null && widthTarget.Layers.Count != N)
+                return;
+            if (sideTarget != null && sideTarget.Layers.Count != N)
+                return;
+
+            List<VisualLayerPresentingVM> content = new List<VisualLayerPresentingVM>();
+            
             for (int i = 0; i < N; i++)
             {
                 SingleClassificationLayerVM background = backgroundTarget.Layers[i] as SingleClassificationLayerVM;

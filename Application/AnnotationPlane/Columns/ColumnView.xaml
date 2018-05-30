@@ -83,7 +83,7 @@
                 </ItemsControl.ItemContainerStyle>
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
-                            <Border Width="100" Height="40">
+                            <Border Width="50" Height="40">
                                 <TextBlock FontSize="16" Foreground="Black" VerticalAlignment="Center" TextAlignment="Center">
                                     <TextBlock.Text>
                                         <MultiBinding Converter="{StaticResource NumberSelectorConverter}">

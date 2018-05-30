@@ -993,8 +993,10 @@ namespace CoreSampleAnnotation.AnnotationPlane
                             });
 
                         colVM.ColumnHeight = colHeight;
-
+                        
                         AnnoGridVM.Columns.Add(colVM);
+
+                        //column layer sync is not needed as underling logical layer col is already syncronized
                     }
                 }
                 else if (columnDefinition is LayerEditColumnDefinitionVM)
