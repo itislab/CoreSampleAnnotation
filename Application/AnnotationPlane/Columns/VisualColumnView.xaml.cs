@@ -69,7 +69,7 @@ namespace CoreSampleAnnotation.AnnotationPlane.Columns
         }
     }
 
-    public class PolylinePointsConverter : IMultiValueConverter
+    public class RightSidePointsConverter : IMultiValueConverter
     {        
         public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
         {
@@ -79,7 +79,26 @@ namespace CoreSampleAnnotation.AnnotationPlane.Columns
             double height = (double)values[1];
             Template.RightSideFormEnum rightSideForm = (Template.RightSideFormEnum)values[2];
             ISideCurveGenerator rightSideGenerator = SideCurveGeneratorFactory.GetGeneratorFor(rightSideForm);
-            return new PointCollection(Drawing.GetPolyline(width, height, rightSideGenerator));
+            return new PointCollection(Drawing.GetRightPolyline(width, height, rightSideGenerator));
+        }
+
+        public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+    public class BackgroundPolygonPointsConverter : IMultiValueConverter
+    {
+        public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (values.Length != 3)
+                return null;
+            double width = (double)values[0];
+            double height = (double)values[1];
+            Template.RightSideFormEnum rightSideForm = (Template.RightSideFormEnum)values[2];
+            ISideCurveGenerator rightSideGenerator = SideCurveGeneratorFactory.GetGeneratorFor(rightSideForm);
+            return new PointCollection(Drawing.GetBackgroundPolyline(width, height, rightSideGenerator));
         }
 
         public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)

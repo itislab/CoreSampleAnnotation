@@ -9,12 +9,9 @@ namespace CoreSampleAnnotation.AnnotationPlane.Columns
 {
     public static class Drawing
     {
-        public static IEnumerable<Point> GetPolyline(double width, double height, ISideCurveGenerator rightSideCurve)
+        public static IEnumerable<Point> GetRightPolyline(double width, double height, ISideCurveGenerator rightSideCurve)
         {
             List<Point> result = new List<Point>();
-            result.Add(new Point(0.0, height));
-            result.Add(new Point(0.0, 0.0));
-
             IEnumerable<Point> rightSidePoints = rightSideCurve.GenerateSide(height).
                 Select(p => new Point(p.Y + width, p.X)); // transposing, so that (0.0;0.0);(length;0.0) projected to (width;0.0);(width;length)
 
@@ -28,12 +25,28 @@ namespace CoreSampleAnnotation.AnnotationPlane.Columns
             List<Point> result = new List<Point>();
 
             IEnumerable<Point> bottomSidePoints = bottomSideCurve.GenerateSide(width).
-                Select(p => new Point(p.X, p.Y + height - 3)); // parallel shift, so that (0.0;0.0);(length;0.0) is shifted to (0.0;height-3);(width;height-3)
+                Select(p => new Point(p.X, p.Y + height)); // parallel shift, so that (0.0;0.0);(length;0.0) is shifted to (0.0;height);(width;height)
 
             result.AddRange(bottomSidePoints);
 
             return result;
         }
+
+        
+        public static IEnumerable<Point> GetBackgroundPolyline(double width, double height, ISideCurveGenerator rightSideCurve)
+        {
+            List<Point> result = new List<Point>();
+            result.Add(new Point(0.0, height));
+            result.Add(new Point(0.0, 0.0));
+            
+            IEnumerable < Point > rightSidePoints = rightSideCurve.GenerateSide(height).
+             Select(p => new Point(p.Y + width, p.X)); // transposing, so that (0.0;0.0);(length;0.0) projected to (width;0.0);(width;length)
+            
+            result.AddRange(rightSidePoints);
+
+            return result;
+        }
+
     }
 
     public interface ISideCurveGenerator

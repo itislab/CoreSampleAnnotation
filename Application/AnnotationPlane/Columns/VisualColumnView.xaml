@@ -8,9 +8,10 @@
              d:DesignHeight="300" d:DesignWidth="300">
     <UserControl.Resources>
         <local:ViewPortConverter x:Key="viewPortConverter"/>
-        <local:PolylinePointsConverter x:Key="polylinePointsConverter"/>
+        <local:RightSidePointsConverter x:Key="rightSidePointsConverter"/>
         <local:BottomSideStrokeConverter x:Key="bottomSideStrokeConverter"/>
         <local:BottomSidePointsConverter x:Key="bottomSidePointsConverter"/>
+        <local:BackgroundPolygonPointsConverter x:Key="backgroundPolygonPointsConverter"/>
     </UserControl.Resources>
     <ItemsControl ItemsSource="{Binding Layers}"  Height="{Binding ColumnHeight}" Width="{Binding ColumnWidth}">
         <ItemsControl.ItemsPanel>
@@ -30,9 +31,9 @@
         <ItemsControl.ItemTemplate>
             <DataTemplate>
                 <Grid>
-                   <Polyline Stroke="Black" Fill="{Binding BackgroundBrush}" StrokeThickness="1">
+                    <Polyline Stroke="Black" Fill="{Binding BackgroundBrush}" StrokeThickness="1">
                         <Polyline.Points>
-                            <MultiBinding Converter="{StaticResource polylinePointsConverter}">
+                            <MultiBinding Converter="{StaticResource rightSidePointsConverter}">
                                 <Binding Path="Width"></Binding>
                                 <Binding Path="Height"></Binding>
                                 <Binding Path="RightSideForm"></Binding>
@@ -51,6 +52,15 @@
                             <Binding Converter="{StaticResource bottomSideStrokeConverter}" Path="BottomSideForm"/>
                         </Polyline.StrokeDashArray>
                     </Polyline>
+                    <Polygon Fill="{Binding BackgroundBrush}" StrokeThickness="0">
+                        <Polygon.Points>
+                            <MultiBinding Converter="{StaticResource backgroundPolygonPointsConverter}">
+                                <Binding Path="Width"></Binding>
+                                <Binding Path="Height"></Binding>
+                                <Binding Path="RightSideForm"></Binding>
+                            </MultiBinding>
+                        </Polygon.Points>
+                    </Polygon>
                 </Grid>
             </DataTemplate>
         </ItemsControl.ItemTemplate>
