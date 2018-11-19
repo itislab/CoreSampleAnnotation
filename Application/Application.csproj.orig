@@ -1,0 +1,600 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{099C27F4-B9B9-444B-91AF-B0AF982DC040}</ProjectGuid>
+    <OutputType>WinExe</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>CoreSampleAnnotation</RootNamespace>
+    <AssemblyName>CoreSampleAnnotation</AssemblyName>
+    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <WarningLevel>4</WarningLevel>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <IsWebBootstrapper>false</IsWebBootstrapper>
+    <PublishUrl>publish\</PublishUrl>
+    <Install>true</Install>
+    <InstallFrom>Disk</InstallFrom>
+    <UpdateEnabled>false</UpdateEnabled>
+    <UpdateMode>Foreground</UpdateMode>
+    <UpdateInterval>7</UpdateInterval>
+    <UpdateIntervalUnits>Days</UpdateIntervalUnits>
+    <UpdatePeriodically>false</UpdatePeriodically>
+    <UpdateRequired>false</UpdateRequired>
+    <MapFileExtensions>true</MapFileExtensions>
+    <ApplicationRevision>0</ApplicationRevision>
+    <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
+    <UseApplicationTrust>false</UseApplicationTrust>
+    <BootstrapperEnabled>true</BootstrapperEnabled>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="CsvHelper, Version=7.0.0.0, Culture=neutral, PublicKeyToken=8c4959082be5c823, processorArchitecture=MSIL">
+      <HintPath>..\packages\CsvHelper.7.1.0\lib\net45\CsvHelper.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="FileHelpers, Version=3.2.7.0, Culture=neutral, PublicKeyToken=3e0c08d59cc3d657, processorArchitecture=MSIL">
+      <HintPath>..\packages\FileHelpers.3.2.7\lib\net45\FileHelpers.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="InteractiveDataDisplay.WPF, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\InteractiveDataDisplay.WPF.1.0.0\lib\net452\InteractiveDataDisplay.WPF.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.Maps.MapControl.WPF, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\App\packages\Microsoft.Maps.MapControl.WPF.1.0.0.3\lib\net40-Client\Microsoft.Maps.MapControl.WPF.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.WindowsAPICodePack, Version=1.1.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.WindowsAPICodePack.Core.1.1.0\lib\Microsoft.WindowsAPICodePack.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.WindowsAPICodePack.Shell, Version=1.1.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.WindowsAPICodePack.Shell.1.1.0\lib\Microsoft.WindowsAPICodePack.Shell.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Newtonsoft.Json, Version=11.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.11.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="nrtftree-library, Version=0.4.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\nrtftree-library.0.4.0\lib\net452\nrtftree-library.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="ReachFramework" />
+    <Reference Include="Svg, Version=2.2.1.39233, Culture=neutral, PublicKeyToken=12a0bac221edeae2, processorArchitecture=MSIL">
+      <HintPath>..\packages\Svg.2.3.0\lib\net35\Svg.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Printing" />
+    <Reference Include="System.Reactive.Core, Version=3.0.1000.0, Culture=neutral, PublicKeyToken=94bc3704cddfc263, processorArchitecture=MSIL">
+      <HintPath>..\App\packages\System.Reactive.Core.3.1.1\lib\net45\System.Reactive.Core.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Reactive.Interfaces, Version=3.0.1000.0, Culture=neutral, PublicKeyToken=94bc3704cddfc263, processorArchitecture=MSIL">
+      <HintPath>..\App\packages\System.Reactive.Interfaces.3.1.1\lib\net45\System.Reactive.Interfaces.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Reactive.Linq, Version=3.0.1000.0, Culture=neutral, PublicKeyToken=94bc3704cddfc263, processorArchitecture=MSIL">
+      <HintPath>..\App\packages\System.Reactive.Linq.3.1.1\lib\net45\System.Reactive.Linq.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Reactive.PlatformServices, Version=3.0.1000.0, Culture=neutral, PublicKeyToken=94bc3704cddfc263, processorArchitecture=MSIL">
+      <HintPath>..\App\packages\System.Reactive.PlatformServices.3.1.1\lib\net45\System.Reactive.PlatformServices.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Reactive.Windows.Threading, Version=3.0.1000.0, Culture=neutral, PublicKeyToken=94bc3704cddfc263, processorArchitecture=MSIL">
+      <HintPath>..\App\packages\System.Reactive.Windows.Threading.3.1.1\lib\net45\System.Reactive.Windows.Threading.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Windows" />
+    <Reference Include="System.Xml" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Xaml">
+      <RequiredTargetFramework>4.0</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="WindowsBase" />
+    <Reference Include="PresentationCore" />
+    <Reference Include="PresentationFramework" />
+  </ItemGroup>
+  <ItemGroup>
+    <ApplicationDefinition Include="App.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </ApplicationDefinition>
+    <Compile Include="AnnotationPlane\ColumnSettings\IconsColumnDefinitionView.xaml.cs">
+      <DependentUpon>IconsColumnDefinitionView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="AnnotationPlane\ColumnSettings\IconsColumnDefinitionVM.cs" />
+    <Compile Include="AnnotationPlane\ColumnSettings\LayerEditColumnDefinitionView.xaml.cs">
+      <DependentUpon>LayerEditColumnDefinitionView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="AnnotationPlane\ColumnSettings\LayerEditColumnDefinitionVM.cs" />
+    <Compile Include="AnnotationPlane\ColumnSettings\LayeredTextColumnDefinitionView.xaml.cs">
+      <DependentUpon>LayeredTextColumnDefinitionView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="AnnotationPlane\ColumnSettings\Presentation.cs" />
+    <Compile Include="AnnotationPlane\ColumnSettings\VisualColumnDefinitionView.xaml.cs">
+      <DependentUpon>VisualColumnDefinitionView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="AnnotationPlane\ColumnSettings\VisualColumnDefinitionVM.cs" />
+    <Compile Include="AnnotationPlane\Columns\BlankColumnView.xaml.cs">
+      <DependentUpon>BlankColumnView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="AnnotationPlane\Columns\BlankColumnVM.cs" />
+    <Compile Include="AnnotationPlane\Columns\Drawing.cs" />
+    <Compile Include="AnnotationPlane\Columns\ILayerColumn.cs" />
+    <Compile Include="AnnotationPlane\Columns\Sample.xaml.cs">
+      <DependentUpon>Sample.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="AnnotationPlane\Columns\SamplesColumnVM.cs" />
+    <Compile Include="AnnotationPlane\Columns\VisualColumnView.xaml.cs">
+      <DependentUpon>VisualColumnView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="AnnotationPlane\Columns\VisualColumnVM.cs" />
+    <Compile Include="AnnotationPlane\LayerBoundaries\BoundaryColumnVM.cs" />
+    <Compile Include="AnnotationPlane\LayerBoundaries\BoundaryLabelColumnVM.cs" />
+    <Compile Include="AnnotationPlane\LayerBoundaries\BoundaryLineColumnVM.cs" />
+    <Compile Include="AnnotationPlane\LayerBoundaries\ILayerBoundariesVM.cs" />
+    <Compile Include="AnnotationPlane\LayerBoundaries\LayerLabel.xaml.cs">
+      <DependentUpon>LayerLabel.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="AnnotationPlane\LayerBoundaries\LayerBoundaryEditorVM.cs" />
+    <Compile Include="AnnotationPlane\LayerBoundaries\RankMatchingBoundaryCollection.cs" />
+    <Compile Include="AnnotationPlane\LayerBoundaries\Utils.cs" />
+    <Compile Include="AnnotationPlane\LayersAnnotation.cs" />
+    <Compile Include="AnnotationPlane\AnnotationGrid.xaml.cs">
+      <DependentUpon>AnnotationGrid.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="AnnotationPlane\AnnotationGridVM.cs" />
+    <Compile Include="AnnotationPlane\ClassificationView.xaml.cs">
+      <DependentUpon>ClassificationView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="AnnotationPlane\ClassificationVM.cs" />
+    <Compile Include="AnnotationPlane\ColumnScaleAdapters.cs" />
+    <Compile Include="AnnotationPlane\ColumnScaleController.cs" />
+    <Compile Include="AnnotationPlane\ColumnSettings\ColumnDefinitionView.xaml.cs">
+      <DependentUpon>ColumnDefinitionView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="AnnotationPlane\ColumnSettings\ColumnDefinitionVM.cs" />
+    <Compile Include="AnnotationPlane\ColumnSettings\ColumnSettingsView.xaml.cs">
+      <DependentUpon>ColumnSettingsView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="AnnotationPlane\ColumnSettings\ColumnSettingsVM.cs" />
+    <Compile Include="AnnotationPlane\ColumnSettings\DepthColumnDefinitionView.xaml.cs">
+      <DependentUpon>DepthColumnDefinitionView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="AnnotationPlane\ColumnSettings\LayeredTextColumnDefinitionVM.cs" />
+    <Compile Include="AnnotationPlane\ColumnSettings\LayerLengthColumnDefinitionView.xaml.cs">
+      <DependentUpon>LayerLengthColumnDefinitionView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="AnnotationPlane\ColumnSettings\PhotoColumnDefinitionView.xaml.cs">
+      <DependentUpon>PhotoColumnDefinitionView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="AnnotationPlane\Columns\ColumnView.xaml.cs">
+      <DependentUpon>ColumnView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="AnnotationPlane\Columns\ColumnVM.cs" />
+    <Compile Include="AnnotationPlane\Columns\DepthAxisView.xaml.cs">
+      <DependentUpon>DepthAxisView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="AnnotationPlane\Columns\ImageColumnView.xaml.cs" />
+    <Compile Include="AnnotationPlane\LayerDepthPropertyView.xaml.cs">
+      <DependentUpon>LayerDepthPropertyView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="AnnotationPlane\LayeredColumnView.xaml.cs">
+      <DependentUpon>LayeredColumnView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="AnnotationPlane\LayerPropertyVM.cs" />
+    <Compile Include="AnnotationPlane\LayerSynchronizer.cs" />
+    <Compile Include="AnnotationPlane\PhotoRegion.xaml.cs">
+      <DependentUpon>PhotoRegion.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="AnnotationPlane\Plane.xaml.cs">
+      <DependentUpon>Plane.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="AnnotationPlane\PlaneVM.cs" />
+    <Compile Include="AnnotationPlane\RegionImage.cs" />
+    <Compile Include="AnnotationPlane\SyncronizerBoundaryAdapter.cs" />
+    <Compile Include="AnnotationPlane\syncronizerColumnAdapter.cs" />
+    <Compile Include="AnnotationPlane\SyncronizerScaleAdapter.cs" />
+    <Compile Include="AnnotationPlane\Template\Class.cs" />
+    <Compile Include="AnnotationPlane\Template\InputField.cs" />
+    <Compile Include="AnnotationPlane\Template\Property.cs" />
+    <Compile Include="ILayerRankNamesSource.cs" />
+    <Compile Include="ILayersTemplateSource.cs" />
+    <Compile Include="Intervals\BoreIntervalsView.xaml.cs">
+      <DependentUpon>BoreIntervalsView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Intervals\BoreIntervalsVM.cs" />
+    <Compile Include="CommonConverters.cs" />
+    <Compile Include="DelegateCommand.cs" />
+    <Compile Include="Intervals\BoreIntervalVM.cs" />
+    <Compile Include="Intervals\IntervalImages.xaml.cs">
+      <DependentUpon>IntervalImages.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Intervals\PhotoCalibratedBoreIntervalVM.cs" />
+    <Compile Include="Intervals\PhotoRegion.cs" />
+    <Compile Include="Media\AddNewPhoto.xaml.cs">
+      <DependentUpon>AddNewPhoto.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Media\ApertureIcon.xaml.cs">
+      <DependentUpon>ApertureIcon.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Media\Arrow_In_circle.xaml.cs">
+      <DependentUpon>Arrow_In_circle.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Media\CrossIcon.xaml.cs">
+      <DependentUpon>CrossIcon.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Media\ExitIcon.xaml.cs">
+      <DependentUpon>ExitIcon.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Media\GearsIcon.xaml.cs">
+      <DependentUpon>GearsIcon.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Media\RotateIcon.xaml.cs">
+      <DependentUpon>RotateIcon.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Media\SaveIcon.xaml.cs">
+      <DependentUpon>SaveIcon.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Media\TableIcon.xaml.cs">
+      <DependentUpon>TableIcon.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Persistence\CsvFileLayerRankSource.cs" />
+    <Compile Include="Persistence\FolderImageStorage.cs" />
+    <Compile Include="Persistence\FolderLayersTemplateSource.cs" />
+    <Compile Include="Persistence\FolderPersisterFactory.cs" />
+    <Compile Include="Persistence\HardcodedLayerTemplate.cs" />
+    <Compile Include="Persistence\JsonFileColumnSettings.cs" />
+    <Compile Include="Persistence\PathUtils.cs" />
+    <Compile Include="Persistence\StaticLayerRankNamesSource.cs" />
+    <Compile Include="PhotoMarkup\AnnotatedPolygon.xaml.cs">
+      <DependentUpon>AnnotatedPolygon.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="PhotoMarkup\CalibratedRegionInfoView.xaml.cs">
+      <DependentUpon>CalibratedRegionInfoView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="PhotoMarkup\CalibratedRegionVM.cs" />
+    <Compile Include="PhotoMarkup\CoordTransformedCanvas.cs" />
+    <Compile Include="PhotoMarkup\ExtractionInfoView.xaml.cs">
+      <DependentUpon>ExtractionInfoView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="PhotoMarkup\ExtractionInfoVM.cs" />
+    <Compile Include="PhotoMarkup\IInfoLayerElement.cs" />
+    <Compile Include="PhotoMarkup\PhotoCalibrationMarker.xaml.cs">
+      <DependentUpon>PhotoCalibrationMarker.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="PhotoMarkup\PhotoMarkup.xaml.cs">
+      <DependentUpon>PhotoMarkup.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="ProjectMenuView.xaml.cs">
+      <DependentUpon>ProjectMenuView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="ProjectMenuVM.cs" />
+    <Compile Include="ProjectVM.cs" />
+    <Compile Include="Persistence\FolderPersister.cs" />
+<<<<<<< HEAD
+    <Compile Include="Reports\CSV\ReportCSV.cs" />
+    <Compile Include="Reports\CSV\ReportHelpersCSV.cs" />
+=======
+    <Compile Include="Reports\Helpers.cs" />
+>>>>>>> 60c671215cb80c30b88dd14885848499984ea8be
+    <Compile Include="Reports\RTF\ReportHelpers.cs" />
+    <Compile Include="Reports\RTF\TableDocument.cs" />
+    <Compile Include="Reports\SVG\BoundaryColumnPainter.cs" />
+    <Compile Include="Reports\SVG\LayeredColumnPainter.cs" />
+    <Compile Include="ReportsMenuView.xaml.cs">
+      <DependentUpon>ReportsMenuView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="ReportsMenuVM.cs" />
+    <Compile Include="Reports\SamplesCSV\Report.cs" />
+    <Compile Include="Reports\SVG\ColumnPainter.cs" />
+    <Compile Include="Reports\SVG\ColumnPainterFactory.cs" />
+    <Compile Include="Reports\SVG\DepthColumnPainter.cs" />
+    <Compile Include="Reports\SVG\Helpers.cs" />
+    <Compile Include="Reports\SVG\ImageColumnPainter.cs" />
+    <Compile Include="Reports\SVG\LayerPainter.cs" />
+    <Compile Include="Reports\SVG\LegendAdapters.cs" />
+    <Compile Include="Reports\SVG\LegendFactory.cs" />
+    <Compile Include="Reports\SVG\Report.cs" />
+    <Compile Include="Reports\SVG\SamplesColumnPainter.cs" />
+    <Compile Include="Reports\SVG\VisualColumnPainter.cs" />
+    <Compile Include="StartupMenu.xaml.cs">
+      <DependentUpon>StartupMenu.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="StartupMenuVM.cs" />
+    <Compile Include="TextInput.xaml.cs">
+      <DependentUpon>TextInput.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="ViewModel.cs" />
+    <Compile Include="ViewModelStubs.cs" />
+    <Page Include="AnnotationPlane\AnnotationGrid.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="AnnotationPlane\ClassificationView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="AnnotationPlane\ColumnSettings\ColumnDefinitionView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="AnnotationPlane\ColumnSettings\ColumnSettingsView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="AnnotationPlane\ColumnSettings\DepthColumnDefinitionView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="AnnotationPlane\ColumnSettings\IconsColumnDefinitionView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="AnnotationPlane\ColumnSettings\LayerEditColumnDefinitionView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="AnnotationPlane\ColumnSettings\LayeredTextColumnDefinitionView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="AnnotationPlane\ColumnSettings\LayerLengthColumnDefinitionView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="AnnotationPlane\ColumnSettings\PhotoColumnDefinitionView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="AnnotationPlane\ColumnSettings\VisualColumnDefinitionView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="AnnotationPlane\Columns\BlankColumnView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="AnnotationPlane\Columns\ColumnView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="AnnotationPlane\Columns\DepthAxisView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="AnnotationPlane\Columns\ImageColumnView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="AnnotationPlane\Columns\Sample.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="AnnotationPlane\Columns\VisualColumnView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="AnnotationPlane\LayerBoundaries\LayerLabel.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="AnnotationPlane\LayerDepthPropertyView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="AnnotationPlane\LayeredColumnView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="AnnotationPlane\PhotoRegion.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="AnnotationPlane\Plane.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Intervals\BoreIntervalsView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Intervals\IntervalImages.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="MainWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Compile Include="App.xaml.cs">
+      <DependentUpon>App.xaml</DependentUpon>
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="MainWindow.xaml.cs">
+      <DependentUpon>MainWindow.xaml</DependentUpon>
+      <SubType>Code</SubType>
+    </Compile>
+    <Page Include="Media\AddNewPhoto.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Media\ApertureIcon.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Media\Arrow_In_circle.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Media\CrossIcon.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Media\ExitIcon.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Media\GearsIcon.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Media\RotateIcon.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Media\SaveIcon.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Media\TableIcon.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="PhotoMarkup\AnnotatedPolygon.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="PhotoMarkup\CalibratedRegionInfoView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="PhotoMarkup\ExtractionInfoView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="PhotoMarkup\PhotoCalibrationMarker.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="PhotoMarkup\PhotoMarkup.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="ProjectMenuView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="ReportsMenuView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="StartupMenu.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="TextInput.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="MainWindowVM.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+    </Compile>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <Compile Include="AnnotationPlane\ColumnSettings\SimpleColumnDefinitionVMs.cs" />
+    <None Include="packages.config" />
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+    <AppDesigner Include="Properties\" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="credits\exit_icon_cc.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="credits\arrow_ni_circle_icon.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="credits\cross_icon_cc.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="credits\rotate-icon.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Media\checkerboard.jpg" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="credits\save_icon.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="credits\gears_icon.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="credits\table_icon.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="credits\ApertureIcon.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <BootstrapperPackage Include=".NETFramework,Version=v4.5.2">
+      <Visible>False</Visible>
+      <ProductName>Microsoft .NET Framework 4.5.2 %28x86 and x64%29</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

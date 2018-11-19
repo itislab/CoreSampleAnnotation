@@ -9,19 +9,29 @@ namespace CoreSampleAnnotation.AnnotationPlane.Columns
 {
     public static class Drawing
     {
-        public static IEnumerable<Point> GetPolygon(double width, double height, ISideCurveGenerator sideCurve)
+        public static IEnumerable<Point> GetPolyline(double width, double height, ISideCurveGenerator rightSideCurve)
         {
             List<Point> result = new List<Point>();
-            result.Add(new Point(0.0, 0.0));
-            result.Add(new Point(width, 0.0));
-
-            IEnumerable<Point> sidePoints = sideCurve.GenerateSide(height).
-                Select(p => new Point(p.Y + width, p.X)); // transposing, so that (0.0;0.0);(length;0.0) projected to (width;0.0);(width;length) 
-
-            result.AddRange(sidePoints);
-
-            result.Add(new Point(width, height));
             result.Add(new Point(0.0, height));
+            result.Add(new Point(0.0, 0.0));
+
+            IEnumerable<Point> rightSidePoints = rightSideCurve.GenerateSide(height).
+                Select(p => new Point(p.Y + width, p.X)); // transposing, so that (0.0;0.0);(length;0.0) projected to (width;0.0);(width;length)
+
+            result.AddRange(rightSidePoints);
+
+            return result;
+        }
+
+        public static IEnumerable<Point> GetBottomPolyline(double width, double height, ISideCurveGenerator bottomSideCurve)
+        {
+            List<Point> result = new List<Point>();
+
+            IEnumerable<Point> bottomSidePoints = bottomSideCurve.GenerateSide(width).
+                Select(p => new Point(p.X, p.Y + height - 3)); // parallel shift, so that (0.0;0.0);(length;0.0) is shifted to (0.0;height-3);(width;height-3)
+
+            result.AddRange(bottomSidePoints);
+
             return result;
         }
     }
@@ -92,7 +102,7 @@ namespace CoreSampleAnnotation.AnnotationPlane.Columns
                 result.AddRange(periodPoints);
             }
 
-            //drawing trailing strait line
+            //drawing trailing straight line
             result.Add(new Point(length, 0.0));
             return result;
         }

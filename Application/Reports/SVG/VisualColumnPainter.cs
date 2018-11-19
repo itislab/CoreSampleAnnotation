@@ -42,14 +42,15 @@ namespace CoreSampleAnnotation.Reports.SVG
             for (int i = 0; i < layers.Length; i++)
             {
                 VisualLayerPresentingVM lvm = layers[i];
+                SvgGroup levelGroup = new SvgGroup();
                 if (lvm.BackgroundClass.CurrentClass != null)
                 {
-                    ISideCurveGenerator sideCurveGenerator = null;
+                    ISideCurveGenerator rightSideCurveGenerator = null;
 
                     if ((lvm.RightSideClass != null) && (lvm.RightSideClass.CurrentClass != null))
-                        sideCurveGenerator = SideCurveGeneratorFactory.GetGeneratorFor(lvm.RightSideClass.CurrentClass.RightSideForm);
+                        rightSideCurveGenerator = SideCurveGeneratorFactory.GetGeneratorFor(lvm.RightSideClass.CurrentClass.RightSideForm);
                     else
-                        sideCurveGenerator = SideCurveGeneratorFactory.GetGeneratorFor(AnnotationPlane.Template.RightSideFormEnum.NotDefined);
+                        rightSideCurveGenerator = SideCurveGeneratorFactory.GetGeneratorFor(AnnotationPlane.Template.RightSideFormEnum.NotDefined);
 
                     SvgPatternServer sps = lvm.BackgroundClass.CurrentClass.BackgroundPattern;
                     sps.PatternContentUnits = SvgCoordinateUnits.ObjectBoundingBox;
@@ -63,7 +64,7 @@ namespace CoreSampleAnnotation.Reports.SVG
                     poly.StrokeWidth = 1f;
                     poly.Fill = sps;
 
-                    var points = Drawing.GetPolygon(lvm.Width, lvm.Height, sideCurveGenerator).ToArray();
+                    var points = Drawing.GetPolyline(lvm.Width, lvm.Height, rightSideCurveGenerator).ToArray();
 
                     SvgPointCollection svgPoints = new SvgPointCollection();
                     for (int j = 0; j < points.Length; j++)
@@ -74,8 +75,43 @@ namespace CoreSampleAnnotation.Reports.SVG
                     }
                     
                     poly.Points = svgPoints;
-                    
-                    group.Children.Add(poly);
+
+                    levelGroup.Children.Add(poly);
+
+
+                    ISideCurveGenerator bottomSideCurveGenerator = null;
+                    if ((lvm.BottomSideClass != null) && (lvm.BottomSideClass.CurrentClass != null))
+                        bottomSideCurveGenerator = SideCurveGeneratorFactory.GetGeneratorFor(lvm.BottomSideClass.CurrentClass.BottomSideForm);
+                    else
+                        bottomSideCurveGenerator = SideCurveGeneratorFactory.GetGeneratorFor(AnnotationPlane.Template.BottomSideFormEnum.NotDefined);
+
+                    SvgPolyline bottomEdge = new SvgPolyline
+                    {
+                        Stroke = new SvgColourServer(System.Drawing.Color.Black),
+                        StrokeLineCap = SvgStrokeLineCap.Round,
+                        StrokeWidth = 1f
+                    };
+
+                    if (lvm.BottomSideClass.CurrentClass.BottomSideForm == AnnotationPlane.Template.BottomSideFormEnum.Dotted) {
+                        bottomEdge.StrokeDashArray = new List<float>() { 3, 3 }.
+                            Select(p => new SvgUnit(p)) as SvgUnitCollection;
+                    }
+
+                    var bottomPoints = Drawing.GetBottomPolyline(lvm.Width, lvm.Height, bottomSideCurveGenerator).ToArray();
+
+                    SvgPointCollection svgBottomPoints = new SvgPointCollection();
+                    for (int j = 0; j < bottomPoints.Length; j++)
+                    {
+                        var point = bottomPoints[j];
+                        point.Y += lvm.Y;
+                        AddPointToCollection(svgBottomPoints, point);
+                    }
+
+                    bottomEdge.Points = svgBottomPoints;
+
+                    levelGroup.Children.Add(bottomEdge);
+
+                    group.Children.Add(levelGroup);
                 }
             }
 

@@ -133,7 +133,7 @@ namespace CoreSampleAnnotation
                     }
                     catch (Exception ex)
                     {
-                        MessageBox.Show("происошла ошибка загрузки проекта: \n" + ex.ToString(), "Ошибка загрузки проекта", MessageBoxButton.OK, MessageBoxImage.Error);
+                        MessageBox.Show("произошла ошибка загрузки проекта: \n" + ex.ToString(), "Ошибка загрузки проекта", MessageBoxButton.OK, MessageBoxImage.Error);
                     }
                 }
             });

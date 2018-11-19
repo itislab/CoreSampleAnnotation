@@ -25,6 +25,8 @@ namespace CoreSampleAnnotation.Persistence
         public double? WidthPercentage;
         [OptionalField]
         public string RightSideForm;
+        [OptionalField]
+        public string BottomSideForm;
     }
 
     [Serializable]
@@ -79,7 +81,7 @@ namespace CoreSampleAnnotation.Persistence
                     else
                     if (row.WidthPercentage < 0 || row.WidthPercentage > 100.0)
                     {
-                        MessageBox.Show(string.Format("значение ширна крапа вне допустимых значений. допустимый интервал 0 - 100 (%), в файле задано {0}. Будет использовано значение 100%", row.WidthPercentage), "Ширина крапа", MessageBoxButton.OK, MessageBoxImage.Warning);
+                        MessageBox.Show(string.Format("значение ширины крапа вне допустимых значений. допустимый интервал 0 - 100 (%), в файле задано {0}. Будет использовано значение 100%", row.WidthPercentage), "Ширина крапа", MessageBoxButton.OK, MessageBoxImage.Warning);
                         row.WidthPercentage = 100.0;
                     }
 
@@ -123,6 +125,22 @@ namespace CoreSampleAnnotation.Persistence
                                 break;
                         }
 
+                    BottomSideFormEnum bottomSide = BottomSideFormEnum.NotDefined;
+                    if (!string.IsNullOrEmpty(row.BottomSideForm))
+                        switch (row.BottomSideForm.ToLowerInvariant())
+                        {
+                            case "прямая": bottomSide = BottomSideFormEnum.Straight; break;
+                            case "волна": bottomSide = BottomSideFormEnum.Wave; break;
+                            case "пунктир": bottomSide = BottomSideFormEnum.Dotted; break;
+                            default:
+                                MessageBox.Show(
+                                    string.Format("Форма нижней границы крапа \"{0}\", указанная в шаблоне, не поддерживается. Будет использована прямая форма. ({1})", row.BottomSideForm, row.ToString()),
+                                    "Форма нижней границы крапа",
+                                    MessageBoxButton.OK,
+                                    MessageBoxImage.Warning);
+                                break;
+                        }
+
                     loadedClasses.Add(row.ID.ToLowerInvariant(),
                         new Class()
                         {
@@ -134,7 +152,8 @@ namespace CoreSampleAnnotation.Persistence
                             Description = row.Description,
                             WidthRatio = row.WidthPercentage.Value * 0.01,// percent to ratio
                             ExampleImage = exampleImage,
-                            RightSideForm = rightSide
+                            RightSideForm = rightSide,
+                            BottomSideForm = bottomSide
                         });
                 }
 

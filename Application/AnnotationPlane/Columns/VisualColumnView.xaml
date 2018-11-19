@@ -8,7 +8,9 @@
              d:DesignHeight="300" d:DesignWidth="300">
     <UserControl.Resources>
         <local:ViewPortConverter x:Key="viewPortConverter"/>
-        <local:PolygonPointsConverter x:Key="polygonPointsConverter"/>
+        <local:PolylinePointsConverter x:Key="polylinePointsConverter"/>
+        <local:BottomSideStrokeConverter x:Key="bottomSideStrokeConverter"/>
+        <local:BottomSidePointsConverter x:Key="bottomSidePointsConverter"/>
     </UserControl.Resources>
     <ItemsControl ItemsSource="{Binding Layers}"  Height="{Binding ColumnHeight}" Width="{Binding ColumnWidth}">
         <ItemsControl.ItemsPanel>
@@ -27,15 +29,29 @@
         </ItemsControl.ItemContainerStyle>
         <ItemsControl.ItemTemplate>
             <DataTemplate>
-                <Polygon  Stroke="Black" Fill="{Binding BackgroundBrush}" StrokeThickness="1">
-                    <Polygon.Points>
-                        <MultiBinding Converter="{StaticResource polygonPointsConverter}">
-                            <Binding Path="Width"></Binding>
-                            <Binding Path="Height"></Binding>
-                            <Binding Path="RightSideForm"></Binding>
-                        </MultiBinding>
-                    </Polygon.Points>
-                </Polygon>
+                <Grid>
+                   <Polyline Stroke="Black" Fill="{Binding BackgroundBrush}" StrokeThickness="1">
+                        <Polyline.Points>
+                            <MultiBinding Converter="{StaticResource polylinePointsConverter}">
+                                <Binding Path="Width"></Binding>
+                                <Binding Path="Height"></Binding>
+                                <Binding Path="RightSideForm"></Binding>
+                            </MultiBinding>
+                        </Polyline.Points>
+                    </Polyline>
+                    <Polyline Stroke="Black" StrokeThickness="1" StrokeDashCap="Round">
+                        <Polyline.Points>
+                            <MultiBinding Converter="{StaticResource bottomSidePointsConverter}">
+                                <Binding Path="Width"></Binding>
+                                <Binding Path="Height"></Binding>
+                                <Binding Path="BottomSideForm"></Binding>
+                            </MultiBinding>
+                        </Polyline.Points>
+                        <Polyline.StrokeDashArray>
+                            <Binding Converter="{StaticResource bottomSideStrokeConverter}" Path="BottomSideForm"/>
+                        </Polyline.StrokeDashArray>
+                    </Polyline>
+                </Grid>
             </DataTemplate>
         </ItemsControl.ItemTemplate>
     </ItemsControl>
