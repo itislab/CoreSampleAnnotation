@@ -10,6 +10,8 @@ using System.Windows;
 using FileHelpers;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using CsvHelper;
+using CsvHelper.Configuration;
 
 namespace CoreSampleAnnotation.Persistence
 {
@@ -27,6 +29,20 @@ namespace CoreSampleAnnotation.Persistence
         public string RightSideForm;
         [OptionalField]
         public string BottomSideForm;
+    }
+
+    public sealed class NamesFileRowMap : ClassMap<NamesFileRow>
+    {
+        public NamesFileRowMap()
+        {
+            Map(m => m.ID).Name("ID");
+            Map(m => m.Acronym).Name("Короткое имя");
+            Map(m => m.Name).Name("Длинное имя");
+            Map(m => m.Description).Name("Полное описание");
+            Map(m => m.WidthPercentage).Name("Ширина крапа (%)");
+            Map(m => m.RightSideForm).Name("Форма правой границы крапа");
+            Map(m => m.BottomSideForm).Name("Форма нижней границы крапа");
+        }
     }
 
     [Serializable]
@@ -68,8 +84,13 @@ namespace CoreSampleAnnotation.Persistence
 
             if (File.Exists(namesFileFullPath))
             {
-                var engine = new FileHelperEngine<NamesFileRow>();
-                var rows = engine.ReadFile(namesFileFullPath);
+                string csvText = File.ReadAllText(namesFileFullPath);
+                CsvReader csvReader = new CsvReader(new StringReader(csvText));
+                csvReader.Configuration.RegisterClassMap<NamesFileRowMap>();
+                csvReader.Configuration.Delimiter = ";";
+                csvReader.Configuration.HeaderValidated = null;
+                csvReader.Configuration.MissingFieldFound = null;
+                List<NamesFileRow> rows = csvReader.GetRecords<NamesFileRow>().ToList();
 
                 bool backgroundBrushFolderAvailable = Directory.Exists(backgroundImagesDirFullPath);
 

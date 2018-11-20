@@ -39,7 +39,7 @@ namespace CoreSampleAnnotation.AnnotationPlane.Columns
     {
         private static ISideCurveGenerator straight = new StraightSideCurveGenerator();
         private static ISideCurveGenerator steps = new OscillatingSignalCurveGenerator(20, 3, new StepOscillationGenerator());
-        private static ISideCurveGenerator wave = new OscillatingSignalCurveGenerator(20, 3, new SinOscillationGenerator(10));
+        private static ISideCurveGenerator wave = new OscillatingSignalCurveGenerator(20, 3, new SinOscillationGenerator(11));
         private static ISideCurveGenerator zigzag = new OscillatingSignalCurveGenerator(20, 3, new ZigZagOscillationGenerator());
 
 
