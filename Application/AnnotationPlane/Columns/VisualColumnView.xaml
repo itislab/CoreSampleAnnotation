@@ -31,7 +31,7 @@
         <ItemsControl.ItemTemplate>
             <DataTemplate>
                 <Grid>
-                    <Polyline Stroke="Black" Fill="{Binding BackgroundBrush}" StrokeThickness="1">
+                    <Polyline Stroke="Black" StrokeThickness="1">
                         <Polyline.Points>
                             <MultiBinding Converter="{StaticResource rightSidePointsConverter}">
                                 <Binding Path="Width"></Binding>
@@ -52,7 +52,7 @@
                             <Binding Converter="{StaticResource bottomSideStrokeConverter}" Path="BottomSideForm"/>
                         </Polyline.StrokeDashArray>
                     </Polyline>
-                    <Polygon Fill="{Binding BackgroundBrush}" StrokeThickness="0">
+                    <Polygon Fill="{Binding BackgroundBrush}" Stroke="Transparent">
                         <Polygon.Points>
                             <MultiBinding Converter="{StaticResource backgroundPolygonPointsConverter}">
                                 <Binding Path="Width"></Binding>

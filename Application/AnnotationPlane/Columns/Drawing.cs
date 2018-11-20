@@ -36,13 +36,16 @@ namespace CoreSampleAnnotation.AnnotationPlane.Columns
         public static IEnumerable<Point> GetBackgroundPolyline(double width, double height, ISideCurveGenerator rightSideCurve)
         {
             List<Point> result = new List<Point>();
-            result.Add(new Point(0.0, height));
             result.Add(new Point(0.0, 0.0));
-            
+            result.Add(new Point(width, 0.0));
+
             IEnumerable < Point > rightSidePoints = rightSideCurve.GenerateSide(height).
              Select(p => new Point(p.Y + width, p.X)); // transposing, so that (0.0;0.0);(length;0.0) projected to (width;0.0);(width;length)
             
             result.AddRange(rightSidePoints);
+
+            result.Add(new Point(width, height));
+            result.Add(new Point(0.0, height));
 
             return result;
         }
