@@ -84,10 +84,13 @@ namespace CoreSampleAnnotation.Reports.SVG
                         StrokeLineCap = SvgStrokeLineCap.Round,
                         StrokeWidth = 1f
                     };
-
-                    if (lvm.BottomSideClass.CurrentClass.BottomSideForm == AnnotationPlane.Template.BottomSideFormEnum.Dotted) {
-                        bottomEdge.StrokeDashArray = new List<float>() { 3, 3 }.
-                            Select(p => new SvgUnit(p)) as SvgUnitCollection;
+                    if (lvm.BottomSideClass.CurrentClass != null)
+                    {
+                        if (lvm.BottomSideClass.CurrentClass.BottomSideForm == AnnotationPlane.Template.BottomSideFormEnum.Dotted)
+                        {
+                            bottomEdge.StrokeDashArray = new List<float>() { 3, 3 }.
+                                Select(p => new SvgUnit(p)) as SvgUnitCollection;
+                        }
                     }
 
                     var bottomPoints = Drawing.GetBottomPolyline(lvm.Width, lvm.Height, bottomSideCurveGenerator).ToArray();
