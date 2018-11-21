@@ -10,6 +10,8 @@ using System.Windows;
 using FileHelpers;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using CsvHelper;
+using CsvHelper.Configuration;
 
 namespace CoreSampleAnnotation.Persistence
 {
@@ -25,6 +27,22 @@ namespace CoreSampleAnnotation.Persistence
         public double? WidthPercentage;
         [OptionalField]
         public string RightSideForm;
+        [OptionalField]
+        public string BottomSideForm;
+    }
+
+    public sealed class NamesFileRowMap : ClassMap<NamesFileRow>
+    {
+        public NamesFileRowMap()
+        {
+            Map(m => m.ID).Name("ID");
+            Map(m => m.Acronym).Name("Короткое имя");
+            Map(m => m.Name).Name("Длинное имя");
+            Map(m => m.Description).Name("Полное описание");
+            Map(m => m.WidthPercentage).Name("Ширина крапа (%)");
+            Map(m => m.RightSideForm).Name("Форма правой границы крапа");
+            Map(m => m.BottomSideForm).Name("Форма нижней границы крапа");
+        }
     }
 
     [Serializable]
@@ -66,8 +84,13 @@ namespace CoreSampleAnnotation.Persistence
 
             if (File.Exists(namesFileFullPath))
             {
-                var engine = new FileHelperEngine<NamesFileRow>();
-                var rows = engine.ReadFile(namesFileFullPath);
+                string csvText = File.ReadAllText(namesFileFullPath);
+                CsvReader csvReader = new CsvReader(new StringReader(csvText));
+                csvReader.Configuration.RegisterClassMap<NamesFileRowMap>();
+                csvReader.Configuration.Delimiter = ";";
+                csvReader.Configuration.HeaderValidated = null;
+                csvReader.Configuration.MissingFieldFound = null;
+                List<NamesFileRow> rows = csvReader.GetRecords<NamesFileRow>().ToList();
 
                 bool backgroundBrushFolderAvailable = Directory.Exists(backgroundImagesDirFullPath);
 
@@ -79,7 +102,7 @@ namespace CoreSampleAnnotation.Persistence
                     else
                     if (row.WidthPercentage < 0 || row.WidthPercentage > 100.0)
                     {
-                        MessageBox.Show(string.Format("значение ширна крапа вне допустимых значений. допустимый интервал 0 - 100 (%), в файле задано {0}. Будет использовано значение 100%", row.WidthPercentage), "Ширина крапа", MessageBoxButton.OK, MessageBoxImage.Warning);
+                        MessageBox.Show(string.Format("значение ширины крапа вне допустимых значений. допустимый интервал 0 - 100 (%), в файле задано {0}. Будет использовано значение 100%", row.WidthPercentage), "Ширина крапа", MessageBoxButton.OK, MessageBoxImage.Warning);
                         row.WidthPercentage = 100.0;
                     }
 
@@ -123,6 +146,22 @@ namespace CoreSampleAnnotation.Persistence
                                 break;
                         }
 
+                    BottomSideFormEnum bottomSide = BottomSideFormEnum.NotDefined;
+                    if (!string.IsNullOrEmpty(row.BottomSideForm))
+                        switch (row.BottomSideForm.ToLowerInvariant())
+                        {
+                            case "прямая": bottomSide = BottomSideFormEnum.Straight; break;
+                            case "волна": bottomSide = BottomSideFormEnum.Wave; break;
+                            case "пунктир": bottomSide = BottomSideFormEnum.Dotted; break;
+                            default:
+                                MessageBox.Show(
+                                    string.Format("Форма нижней границы крапа \"{0}\", указанная в шаблоне, не поддерживается. Будет использована прямая форма. ({1})", row.BottomSideForm, row.ToString()),
+                                    "Форма нижней границы крапа",
+                                    MessageBoxButton.OK,
+                                    MessageBoxImage.Warning);
+                                break;
+                        }
+
                     loadedClasses.Add(row.ID.ToLowerInvariant(),
                         new Class()
                         {
@@ -134,7 +173,8 @@ namespace CoreSampleAnnotation.Persistence
                             Description = row.Description,
                             WidthRatio = row.WidthPercentage.Value * 0.01,// percent to ratio
                             ExampleImage = exampleImage,
-                            RightSideForm = rightSide
+                            RightSideForm = rightSide,
+                            BottomSideForm = bottomSide
                         });
                 }
 

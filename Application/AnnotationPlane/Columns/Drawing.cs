@@ -9,21 +9,47 @@ namespace CoreSampleAnnotation.AnnotationPlane.Columns
 {
     public static class Drawing
     {
-        public static IEnumerable<Point> GetPolygon(double width, double height, ISideCurveGenerator sideCurve)
+        public static IEnumerable<Point> GetRightPolyline(double width, double height, ISideCurveGenerator rightSideCurve)
+        {
+            List<Point> result = new List<Point>();
+            IEnumerable<Point> rightSidePoints = rightSideCurve.GenerateSide(height).
+                Select(p => new Point(p.Y + width, p.X)); // transposing, so that (0.0;0.0);(length;0.0) projected to (width;0.0);(width;length)
+
+            result.AddRange(rightSidePoints);
+
+            return result;
+        }
+
+        public static IEnumerable<Point> GetBottomPolyline(double width, double height, ISideCurveGenerator bottomSideCurve)
+        {
+            List<Point> result = new List<Point>();
+
+            IEnumerable<Point> bottomSidePoints = bottomSideCurve.GenerateSide(width).
+                Select(p => new Point(p.X, p.Y + height)); // parallel shift, so that (0.0;0.0);(width;0.0) is shifted to (0.0;height);(width;height)
+
+            result.AddRange(bottomSidePoints);
+
+            return result;
+        }
+
+        
+        public static IEnumerable<Point> GetBackgroundPolyline(double width, double height, ISideCurveGenerator rightSideCurve)
         {
             List<Point> result = new List<Point>();
             result.Add(new Point(0.0, 0.0));
             result.Add(new Point(width, 0.0));
 
-            IEnumerable<Point> sidePoints = sideCurve.GenerateSide(height).
-                Select(p => new Point(p.Y + width, p.X)); // transposing, so that (0.0;0.0);(length;0.0) projected to (width;0.0);(width;length) 
-
-            result.AddRange(sidePoints);
+            IEnumerable < Point > rightSidePoints = rightSideCurve.GenerateSide(height).
+             Select(p => new Point(p.Y + width, p.X)); // transposing, so that (0.0;0.0);(length;0.0) projected to (width;0.0);(width;length)
+            
+            result.AddRange(rightSidePoints);
 
             result.Add(new Point(width, height));
             result.Add(new Point(0.0, height));
+
             return result;
         }
+
     }
 
     public interface ISideCurveGenerator
@@ -92,7 +118,8 @@ namespace CoreSampleAnnotation.AnnotationPlane.Columns
                 result.AddRange(periodPoints);
             }
 
-            //drawing trailing strait line
+            //ending straight line
+
             result.Add(new Point(length, 0.0));
             return result;
         }
@@ -141,14 +168,14 @@ namespace CoreSampleAnnotation.AnnotationPlane.Columns
         public IEnumerable<Point> GeneratePeriod(double xPeriod, double signalMaxY)
         {
             double step = Math.PI * 2.0 / (points - 1);
-            Point[] result = new Point[points];
+            Point[] result = new Point[points - 1];
 
-            double xScale = xPeriod / (Math.PI * 2.0);
+            double xScaled = xPeriod / (Math.PI * 2.0);
 
-            for (int i = 0; i < points; i++)
+            for (int i = 0; i < points - 1; i++)
             {
-                double arg = step * (i + 1);
-                result[i] = new Point(arg * xScale, Math.Sin(arg)* signalMaxY);
+                double Xi = step * (i + 1);
+                result[i] = new Point(Xi * xScaled, Math.Sin(Xi) * signalMaxY);
             }
             return result;
         }

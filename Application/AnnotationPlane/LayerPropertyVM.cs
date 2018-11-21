@@ -482,6 +482,19 @@ namespace CoreSampleAnnotation.AnnotationPlane
             }
         }
 
+        private Template.BottomSideFormEnum bottomSideForm;
+
+        public Template.BottomSideFormEnum BottomSideForm {
+            get { return bottomSideForm; }
+            set {
+                if (bottomSideForm != value)
+                {
+                    bottomSideForm = value;
+                    RaisePropertyChanged(nameof(BottomSideForm));
+                }
+            }
+        }
+
         private Svg.SvgPatternServer backgroundPattern;
 
         public Svg.SvgPatternServer BackgroundPattern

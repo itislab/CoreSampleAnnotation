@@ -75,6 +75,18 @@ namespace CoreSampleAnnotation.AnnotationPlane.ColumnSettings
             }
         }
 
+        private Variant selectedBottomSideProp;
+        public Variant SelectedBottomSideProp {
+            get { return selectedBottomSideProp; }
+            set {
+                if (selectedBottomSideProp != value)
+                {
+                    selectedBottomSideProp = value;
+                    RaisePropertyChanged(nameof(SelectedBottomSideProp));
+                }
+            }
+        }
+
         private Variant[] availableRightSideProps;
         public Variant[] AvailableRightSideProps {
             get { return availableRightSideProps; }
@@ -82,6 +94,18 @@ namespace CoreSampleAnnotation.AnnotationPlane.ColumnSettings
                 if (availableRightSideProps != value) {
                     availableRightSideProps = value;
                     RaisePropertyChanged(nameof(AvailableRightSideProps));
+                }
+            }
+        }
+
+        private Variant[] availableBottomSideProps;
+        public Variant[] AvailableBottomSideProps {
+            get { return availableBottomSideProps; }
+            set {
+                if (availableBottomSideProps != value)
+                {
+                    availableBottomSideProps = value;
+                    RaisePropertyChanged(nameof(AvailableBottomSideProps));
                 }
             }
         }
@@ -97,12 +121,14 @@ namespace CoreSampleAnnotation.AnnotationPlane.ColumnSettings
             List<Variant> backgroundVariants = new List<Variant>();
             List<Variant> widthVariants = new List<Variant>();
             List<Variant> rightSideVariants = new List<Variant>();
+            List<Variant> bottomSideVariants = new List<Variant>();
 
             foreach (Property p in layersTemplateSource.Template)
             {
                 bool foundBackgroundImage = false;
                 bool foundWidth = false;
                 bool foundRightSide = false;
+                bool foundBottomSide = false;
                 foreach (Class c in p.Classes)
                 {
                     if (!foundBackgroundImage && !string.IsNullOrEmpty(c.BackgroundPatternSVG))
@@ -118,12 +144,18 @@ namespace CoreSampleAnnotation.AnnotationPlane.ColumnSettings
                         rightSideVariants.Add(new Variant(p.ID, p.Name, Presentation.RightSide));
                         foundRightSide = true;
                     }
+                    if (!foundBottomSide && (c.BottomSideForm != BottomSideFormEnum.NotDefined))
+                    {
+                        bottomSideVariants.Add(new Variant(p.ID, p.Name, Presentation.BottomSide));
+                        foundBottomSide = true;
+                    }
                 }
             }
             
             AvailableBackgroundImageProps = backgroundVariants.ToArray();
             AvailableWidthProps = widthVariants.ToArray();
             AvailableRightSideProps = rightSideVariants.ToArray();
+            AvailableBottomSideProps = bottomSideVariants.ToArray();
         }
 
         #region Serialization
@@ -133,14 +165,17 @@ namespace CoreSampleAnnotation.AnnotationPlane.ColumnSettings
             Initialize();
             string backgroundSelectedPropID = info.GetString("BackgroundSelectedPropID");
             string widthSelectedPropID = info.GetString("WidthSelectedPropID");
-            string sideSelectedPropID = info.GetString("SideSelectedPropID");
+            string rightSideSelectedPropID = info.GetString("RightSideSelectedPropID");
+            string bottomSideSelectedPropID = info.GetString("BottomSideSelectedPropID");
             //setting the user choice but only if it is avaialabe in loaded template
             if (backgroundSelectedPropID != null)                         
                 selectedBackgroundImageProp = AvailableBackgroundImageProps.FirstOrDefault(v => (v.PropID == backgroundSelectedPropID) && (v.Presentation == Presentation.BackgroundImage));
             if (widthSelectedPropID != null)
                 selectedWidthProp = AvailableWidthProps.FirstOrDefault(v => (v.PropID == widthSelectedPropID) && (v.Presentation == Presentation.Width));
-            if (sideSelectedPropID != null)
-                selectedRightSideProp = AvailableRightSideProps.FirstOrDefault(v => (v.PropID == sideSelectedPropID) && (v.Presentation == Presentation.RightSide));            
+            if (rightSideSelectedPropID != null)
+                selectedRightSideProp = AvailableRightSideProps.FirstOrDefault(v => (v.PropID == rightSideSelectedPropID) && (v.Presentation == Presentation.RightSide));
+            if (bottomSideSelectedPropID != null)
+                selectedBottomSideProp = AvailableBottomSideProps.FirstOrDefault(v => (v.PropID == bottomSideSelectedPropID) && (v.Presentation == Presentation.BottomSide));
         }
 
         public override void GetObjectData(SerializationInfo info, StreamingContext context)
@@ -148,8 +183,9 @@ namespace CoreSampleAnnotation.AnnotationPlane.ColumnSettings
             base.GetObjectData(info, context);
             info.AddValue("LayersTemplateSource", layersTemplateSource);            
             info.AddValue("BackgroundSelectedPropID", (selectedBackgroundImageProp == null) ? (null) : (selectedBackgroundImageProp.PropID));            
-            info.AddValue("WidthSelectedPropID", (selectedWidthProp == null) ? (null) : (selectedWidthProp.PropID));            
-            info.AddValue("SideSelectedPropID", (selectedRightSideProp == null) ? (null) : (selectedRightSideProp.PropID));            
+            info.AddValue("WidthSelectedPropID", (selectedWidthProp == null) ? (null) : (selectedWidthProp.PropID));
+            info.AddValue("RightSideSelectedPropID", (selectedRightSideProp == null) ? (null) : (selectedRightSideProp.PropID));
+            info.AddValue("BottomSideSelectedPropID", (selectedBottomSideProp == null) ? (null) : (selectedBottomSideProp.PropID));
         }
         #endregion
     }

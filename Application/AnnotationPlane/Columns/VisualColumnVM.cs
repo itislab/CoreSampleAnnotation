@@ -13,6 +13,7 @@ namespace CoreSampleAnnotation.AnnotationPlane.Columns
         protected readonly SingleClassificationLayerVM backgroundTarget;
         protected readonly SingleClassificationLayerVM widthTarget;
         protected readonly SingleClassificationLayerVM rightSideTarget;
+        protected readonly SingleClassificationLayerVM bottomSideTarget;
 
         public SingleClassificationLayerVM BackgroundClass
         {
@@ -35,20 +36,35 @@ namespace CoreSampleAnnotation.AnnotationPlane.Columns
                 return rightSideTarget;
             }
         }
+        public SingleClassificationLayerVM BottomSideClass
+        {
+            get
+            {
+                return bottomSideTarget;
+            }
+        }
 
         public VisualLayerPresentingVM(
             SingleClassificationLayerVM backgroundTarget,
             SingleClassificationLayerVM widthTarget,
-            SingleClassificationLayerVM rightSideTarget)
+            SingleClassificationLayerVM rightSideTarget,
+            SingleClassificationLayerVM bottomSideTarget)
         {
             this.backgroundTarget = backgroundTarget;
             this.widthTarget = widthTarget;
             this.rightSideTarget = rightSideTarget;
+            this.bottomSideTarget = bottomSideTarget;
+
             backgroundTarget.PropertyChanged += Target_PropertyChanged;
+
             if (widthTarget != null)
                 widthTarget.PropertyChanged += Target_PropertyChanged;
+
             if (rightSideTarget != null)
                 rightSideTarget.PropertyChanged += Target_PropertyChanged;
+            
+            if (bottomSideTarget != null)
+                bottomSideTarget.PropertyChanged += Target_PropertyChanged;
         }
 
         private void Target_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
@@ -59,6 +75,7 @@ namespace CoreSampleAnnotation.AnnotationPlane.Columns
                     RaisePropertyChanged(nameof(BackgroundBrush));
                     RaisePropertyChanged(nameof(Width));
                     RaisePropertyChanged(nameof(RightSideClass));
+                    RaisePropertyChanged(nameof(BottomSideClass));
                     break;
                 case nameof(backgroundTarget.Length):
                     RaisePropertyChanged(nameof(Height));
@@ -142,6 +159,17 @@ namespace CoreSampleAnnotation.AnnotationPlane.Columns
             }
         }
 
+        public Template.BottomSideFormEnum BottomSideForm
+        {
+            get
+            {
+                if (BottomSideClass == null || BottomSideClass.CurrentClass == null)
+                    return Template.BottomSideFormEnum.Straight;
+                else
+                    return BottomSideClass.CurrentClass.BottomSideForm;
+            }
+        }
+
         public Brush BackgroundBrush
         {
             get
@@ -158,9 +186,10 @@ namespace CoreSampleAnnotation.AnnotationPlane.Columns
     {
         private LayeredColumnVM backgroundTarget;
         private LayeredColumnVM widthTarget;
-        private LayeredColumnVM sideTarget;
+        private LayeredColumnVM rightSideTarget;
+        private LayeredColumnVM bottomSideTarget;
 
-        private Func<SingleClassificationLayerVM, SingleClassificationLayerVM, SingleClassificationLayerVM, VisualLayerPresentingVM> adapter;
+        private Func<SingleClassificationLayerVM, SingleClassificationLayerVM, SingleClassificationLayerVM, SingleClassificationLayerVM, VisualLayerPresentingVM> adapter;
 
         private ObservableCollection<VisualLayerPresentingVM> layers = new ObservableCollection<VisualLayerPresentingVM>();
 
@@ -200,14 +229,16 @@ namespace CoreSampleAnnotation.AnnotationPlane.Columns
         public VisualColumnVM(string heading,
             LayeredColumnVM backgroundVm,
             LayeredColumnVM widthVm,
-            LayeredColumnVM sideVm,
-            Func<SingleClassificationLayerVM, SingleClassificationLayerVM, SingleClassificationLayerVM, VisualLayerPresentingVM> adapter) : base(heading)
+            LayeredColumnVM rightSideVm,
+            LayeredColumnVM bottomSideVm,
+            Func<SingleClassificationLayerVM, SingleClassificationLayerVM, SingleClassificationLayerVM, SingleClassificationLayerVM, VisualLayerPresentingVM> adapter) : base(heading)
         {
             this.adapter = adapter;
 
             backgroundTarget = backgroundVm;
             widthTarget = widthVm;
-            sideTarget = sideVm;
+            rightSideTarget = rightSideVm;
+            bottomSideTarget = bottomSideVm;
 
             backgroundTarget.Layers.CollectionChanged += Layers_CollectionChanged;
             backgroundTarget.PropertyChanged += Target_PropertyChanged;
@@ -220,15 +251,22 @@ namespace CoreSampleAnnotation.AnnotationPlane.Columns
                 foreach (var layerVM in widthTarget.Layers)
                     layerVM.PropertyChanged += SingleClass_Vm_PropertyChanged;
             }
-            if (sideTarget != null)
+            if (rightSideTarget != null)
             {
-                sideTarget.Layers.CollectionChanged += Layers_CollectionChanged;
-                sideTarget.PropertyChanged += Target_PropertyChanged;
-                foreach (var layerVM in sideTarget.Layers)
+                rightSideTarget.Layers.CollectionChanged += Layers_CollectionChanged;
+                rightSideTarget.PropertyChanged += Target_PropertyChanged;
+                foreach (var layerVM in rightSideTarget.Layers)
+                    layerVM.PropertyChanged += SingleClass_Vm_PropertyChanged;
+            }
+            if (bottomSideTarget != null)
+            {
+                bottomSideTarget.Layers.CollectionChanged += Layers_CollectionChanged;
+                bottomSideTarget.PropertyChanged += Target_PropertyChanged;
+                foreach (var layerVM in bottomSideTarget.Layers)
                     layerVM.PropertyChanged += SingleClass_Vm_PropertyChanged;
             }
             columnWidth = 200.0;
-            if (widthTarget == null && sideTarget == null)
+            if (widthTarget == null && rightSideTarget == null)
                 columnWidth = 60.0;
 
             Reinit();
@@ -242,13 +280,15 @@ namespace CoreSampleAnnotation.AnnotationPlane.Columns
             int N = backgroundTarget.Layers.Count;
 
             // continuous reiniting during adding of new layers causes cases
-            // where some of the underlayinfg logical prop cols are already splited, while others are not
+            // where some of the underlaying logical prop cols are already splited, while others are not
             // e.g. background image bound already contains N layers, while SideColumn bound yet contains N-1
             // eventually they will have N layers in each logical column
             // but while the layers count is different, just dropping the reinit
             if (widthTarget != null && widthTarget.Layers.Count != N)
                 return;
-            if (sideTarget != null && sideTarget.Layers.Count != N)
+            if (rightSideTarget != null && rightSideTarget.Layers.Count != N)
+                return;
+            if (bottomSideTarget != null && bottomSideTarget.Layers.Count != N)
                 return;
 
             List<VisualLayerPresentingVM> content = new List<VisualLayerPresentingVM>();
@@ -261,12 +301,17 @@ namespace CoreSampleAnnotation.AnnotationPlane.Columns
                     width = widthTarget.Layers[i] as SingleClassificationLayerVM;
                 else
                     width = null; //the width source is not chosen
-                SingleClassificationLayerVM side;
-                if (sideTarget != null)
-                    side = sideTarget.Layers[i] as SingleClassificationLayerVM;
+                SingleClassificationLayerVM rightSide;
+                if (rightSideTarget != null)
+                    rightSide = rightSideTarget.Layers[i] as SingleClassificationLayerVM;
                 else
-                    side = null; // the side source is not chosen
-                var adapted = adapter(background, width, side);
+                    rightSide = null; // the right side source is not chosen
+                SingleClassificationLayerVM bottomSide;
+                if (bottomSideTarget != null)
+                    bottomSide = bottomSideTarget.Layers[i] as SingleClassificationLayerVM;
+                else
+                    bottomSide = null; // the bottom side source is not chosen
+                var adapted = adapter(background, width, rightSide, bottomSide);
                 adapted.AvailableWidth = ColumnWidth;
                 content.Add(adapted);
             }
@@ -275,11 +320,13 @@ namespace CoreSampleAnnotation.AnnotationPlane.Columns
 
             StringBuilder heading = new StringBuilder("");
 
-            heading.Append(string.Format("Колнка\n\nКрап: {0}", backgroundTarget.Heading));
+            heading.Append(string.Format("Колонка\n\nКрап: {0}", backgroundTarget.Heading));
             if (widthTarget != null)
                 heading.Append(string.Format("\nШирина: {0}", widthTarget.Heading));
-            if (sideTarget != null)
-                heading.Append(string.Format("\nграница: {0}", sideTarget.Heading));
+            if (rightSideTarget != null)
+                heading.Append(string.Format("\nПравая граница: {0}", rightSideTarget.Heading));
+            if (bottomSideTarget != null)
+                heading.Append(string.Format("\nНижняя граница: {0}", bottomSideTarget.Heading));
 
             Heading = heading.ToString();
 

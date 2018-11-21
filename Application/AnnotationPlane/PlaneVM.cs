@@ -439,6 +439,7 @@ namespace CoreSampleAnnotation.AnnotationPlane
                 result.WidthRatio = cl.WidthRatio;
             }
             result.RightSideForm = cl.RightSideForm;
+            result.BottomSideForm = cl.BottomSideForm;
             if (cl.BackgroundPatternSVG != null)
             {
                 Svg.SvgPatternServer pa = Svg.SvgDocument.FromSvg<Svg.SvgDocument>(cl.BackgroundPatternSVG).Children[0] as Svg.SvgPatternServer;
@@ -1040,11 +1041,14 @@ namespace CoreSampleAnnotation.AnnotationPlane
                     LayeredColumnVM sColumnVM = null;
                     if(vcdVM.SelectedRightSideProp != null)
                         sColumnVM = LayerProps.Where(p => p.Heading == vcdVM.SelectedRightSideProp.PropID).FirstOrDefault();
+                    LayeredColumnVM bsColumnVM = null;
+                    if (vcdVM.SelectedBottomSideProp != null)
+                        bsColumnVM = LayerProps.Where(p => p.Heading == vcdVM.SelectedBottomSideProp.PropID).FirstOrDefault();
                     if (bgColumnVM == null)
                         continue;
                     Columns.VisualColumnVM vcVM = new Columns.VisualColumnVM("Колонка",
-                        bgColumnVM, wColumnVM, sColumnVM,
-                        (bgVM, wVM, sVM) => new Columns.VisualLayerPresentingVM(bgVM, wVM, sVM));
+                        bgColumnVM, wColumnVM, sColumnVM, bsColumnVM,
+                        (bgVM, wVM, sVM, bsVM) => new Columns.VisualLayerPresentingVM(bgVM, wVM, sVM, bsVM));
                     AnnoGridVM.Columns.Add(vcVM);
                     RegisterForScaleSync(vcVM, true);
                 }
