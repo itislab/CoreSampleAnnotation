@@ -31,13 +31,10 @@ namespace CoreSampleAnnotation.Reports.SVG
 
         public override RenderedSvg RenderColumn()
         {
-            var result = base.RenderColumn();
-            
+            var result = base.RenderColumn();            
 
             SvgGroup group = new SvgGroup();
-            VisualLayerPresentingVM[] layers = vm.Layers.ToArray();
-
-            
+            VisualLayerPresentingVM[] layers = vm.Layers.ToArray();            
 
             for (int i = 0; i < layers.Length; i++)
             {
@@ -88,8 +85,9 @@ namespace CoreSampleAnnotation.Reports.SVG
                     {
                         if (lvm.BottomSideClass.CurrentClass.BottomSideForm == AnnotationPlane.Template.BottomSideFormEnum.Dotted)
                         {
-                            bottomEdge.StrokeDashArray = new List<float>() { 3, 3 }.
-                                Select(p => new SvgUnit(p)) as SvgUnitCollection;
+                            var dashedCollection = new SvgUnitCollection();
+                            dashedCollection.AddRange(new[] { new SvgUnit(SvgUnitType.User, 5), new SvgUnit(SvgUnitType.User, 5) });
+                            bottomEdge.StrokeDashArray = dashedCollection;
                         }
                     }
 

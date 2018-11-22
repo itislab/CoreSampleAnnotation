@@ -137,10 +137,10 @@ namespace CoreSampleAnnotation.AnnotationPlane.Columns
                 case Template.BottomSideFormEnum.NotDefined:
                 case Template.BottomSideFormEnum.Straight:
                 case Template.BottomSideFormEnum.Wave:
-                    strokeArr = new DoubleCollection() { 3, 0 };
+                    strokeArr = new DoubleCollection() { 5, 0 };
                     break;
                 case Template.BottomSideFormEnum.Dotted:
-                    strokeArr = new DoubleCollection() { 3, 3 };
+                    strokeArr = new DoubleCollection() { 5, 5 };
                     break;
                 default:
                     break;
