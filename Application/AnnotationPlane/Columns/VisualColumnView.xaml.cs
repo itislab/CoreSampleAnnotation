@@ -38,30 +38,41 @@ namespace CoreSampleAnnotation.AnnotationPlane.Columns
     public static class SideCurveGeneratorFactory
     {
         private static ISideCurveGenerator straight = new StraightSideCurveGenerator();
-        private static ISideCurveGenerator steps = new OscillatingSignalCurveGenerator(20, 3, new StepOscillationGenerator());
-        private static ISideCurveGenerator wave = new OscillatingSignalCurveGenerator(20, 3, new SinOscillationGenerator(11));
-        private static ISideCurveGenerator zigzag = new OscillatingSignalCurveGenerator(20, 3, new ZigZagOscillationGenerator());
+        private static ISideCurveGenerator stepsVertical = new OscillatingSignalCurveGenerator(20, 3, new StepOscillationGenerator(), OscillationAlignment.Center);
+        private static ISideCurveGenerator waveVertical = new OscillatingSignalCurveGenerator(20, 3, new SinOscillationGenerator(11), OscillationAlignment.Center);
+        private static ISideCurveGenerator zigzagVertical = new OscillatingSignalCurveGenerator(20, 3, new ZigZagOscillationGenerator(), OscillationAlignment.Center);
+        private static ISideCurveGenerator waveHorizontalLeft = new OscillatingSignalCurveGenerator(20, 3, new SinOscillationGenerator(11), OscillationAlignment.Left);
+        private static ISideCurveGenerator waveHorizontalRight = new OscillatingSignalCurveGenerator(20, 3, new SinOscillationGenerator(11), OscillationAlignment.Right);
+        private static ISideCurveGenerator waveHorizontalCenter = new OscillatingSignalCurveGenerator(20, 3, new SinOscillationGenerator(11), OscillationAlignment.Center);
 
 
         public static ISideCurveGenerator GetGeneratorFor(Template.RightSideFormEnum rightSideForm) {
             switch (rightSideForm) {
                 case Template.RightSideFormEnum.NotDefined: return straight;
                 case Template.RightSideFormEnum.Straight: return straight;
-                case Template.RightSideFormEnum.Steps: return steps;
-                case Template.RightSideFormEnum.Wave: return wave;
-                case Template.RightSideFormEnum.ZigZag: return zigzag;
+                case Template.RightSideFormEnum.Steps: return stepsVertical;
+                case Template.RightSideFormEnum.Wave: return waveVertical;
+                case Template.RightSideFormEnum.ZigZag: return zigzagVertical;
                 default:
                     throw new NotSupportedException("Unknown right side form");
             }
         }
 
-        public static ISideCurveGenerator GetGeneratorFor(Template.BottomSideFormEnum bottomSideForm)
+        public static ISideCurveGenerator GetGeneratorFor(Template.BottomSideFormEnum bottomSideForm, OscillationAlignment alignment)
         {
             switch (bottomSideForm)
             {
                 case Template.BottomSideFormEnum.NotDefined: return straight;
                 case Template.BottomSideFormEnum.Straight: return straight;
-                case Template.BottomSideFormEnum.Wave: return wave;
+                case Template.BottomSideFormEnum.Wave:
+                    switch (alignment)
+                    {
+                        case OscillationAlignment.Left: return waveHorizontalLeft;
+                        case OscillationAlignment.Right: return waveHorizontalRight;
+                        case OscillationAlignment.Center: return waveHorizontalCenter;
+                        default:
+                            throw new NotSupportedException("Unknown wave alignment");
+                    }
                 case Template.BottomSideFormEnum.Dotted: return straight;
                 default:
                     throw new NotSupportedException("Unknown bottom side form");
@@ -115,11 +126,19 @@ namespace CoreSampleAnnotation.AnnotationPlane.Columns
                 return null;
             if (values[0] == DependencyProperty.UnsetValue) return new PointCollection();
             Template.BottomSideFormEnum bottomSideForm = (Template.BottomSideFormEnum)values[0];
-            ISideCurveGenerator bottomSideGenerator = SideCurveGeneratorFactory.GetGeneratorFor(bottomSideForm);
+            ISideCurveGenerator bottomRightAlignedSideGenerator = SideCurveGeneratorFactory.GetGeneratorFor(bottomSideForm, OscillationAlignment.Right);
+            ISideCurveGenerator bottomLeftAlignedSideGenerator = SideCurveGeneratorFactory.GetGeneratorFor(bottomSideForm, OscillationAlignment.Left);
             double currentWidth = (double)values[1];
             double previousWidth = (double)values[2];
-            double polylineWidth = (currentWidth > previousWidth) ? currentWidth : previousWidth;
-            return new PointCollection(Drawing.GetBottomPolyline(polylineWidth, 0.0, bottomSideGenerator));
+            // splitting the layer boundary into two fragments
+            // getting the minimum length between the two layers
+            double minCrepWidth = (currentWidth < previousWidth) ? currentWidth : previousWidth;
+            // getting the difference between the lengths
+            double crepWidthDiff = (currentWidth > previousWidth) ? currentWidth - minCrepWidth : previousWidth - minCrepWidth;
+            var bottomBoundaryRightAlign = Drawing.GetBottomPolyline(0.0, minCrepWidth, 0.0, bottomRightAlignedSideGenerator);
+            var bottomBoundaryLeftAlign = Drawing.GetBottomPolyline(minCrepWidth, crepWidthDiff, 0.0, bottomLeftAlignedSideGenerator);
+            var bottomBoundary = new PointCollection(bottomBoundaryRightAlign.Concat(bottomBoundaryLeftAlign));
+            return bottomBoundary;
         }
 
         public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)

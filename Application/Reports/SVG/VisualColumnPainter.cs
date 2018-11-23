@@ -69,11 +69,18 @@ namespace CoreSampleAnnotation.Reports.SVG
                     levelGroup.Children.Add(rightEdge);
 
 
-                    ISideCurveGenerator bottomSideCurveGenerator = null;
+                    ISideCurveGenerator bottomSideLeftAlignedCurveGenerator = null;
+                    ISideCurveGenerator bottomSideRightAlignedCurveGenerator = null;
                     if ((lvm.BottomSideClass != null) && (lvm.BottomSideClass.CurrentClass != null))
-                        bottomSideCurveGenerator = SideCurveGeneratorFactory.GetGeneratorFor(lvm.BottomSideClass.CurrentClass.BottomSideForm);
+                    {
+                        bottomSideLeftAlignedCurveGenerator = SideCurveGeneratorFactory.GetGeneratorFor(lvm.BottomSideClass.CurrentClass.BottomSideForm, OscillationAlignment.Left);
+                        bottomSideRightAlignedCurveGenerator = SideCurveGeneratorFactory.GetGeneratorFor(lvm.BottomSideClass.CurrentClass.BottomSideForm, OscillationAlignment.Right);
+                    }
                     else
-                        bottomSideCurveGenerator = SideCurveGeneratorFactory.GetGeneratorFor(AnnotationPlane.Template.BottomSideFormEnum.NotDefined);
+                    {
+                        bottomSideLeftAlignedCurveGenerator = SideCurveGeneratorFactory.GetGeneratorFor(AnnotationPlane.Template.BottomSideFormEnum.NotDefined, OscillationAlignment.Left);
+                        bottomSideRightAlignedCurveGenerator = SideCurveGeneratorFactory.GetGeneratorFor(AnnotationPlane.Template.BottomSideFormEnum.NotDefined, OscillationAlignment.Right);
+                    }
 
                     SvgPolyline bottomEdge = new SvgPolyline
                     {
@@ -91,14 +98,26 @@ namespace CoreSampleAnnotation.Reports.SVG
                         }
                     }
 
-                    double polylineWidth = lvm.Width;
+                    double currentWidth = lvm.Width;
+                    double minCrepWidth = currentWidth;
+                    double crepWidthDiff = 0.0;
                     if (i < layers.Length - 1)
                     {
                         VisualLayerPresentingVM nlvm = layers[i + 1];
-                        polylineWidth = nlvm.Width > polylineWidth ? polylineWidth = nlvm.Width : polylineWidth;
+
+                        // splitting the layer boundary into two fragments
+                        // getting the minimum length between the two layers
+                        minCrepWidth = (currentWidth < nlvm.Width) ? currentWidth : nlvm.Width;
+                        // getting the difference between the lengths
+                        crepWidthDiff = (currentWidth > nlvm.Width) ? currentWidth - minCrepWidth : nlvm.Width - minCrepWidth;
                     }
 
-                    var bottomPoints = Drawing.GetBottomPolyline(polylineWidth, lvm.Height, bottomSideCurveGenerator).ToArray();
+                    var bottomPointsRightAligned = Drawing.GetBottomPolyline(0.0, minCrepWidth, lvm.Height, bottomSideRightAlignedCurveGenerator).ToArray();
+                    var bottomPointsLeftAligned = Drawing.GetBottomPolyline(minCrepWidth, crepWidthDiff, lvm.Height, bottomSideLeftAlignedCurveGenerator).ToArray();
+                    
+                    var bottomPoints = new Point[bottomPointsRightAligned.Length + bottomPointsLeftAligned.Length];
+                    bottomPointsRightAligned.CopyTo(bottomPoints, 0);
+                    bottomPointsLeftAligned.CopyTo(bottomPoints, bottomPointsRightAligned.Length);
 
                     SvgPointCollection svgBottomPoints = new SvgPointCollection();
                     for (int j = 0; j < bottomPoints.Length; j++)

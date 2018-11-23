@@ -20,12 +20,12 @@ namespace CoreSampleAnnotation.AnnotationPlane.Columns
             return result;
         }
 
-        public static IEnumerable<Point> GetBottomPolyline(double width, double height, ISideCurveGenerator bottomSideCurve)
+        public static IEnumerable<Point> GetBottomPolyline(double xOffset, double width, double height, ISideCurveGenerator bottomSideCurve)
         {
             List<Point> result = new List<Point>();
 
             IEnumerable<Point> bottomSidePoints = bottomSideCurve.GenerateSide(width).
-                Select(p => new Point(p.X, p.Y + height)); // parallel shift, so that (0.0;0.0);(width;0.0) is shifted to (0.0;height);(width;height)
+                Select(p => new Point(p.X + xOffset, p.Y + height)); // parallel shift, so that (0.0;0.0);(width;0.0) is shifted to (0.0;height);(width;height)
 
             result.AddRange(bottomSidePoints);
 
@@ -78,24 +78,29 @@ namespace CoreSampleAnnotation.AnnotationPlane.Columns
         IEnumerable<Point> GeneratePeriod(double xPeriod, double signalMaxY);
     }
 
+    public enum OscillationAlignment { Left, Center, Right }
+
     /// <summary>
     /// Generates a side curve by repeating integer repeating periods provided by oscillationGenerator
     /// </summary>
     public class OscillatingSignalCurveGenerator : ISideCurveGenerator
     {
         private double xPeriod, signalMaxY;
+        private OscillationAlignment alignment;
         IOscillationGenerator generator;
 
         /// <param name="xPeriod">The period of the pattern allong X axis</param>
-        /// <param name="signalMaxY">the avsolute hight of the pattern along Y axis</param>
+        /// <param name="signalMaxY">the absolute hight of the pattern along Y axis</param>
         /// <param name="generator">Which signal to generate</param>
-        public OscillatingSignalCurveGenerator(double xPeriod, double signalMaxY, IOscillationGenerator generator)
+        /// <param name="alignment">Where the straight part will be / where to stick the signal curve</param>
+        public OscillatingSignalCurveGenerator(double xPeriod, double signalMaxY, IOscillationGenerator generator, OscillationAlignment alignment)
         {
             if (signalMaxY < 0)
                 throw new ArgumentException("signalMaxY must be non-negative");
             this.xPeriod = xPeriod;
             this.signalMaxY = signalMaxY;
             this.generator = generator;
+            this.alignment = alignment;
         }
 
         public IEnumerable<Point> GenerateSide(double length)
@@ -104,15 +109,35 @@ namespace CoreSampleAnnotation.AnnotationPlane.Columns
             double straitEndsLength = length - periods * xPeriod;
 
             List<Point> result = new List<Point>();
+
+            double leftOffset = 0.0;
+            double rightOffset = 0.0;
+            switch (alignment)
+            {
+                case OscillationAlignment.Center:
+                    leftOffset = straitEndsLength / 2;
+                    rightOffset = straitEndsLength / 2;
+                    break;
+                case OscillationAlignment.Left:
+                    leftOffset = 0.0;
+                    rightOffset = straitEndsLength;
+                    break;
+                case OscillationAlignment.Right:
+                    leftOffset = straitEndsLength;
+                    rightOffset = 0.0;
+                    break;
+            }
+
+
             //starting straight line
             result.Add(new Point(0.0, 0.0));
-            result.Add(new Point(straitEndsLength * 0.5, 0.0));
+            result.Add(new Point(leftOffset, 0.0));
 
             //drawing curves
             double miniStep = xPeriod * 0.5;
             for (int i = 0; i < periods; i++)
             {
-                double xOffset = straitEndsLength * 0.5 + i * xPeriod;
+                double xOffset = leftOffset + i * xPeriod;
                 IEnumerable<Point> periodPoints = generator.GeneratePeriod(xPeriod, signalMaxY).Select(p => new Point(p.X + xOffset, p.Y));
 
                 result.AddRange(periodPoints);
