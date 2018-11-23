@@ -91,7 +91,14 @@ namespace CoreSampleAnnotation.Reports.SVG
                         }
                     }
 
-                    var bottomPoints = Drawing.GetBottomPolyline(lvm.Width, lvm.Height, bottomSideCurveGenerator).ToArray();
+                    double polylineWidth = lvm.Width;
+                    if (i < layers.Length - 1)
+                    {
+                        VisualLayerPresentingVM nlvm = layers[i + 1];
+                        polylineWidth = nlvm.Width > polylineWidth ? polylineWidth = nlvm.Width : polylineWidth;
+                    }
+
+                    var bottomPoints = Drawing.GetBottomPolyline(polylineWidth, lvm.Height, bottomSideCurveGenerator).ToArray();
 
                     SvgPointCollection svgBottomPoints = new SvgPointCollection();
                     for (int j = 0; j < bottomPoints.Length; j++)

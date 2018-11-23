@@ -113,11 +113,13 @@ namespace CoreSampleAnnotation.AnnotationPlane.Columns
         {
             if (values.Length != 3)
                 return null;
-            double width = (double)values[0];
-            double height = (double)values[1];
-            Template.BottomSideFormEnum bottomSideForm = (Template.BottomSideFormEnum)values[2];
+            if (values[0] == DependencyProperty.UnsetValue) return new PointCollection();
+            Template.BottomSideFormEnum bottomSideForm = (Template.BottomSideFormEnum)values[0];
             ISideCurveGenerator bottomSideGenerator = SideCurveGeneratorFactory.GetGeneratorFor(bottomSideForm);
-            return new PointCollection(Drawing.GetBottomPolyline(width, height, bottomSideGenerator));
+            double currentWidth = (double)values[1];
+            double previousWidth = (double)values[2];
+            double polylineWidth = (currentWidth > previousWidth) ? currentWidth : previousWidth;
+            return new PointCollection(Drawing.GetBottomPolyline(polylineWidth, 0.0, bottomSideGenerator));
         }
 
         public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)

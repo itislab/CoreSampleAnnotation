@@ -37,10 +37,10 @@ namespace CoreSampleAnnotation.Reports.SVG
             LayerVM[] layers = columnVm.Layers.ToArray();
             double boundary = 0.0;
             for (int i = 0; i < layers.Length; i++)
-            {                
+            {               
                 LayerVM lVM = layers[i];
+                boundary += lVM.Length; 
                 if (i < layers.Length - 1) {
-                    boundary += lVM.Length;
                     SvgLine line = new SvgLine();
                     line.Stroke = blackPaint;
                     line.StartX = Helpers.dtos(0.0);
@@ -49,6 +49,7 @@ namespace CoreSampleAnnotation.Reports.SVG
                     line.EndY = Helpers.dtos(boundary);
                     group.Children.Add(line);
                 }
+                // drawing layer itself
                 var layerSvg = layerPainter.Paint(layers[i], width, lVM.Length);
                 layerSvg.Transforms.Add(new Svg.Transforms.SvgTranslate(0.0f, (float)(boundary - lVM.Length)));
                 group.Children.Add(layerSvg);
