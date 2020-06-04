@@ -12,17 +12,32 @@
             <local:ColumnDefinitionView HorizontalAlignment="Center" />
         </DataTemplate>
     </UserControl.Resources>
-    <Grid>
-        <Grid VerticalAlignment="Stretch" HorizontalAlignment="Center">
-            <Grid.RowDefinitions>
-                <RowDefinition/>
-                <RowDefinition Height="auto"/>
-            </Grid.RowDefinitions>
-            <ScrollViewer Grid.Row="0" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto" FlowDirection="RightToLeft">
-                <ItemsControl HorizontalAlignment="Right" ItemsSource="{Binding OrderedColumnDefinitions}"  VerticalAlignment="Center" Grid.IsSharedSizeScope="True" FlowDirection="LeftToRight"/>
-            </ScrollViewer>            
-            <StackPanel Grid.Row="1" Orientation="Horizontal" VerticalAlignment="Center" Margin="0,30,0,30">
-                <TextBlock VerticalAlignment="Center" FontSize="20">Добавить колонку:</TextBlock>
+
+    <Grid VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="Auto"/>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <ScrollViewer Grid.Row="0" Grid.Column="0" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" FlowDirection="RightToLeft" HorizontalAlignment="Stretch" PanningMode="Both">
+            <ItemsControl HorizontalAlignment="Right" ItemsSource="{Binding OrderedColumnDefinitions}" VerticalAlignment="Center" Grid.IsSharedSizeScope="True" FlowDirection="LeftToRight"/>
+        </ScrollViewer>
+
+        <StackPanel Grid.Row="0" Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Right">
+            <Button Style="{StaticResource MetroButton}" HorizontalAlignment="Right" Width="50" Height="50" Command="{Binding ActivateAnnotationPlaneCommand}">
+                <media:TableIcon></media:TableIcon>
+            </Button>
+            <Button Style="{StaticResource MetroButton}" Command="{Binding ImportFromFileCommnad}" Content="Загрузить столбцы"/>
+            <Button Style="{StaticResource MetroButton}" Command="{Binding ExportToFileCommand}" Content="Сохранить столбцы"/>
+        </StackPanel>
+
+        <ScrollViewer Grid.Row="1" Grid.ColumnSpan="2" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled" VerticalAlignment="Center" Margin="5,10,0,10">
+            <StackPanel Orientation="Horizontal">
+                <TextBlock VerticalAlignment="Center" FontSize="17">Добавить колонку:</TextBlock>
                 <WrapPanel>
                     <Button Style="{StaticResource MetroButton}" Command="{Binding AddDepthCommand}">Шкала глубин</Button>
                     <Button Style="{StaticResource MetroButton}" Command="{Binding AddPhotoCommand}">Фото</Button>
@@ -34,14 +49,7 @@
                     <Button Style="{StaticResource MetroButton}" Command="{Binding AddIconsCommand}">Значки</Button>
                 </WrapPanel>
             </StackPanel>
-        </Grid>
-        <StackPanel VerticalAlignment="Center" HorizontalAlignment="Right">
-            <Button Style="{StaticResource MetroButton}" HorizontalAlignment="Right" Width="50" Height="50" Command="{Binding ActivateAnnotationPlaneCommand}">
-                <media:TableIcon></media:TableIcon>
-            </Button>
-            <Button Style="{StaticResource MetroButton}" Command="{Binding ImportFromFileCommnad}" Content="Загрузить столбцы"/>
-            <Button Style="{StaticResource MetroButton}" Command="{Binding ExportToFileCommand}" Content="Сохранить столбцы"/>
-        </StackPanel>
+        </ScrollViewer>
 
     </Grid>
 </UserControl>

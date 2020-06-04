@@ -37,10 +37,10 @@
     </UserControl.Resources>
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="auto" SharedSizeGroup="ColumnDefinitionWidth1"/>
-            <ColumnDefinition Width="auto" SharedSizeGroup="ColumnDefinitionWidth2"/>
-            <ColumnDefinition Width="auto" SharedSizeGroup="ColumnDefinitionWidth3"/>
-            <ColumnDefinition Width="auto" SharedSizeGroup="ColumnDefinitionWidth4"/>
+            <ColumnDefinition SharedSizeGroup="ColumnDefinitionWidth1" Width="Auto"/>
+            <ColumnDefinition SharedSizeGroup="ColumnDefinitionWidth2" Width="Auto"/>
+            <ColumnDefinition SharedSizeGroup="ColumnDefinitionWidth3" Width="*"/>
+            <ColumnDefinition SharedSizeGroup="ColumnDefinitionWidth4" Width="Auto"/>
         </Grid.ColumnDefinitions>
         <Button FontSize="20" Grid.Column="0" Visibility="{Binding CanMoveLeft,Converter={StaticResource visibilityHiddenConverter}}" CommandParameter="{Binding ColumnOrder}" Command="{Binding MoveLeft}" Style="{StaticResource MetroButton}" Width="50" VerticalAlignment="Center">
             <media:Arrow_In_circle>
@@ -53,8 +53,9 @@
             <media:Arrow_In_circle>
             </media:Arrow_In_circle>
         </Button>
-        <ContentPresenter Grid.Column="2"  Content="{Binding .}" Margin="3" />
-        <Button FontSize="20" Grid.Column="3" Command="{Binding RemoveCommand}"  CommandParameter="{Binding ColumnOrder}" Style="{StaticResource MetroButton}" Width="50" VerticalAlignment="Center">
+        <ContentPresenter Content="{Binding .}" Margin="3" Grid.Column="2"/>
+        <Button FontSize="20" Grid.Column="3" Command="{Binding RemoveCommand}"  CommandParameter="{Binding ColumnOrder}"
+                Style="{StaticResource MetroButton}" Width="50" VerticalAlignment="Center" HorizontalAlignment="Right">
             <media:CrossIcon/>
         </Button>
     </Grid>

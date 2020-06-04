@@ -43,13 +43,13 @@
                     <Polyline Stroke="Black" StrokeThickness="1" StrokeDashCap="Round">
                         <Polyline.Points>
                             <MultiBinding Converter="{StaticResource bottomSidePointsConverter}">
+                                <Binding RelativeSource="{RelativeSource Mode=PreviousData}" Path="BottomSideForm"></Binding>
                                 <Binding Path="Width"></Binding>
-                                <Binding Path="Height"></Binding>
-                                <Binding Path="BottomSideForm"></Binding>
+                                <Binding RelativeSource="{RelativeSource Mode=PreviousData}" Path="Width"></Binding>
                             </MultiBinding>
                         </Polyline.Points>
                         <Polyline.StrokeDashArray>
-                            <Binding Converter="{StaticResource bottomSideStrokeConverter}" Path="BottomSideForm"/>
+                            <Binding Converter="{StaticResource bottomSideStrokeConverter}" Path="BottomSideForm" RelativeSource="{RelativeSource Mode=PreviousData}"/>
                         </Polyline.StrokeDashArray>
                     </Polyline>
                     <Polygon Fill="{Binding BackgroundBrush}" Stroke="Transparent">

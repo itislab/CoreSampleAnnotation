@@ -4,40 +4,43 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:CoreSampleAnnotation.AnnotationPlane.ColumnSettings"
-             mc:Ignorable="d" 
-             d:DesignHeight="300" d:DesignWidth="300">
-    <StackPanel Orientation="Horizontal">
-        <TextBlock VerticalAlignment="Center" FontSize="20"  HorizontalAlignment="Center">Крап</TextBlock>
-        <ComboBox VerticalAlignment="Center" FontSize="20" MinWidth="150" Margin="15" ItemsSource="{Binding AvailableBackgroundImageProps}" SelectedItem="{Binding SelectedBackgroundImageProp}">
-            <ComboBox.ItemTemplate>
-                <DataTemplate>
-                    <TextBlock Text="{Binding PropertyName}" />
-                </DataTemplate>
-            </ComboBox.ItemTemplate>
-        </ComboBox>
-        <TextBlock VerticalAlignment="Center" FontSize="20"  HorizontalAlignment="Center" Margin="15,0,0,0">Ширина</TextBlock>
-        <ComboBox VerticalAlignment="Center" FontSize="20" MinWidth="150" Margin="15" ItemsSource="{Binding AvailableWidthProps}" SelectedItem="{Binding SelectedWidthProp}">
-            <ComboBox.ItemTemplate>
-                <DataTemplate>
-                    <TextBlock Text="{Binding PropertyName}" />
-                </DataTemplate>
-            </ComboBox.ItemTemplate>
-        </ComboBox>
-        <TextBlock VerticalAlignment="Center" FontSize="20"  HorizontalAlignment="Center" Margin="15,0,0,0">Правая граница</TextBlock>
-        <ComboBox VerticalAlignment="Center" FontSize="20" MinWidth="150" Margin="15" ItemsSource="{Binding AvailableRightSideProps}" SelectedItem="{Binding SelectedRightSideProp}">
-            <ComboBox.ItemTemplate>
-                <DataTemplate>
-                    <TextBlock Text="{Binding PropertyName}" />
-                </DataTemplate>
-            </ComboBox.ItemTemplate>
-        </ComboBox>
-        <TextBlock VerticalAlignment="Center" FontSize="20"  HorizontalAlignment="Center" Margin="15,0,0,0">Нижняя граница</TextBlock>
-        <ComboBox VerticalAlignment="Center" FontSize="20" MinWidth="150" Margin="15" ItemsSource="{Binding AvailableBottomSideProps}" SelectedItem="{Binding SelectedBottomSideProp}">
-            <ComboBox.ItemTemplate>
-                <DataTemplate>
-                    <TextBlock Text="{Binding PropertyName}" />
-                </DataTemplate>
-            </ComboBox.ItemTemplate>
-        </ComboBox>
+             mc:Ignorable="d">
+    <StackPanel Orientation="Vertical" HorizontalAlignment="Left" Margin="0,15,0,15">
+        <StackPanel  Orientation="Horizontal" Margin="0,5,0,0">
+            <TextBlock VerticalAlignment="Center" FontSize="20"  HorizontalAlignment="Center">Крап</TextBlock>
+            <ComboBox VerticalAlignment="Center" FontSize="20" MinWidth="150" Margin="5,0,0,0" ItemsSource="{Binding AvailableBackgroundImageProps}" SelectedItem="{Binding SelectedBackgroundImageProp}">
+                <ComboBox.ItemTemplate>
+                    <DataTemplate>
+                        <TextBlock Text="{Binding PropertyName}" />
+                    </DataTemplate>
+                </ComboBox.ItemTemplate>
+            </ComboBox>
+            <TextBlock VerticalAlignment="Center" FontSize="20"  HorizontalAlignment="Center" Margin="5,0,0,0">Ширина</TextBlock>
+            <ComboBox VerticalAlignment="Center" FontSize="20" MinWidth="150" Margin="5,0,0,0" ItemsSource="{Binding AvailableWidthProps}" SelectedItem="{Binding SelectedWidthProp}">
+                <ComboBox.ItemTemplate>
+                    <DataTemplate>
+                        <TextBlock Text="{Binding PropertyName}" />
+                    </DataTemplate>
+                </ComboBox.ItemTemplate>
+            </ComboBox>
+        </StackPanel>
+        <StackPanel  Orientation="Horizontal" Margin="0,5,0,0">
+            <TextBlock VerticalAlignment="Center" FontSize="20"  HorizontalAlignment="Center">Правая граница</TextBlock>
+            <ComboBox VerticalAlignment="Center" FontSize="20" MinWidth="150" Margin="5,0,0,0" ItemsSource="{Binding AvailableRightSideProps}" SelectedItem="{Binding SelectedRightSideProp}">
+                <ComboBox.ItemTemplate>
+                    <DataTemplate>
+                        <TextBlock Text="{Binding PropertyName}" />
+                    </DataTemplate>
+                </ComboBox.ItemTemplate>
+            </ComboBox>
+            <TextBlock VerticalAlignment="Center" FontSize="20"  HorizontalAlignment="Center" Margin="5,0,0,0">Нижняя граница</TextBlock>
+            <ComboBox VerticalAlignment="Center" FontSize="20" MinWidth="150" Margin="5,0,0,0" ItemsSource="{Binding AvailableBottomSideProps}" SelectedItem="{Binding SelectedBottomSideProp}">
+                <ComboBox.ItemTemplate>
+                    <DataTemplate>
+                        <TextBlock Text="{Binding PropertyName}" />
+                    </DataTemplate>
+                </ComboBox.ItemTemplate>
+            </ComboBox>
+        </StackPanel>
     </StackPanel>
 </UserControl>
